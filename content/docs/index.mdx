@@ -1,25 +1,36 @@
 ---
-title: Hello World
-description: Your first document
+title: Documentation
+description: gonest — a NestJS-inspired dependency-injection and HTTP framework for Go
 ---
 
-Welcome to the docs! You can start writing documents in `/content/docs`.
+**gonest** brings modules, providers, controllers, and a full request
+pipeline to Go — the same mental model NestJS gives Node/TypeScript, without
+giving up idiomatic Go.
 
-<Callout type="info">Testing Callout registration.</Callout>
+<Callout type="warn">
+  gonest has no tagged release yet (`v0.x`) and no `LICENSE` file. Read
+  [Installation](/docs/getting-started/installation) before depending on it
+  in production.
+</Callout>
 
-<Steps>
-<Step>First step.</Step>
-<Step>Second step.</Step>
-</Steps>
-
-<Tabs items={['A', 'B']}>
-<Tab value="A">Tab A content.</Tab>
-<Tab value="B">Tab B content.</Tab>
-</Tabs>
-
-## What is Next?
+## Where to start
 
 <Cards>
-  <Card title="Learn more about Next.js" href="https://nextjs.org/docs" />
-  <Card title="Learn more about Fumadocs" href="https://fumadocs.dev" />
+  <Card title="Introduction" description="What gonest is and why it exists." href="/docs/getting-started" />
+  <Card title="Quickstart" description="Your first Module/Provider/Controller in a few steps." href="/docs/getting-started/quickstart" />
+  <Card title="Core Concepts" description="Modules, Providers, Controllers and Dependency Injection." href="/docs/core-concepts" />
+  <Card title="API Reference" description="Signature tables for every exported symbol." href="/docs/api-reference" />
+</Cards>
+
+## Browse by capability
+
+<Cards>
+  <Card title="Request Pipeline" href="/docs/request-pipeline" />
+  <Card title="Validation & Schemas" href="/docs/validation" />
+  <Card title="Multipart & File Uploads" href="/docs/multipart" />
+  <Card title="OpenAPI & Swagger" href="/docs/openapi" />
+  <Card title="Event Emitter" href="/docs/emitter" />
+  <Card title="Scheduler" href="/docs/scheduler" />
+  <Card title="Health Checks" href="/docs/health-checks" />
+  <Card title="Testing" href="/docs/testing" />
 </Cards>
