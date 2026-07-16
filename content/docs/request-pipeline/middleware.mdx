@@ -1,0 +1,40 @@
+---
+title: Middleware
+description: Express-style request middleware
+---
+
+`Middleware` runs before routing — the same mental model as Express
+middleware. Build one with `gonest.NewMiddleware(func(middleware *gonest.Middleware) {...})`.
+
+```go
+var RequestIdMiddleware = gonest.NewMiddleware(func(middleware *gonest.Middleware) {
+  middleware.Handler(func(ctx *gonest.RestContext, next gonest.Next) {
+    ctx.SetHeader("X-Request-Id", "...")
+    next(ctx)
+  })
+})
+```
+
+Calling `next(ctx)` continues the chain. **Omitting it short-circuits** the
+request — nothing downstream runs.
+
+## Global vs. controller-scoped
+
+```go
+var AppModule = gonest.NewModule(func(module *gonest.Module) {
+  module.Use(RequestIdMiddleware) // global — root module only
+})
+
+var UserController = gonest.NewController(func(controller *gonest.Controller) {
+  controller.Use(SomeOtherMiddleware) // controller-scoped
+})
+```
+
+Global middleware (`Module.Use`, root module only) always runs **before**
+controller-level middleware (`Controller.Use`).
+
+## Next steps
+
+<Cards>
+  <Card title="Guards" href="/docs/request-pipeline/guards" />
+</Cards>

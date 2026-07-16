@@ -1,0 +1,34 @@
+---
+title: Interceptors
+description: AOP-style before/after wrapping around the handler
+---
+
+An `Interceptor` wraps the Handler AOP-style. Build one with
+`gonest.NewInterceptor(func(interceptor *gonest.Interceptor) {...})`.
+
+```go
+var TimingInterceptor = gonest.NewInterceptor(func(interceptor *gonest.Interceptor) {
+  interceptor.Handler(func(ctx *gonest.RestContext, next gonest.InterceptorNext) {
+    // code here runs BEFORE the handler
+    next(ctx)
+    // code here runs AFTER the handler
+  })
+})
+```
+
+Interceptors run after Guards and wrap the Handler plus everything nested in
+it. They're **controller-scoped only**.
+
+## Applying an interceptor
+
+```go
+var UserController = gonest.NewController(func(controller *gonest.Controller) {
+  controller.Interceptors(TimingInterceptor)
+})
+```
+
+## Next steps
+
+<Cards>
+  <Card title="Filters & Exceptions" href="/docs/request-pipeline/filters" />
+</Cards>

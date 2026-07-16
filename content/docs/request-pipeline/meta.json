@@ -1,4 +1,4 @@
 {
   "title": "Request Pipeline",
-  "pages": ["index"]
+  "pages": ["index", "middleware", "guards", "interceptors", "filters", "exceptions"]
 }
