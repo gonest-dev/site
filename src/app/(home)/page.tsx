@@ -1,5 +1,19 @@
 import Link from 'next/link';
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
+import { Card, Cards } from 'fumadocs-ui/components/card';
+
+const capabilities = [
+  { title: 'Dependency Injection', description: 'Modules, providers, and 3 DI scopes.', href: '/docs/core-concepts' },
+  { title: 'Request Pipeline', description: 'Middleware, guards, interceptors, filters.', href: '/docs/request-pipeline' },
+  { title: 'Validation & Schemas', description: 'Type-safe builders via generics, no struct tags.', href: '/docs/validation' },
+  { title: 'Multipart Streaming', description: 'True streaming file uploads, no buffering.', href: '/docs/multipart' },
+  { title: 'OpenAPI & Swagger', description: 'Generate docs from the same schemas that validate.', href: '/docs/openapi' },
+  { title: 'Event Emitter', description: 'Typed, fire-and-forget events between providers.', href: '/docs/emitter' },
+  { title: 'Scheduler', description: 'Cron, interval, and timeout jobs.', href: '/docs/scheduler' },
+  { title: 'Health Checks', description: 'Terminus-style readiness and liveness routes.', href: '/docs/health-checks' },
+  { title: 'Testing', description: 'In-memory bootstrap, provider overrides, assertions.', href: '/docs/testing' },
+  { title: 'Type-safe Builders', description: 'Fields identified by pointer, not string tags.', href: '/docs/validation' },
+];
 
 const quickstart = `package main
 
@@ -59,6 +73,11 @@ export default function HomePage() {
       <div className="w-full max-w-2xl text-left mt-4">
         <DynamicCodeBlock lang="go" code={quickstart} />
       </div>
+      <Cards className="w-full max-w-4xl text-left mt-12">
+        {capabilities.map((c) => (
+          <Card key={c.title} title={c.title} description={c.description} href={c.href} />
+        ))}
+      </Cards>
     </div>
   );
 }
