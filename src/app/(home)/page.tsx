@@ -77,7 +77,7 @@ export default function HomePage() {
               'radial-gradient(circle at 15% 20%, hsla(158, 64%, 45%, 0.25), transparent 45%)',
           }}
         />
-        <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 lg:grid-cols-2 lg:items-center lg:py-28">
+        <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 lg:grid-cols-2 lg:items-start lg:py-28">
           <div className="flex flex-col gap-6">
             <span className="w-fit rounded-full border border-fd-border bg-fd-secondary px-3 py-1 text-xs font-medium text-fd-secondary-foreground">
               NestJS-inspired, built for Go
@@ -116,7 +116,7 @@ export default function HomePage() {
               <span className="size-2.5 rounded-full bg-green-500/70" />
               <span className="ml-2 text-xs text-fd-muted-foreground">main.go</span>
             </div>
-            <div className="text-left text-sm [&_pre]:!bg-transparent [&_pre]:!m-0">
+            <div className="max-h-[420px] overflow-y-auto text-left text-xs leading-relaxed [&_pre]:!m-0 [&_pre]:!bg-transparent [&_pre]:!py-4">
               <DynamicCodeBlock lang="go" code={quickstart} />
             </div>
           </div>
