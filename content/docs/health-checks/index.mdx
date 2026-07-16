@@ -1,6 +1,54 @@
 ---
 title: Health Checks
-description: Terminus-style readiness and liveness checks
+description: Terminus-style readiness and liveness routes
 ---
 
-Placeholder — content written in a later task (see `.specs/features/docs-site/tasks.md` T36).
+There's no dedicated bootstrap type for health checks — a health check is
+deliberately just a normal `Controller`, mirroring how NestJS's own Terminus
+module works conceptually.
+
+```go
+type Pingable interface {
+  Name() string
+  Ping(ctx context.Context) error
+}
+
+var HealthController = gonest.NewController(func(controller *gonest.Controller) {
+  controller.Path("/health")
+  pingables := gonest.MustInjectAll[Pingable](controller)
+
+  controller.RouteGet("/readyz", func(route *gonest.Route) {
+    route.Handler(func(ctx *gonest.RestContext) {
+      status := gonest.HttpStatusOk
+      for _, p := range pingables {
+        if p.Ping(context.Background()) != nil {
+          status = gonest.HttpStatusServiceUnavailable
+        }
+      }
+      ctx.Status(status).Json(map[string]string{"status": "ok"})
+    })
+  })
+
+  controller.RouteGet("/livez", func(route *gonest.Route) {
+    route.Handler(func(ctx *gonest.RestContext) {
+      ctx.Status(gonest.HttpStatusOk).SendString("OK")
+    })
+  })
+})
+```
+
+- **`/readyz`** (readiness): pings every registered `Pingable` via
+  [`MustInjectAll`](/docs/core-concepts/dependency-injection) — 200 if all are
+  up, 503 if any is down.
+- **`/livez`** (liveness): a static 200 via `ctx.Status(...).SendString("OK")` —
+  a raw, non-JSON body proving the process isn't deadlocked.
+
+`Context.SendString(s string) error` and the `gonest.HttpStatusOk` /
+`gonest.HttpStatusServiceUnavailable` constants are general-purpose
+primitives, not Terminus-specific.
+
+## Next steps
+
+<Cards>
+  <Card title="Testing" href="/docs/testing" />
+</Cards>

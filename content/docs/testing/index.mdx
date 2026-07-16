@@ -1,6 +1,59 @@
 ---
 title: Testing
-description: In-memory test bootstrap, provider overrides and assertions
+description: In-memory bootstrap, provider overrides, and assertions
 ---
 
-Placeholder — content written in a later task (see `.specs/features/docs-site/tasks.md` T37).
+```go
+func TestUserController_Get(t *testing.T) {
+  tester := gonest.MustNewTestApp(UserModule, func(b *gonest.TestBuilder) {
+    gonest.MustOverride[IUserService](b, &UserServiceMock{ /* ... */ })
+  })
+  defer tester.Close()
+
+  res := tester.MustRequest(gonest.HttpGet, "/users/42", nil)
+  res.AssertStatus(t, gonest.HttpStatusOk)
+  res.AssertJsonPath(t, "id", int64(42))
+}
+```
+
+## `MustNewTestApp(module, fn)`
+
+Runs the **same** three-phase bootstrap as `MustNewApp`, minus starting a
+real HTTP listener — routes are registered for in-memory dispatch.
+
+## `MustOverride[T](builder, mockValue)`
+
+Substitutes a provider's real constructor with a mock, keyed by `T`'s
+`reflect.Type`.
+
+<Callout type="warn">
+  `T` **must be an interface**. Go can't swap a concrete `*struct`'s behavior
+  at runtime — there's no vtable to redirect. Services meant to be mockable
+  in tests must be injected/exposed by interface, not by concrete pointer.
+</Callout>
+
+## Dispatching requests
+
+`tester.MustRequest(method, path, body)` dispatches an in-memory request — no
+real network port — against the test app. `body` is JSON-encoded if non-nil.
+
+Root HTTP-verb aliases used in tests/dispatch:
+`gonest.HttpMethod`, `HttpGet`, `HttpPost`, `HttpPut`, `HttpDelete`, `HttpQuery`.
+
+## Assertions
+
+`TestResponse.AssertStatus(t, want)` and `AssertJsonPath(t, path, want)`
+(dot-notation, e.g. `"id"`, `"address.zip"`) fail the test with a clear
+message on mismatch.
+
+<Callout type="info">
+  See [`.examples`](https://github.com/gonest-dev/gonest/tree/main/.examples)
+  in the gonest repo for both a minimal and a denser full example exercising
+  these testing helpers.
+</Callout>
+
+## Next steps
+
+<Cards>
+  <Card title="API Reference" href="/docs/api-reference" />
+</Cards>
