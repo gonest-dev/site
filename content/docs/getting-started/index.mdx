@@ -3,4 +3,55 @@ title: Introduction
 description: What gonest is and why it exists
 ---
 
-Placeholder — content written in a later task (see `.specs/features/docs-site/tasks.md` T13).
+**gonest** is a NestJS-inspired dependency-injection and HTTP framework for Go
+(`github.com/gonest-dev/gonest`). It gives Go the same developer experience that
+NestJS gives Node/TypeScript: modules, providers, controllers, a request pipeline
+(middleware/guard/interceptor/filter), and metadata-driven validation + OpenAPI
+generation — without giving up idiomatic Go.
+
+<Callout type="warn">
+  gonest has no tagged release yet (`v0.x`, no stable version guarantee) and no
+  `LICENSE` file. Track this before depending on it in production.
+</Callout>
+
+## Why gonest
+
+Existing Go web frameworks (Gin, Echo, plain Fiber) force teams to relearn a
+mental model from scratch — no structured DI, no modules, no
+exception-to-HTTP-response convention. gonest replicates the Nest patterns that
+JS/TS developers already know, lowering the barrier for teams migrating a
+backend to Go.
+
+## Design philosophy
+
+- **No decorators, no struct tags for shape.** Go has neither macros nor
+  decorators, so gonest uses **generics + builder functions**
+  (`gonest.NewX(func(x *gonest.X) {...})`) instead of `@Decorator()` syntax.
+- **Fields are identified by their own pointer.** `m.Property(&t.Id)` uses the
+  field's address — not a string name or a struct tag — so renames stay
+  type-safe and refactor-proof.
+- **One declaration, multiple consumers.** The same `*Schema` built via
+  `NewSchema[T]` drives both runtime validation (`MustParseRestXxx`) **and**
+  OpenAPI generation (`Route.RequestBody`/`Route.Response`) — never two
+  parallel declarations to keep in sync.
+- **Zero magic in the hot path.** Reflection is used only where Go genuinely
+  requires it (e.g. reading a field's type via `Property(&t.X)`), never as a
+  substitute for an explicit builder call.
+- **Three-phase bootstrap.** Provider resolution → Controller declaration →
+  Pipeline-stage declaration, so `MustInject` inside any builder is always a
+  direct, already-resolved lookup — never a placeholder. See
+  [Bootstrap](/docs/getting-started/bootstrap) for details.
+
+## v1 scope
+
+gonest v1 ships exactly one `HttpAdapter`: `gonest.FiberApp` (backed by
+[Fiber](https://gofiber.io) v3). Multi-adapter support (`net/http`, Echo, Gin),
+CLI scaffolding, a microservices/transport layer, and GraphQL/gRPC are
+explicitly out of scope for v1.
+
+## Next steps
+
+<Cards>
+  <Card title="Installation" href="/docs/getting-started/installation" />
+  <Card title="Quickstart" href="/docs/getting-started/quickstart" />
+</Cards>

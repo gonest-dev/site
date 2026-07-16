@@ -1,0 +1,26 @@
+---
+title: Installation
+description: Add gonest to a Go module
+---
+
+gonest requires **Go 1.18+** (generics are used throughout the builder API).
+
+```bash
+go get github.com/gonest-dev/gonest
+```
+
+<Callout type="warn">
+  No stable version tag exists yet. The planned versioning scheme is
+  `v0.{major}-{minor}.{release}` — v0 stays fixed forever to avoid Go's v2+
+  import-path-suffix rule and to keep signaling "no stability guarantee" until
+  a first tagged release ships.
+</Callout>
+
+gonest's only runtime HTTP dependency is [Fiber](https://gofiber.io) v3
+(`github.com/gofiber/fiber`), pulled in automatically via `gonest.FiberApp`.
+
+## Next steps
+
+<Cards>
+  <Card title="Quickstart" href="/docs/getting-started/quickstart" />
+</Cards>

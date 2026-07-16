@@ -1,0 +1,63 @@
+---
+title: Project Structure & Bootstrap
+description: How MustNewApp wires everything together
+---
+
+`gonest.MustNewApp[gonest.FiberApp](RootModule, gonest.AppOptions{})` runs a
+strict three-phase bootstrap:
+
+<Steps>
+
+<Step>
+
+### Phase 1 — Provider resolution
+
+Every `Provider` across the module tree is resolved. Independent providers are
+resolved **in parallel** via `golang.org/x/sync/errgroup`.
+
+</Step>
+
+<Step>
+
+### Phase 2 — Controller declaration
+
+Every `Controller` builder runs exactly once. Because Phase 1 already
+finished, `MustInject` calls inside a controller builder are always resolving
+against a complete, already-built DI graph — never a placeholder.
+
+</Step>
+
+<Step>
+
+### Phase 3 — Pipeline-stage declaration
+
+Every `Middleware`, `Guard`, `Interceptor`, and `Filter` builder runs exactly
+once, scoped to the union of every referencing module's own + exported
+providers.
+
+</Step>
+
+</Steps>
+
+<Callout type="info">
+  This ordering is why `MustInject` never needs a lazy/deferred-resolution
+  mechanism: by the time any builder body executes, everything it could
+  legally depend on already exists.
+</Callout>
+
+## AppOptions
+
+`app.MustListen(":3000")` blocks the calling goroutine. `AppOptions` accepts:
+
+- `BufferLogs` — buffer log output during bootstrap.
+- `LogLevels` — configure log verbosity.
+- `DisableBanner` — suppress the startup banner.
+- `DisableLoaded` — suppress the "routes loaded" summary.
+- `EnableFormStreaming` — app-wide toggle for multipart streaming (see
+  [Multipart Form Streaming](/docs/multipart)).
+
+## Next steps
+
+<Cards>
+  <Card title="Core Concepts" href="/docs/core-concepts" />
+</Cards>
