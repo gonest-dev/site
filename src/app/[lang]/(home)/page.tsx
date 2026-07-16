@@ -14,10 +14,11 @@ import {
 } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { getHomeDictionary } from '@/lib/home-dictionary';
+import { VersionBadge } from '@/components/version-badge';
 
 const quickstart = `package main
 
-import "github.com/gonest-dev/gonest"
+import "gonest.dev/gonest"
 
 type Service struct{}
 
@@ -77,9 +78,12 @@ export default async function HomePage({ params }: PageProps<'/[lang]'>) {
         />
         <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 lg:grid-cols-2 lg:items-start lg:py-28">
           <div className="flex flex-col gap-6">
-            <span className="w-fit rounded-full border border-fd-border bg-fd-secondary px-3 py-1 text-xs font-medium text-fd-secondary-foreground">
-              {t.badge}
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="w-fit rounded-full border border-fd-border bg-fd-secondary px-3 py-1 text-xs font-medium text-fd-secondary-foreground">
+                {t.badge}
+              </span>
+              <VersionBadge />
+            </div>
             <h1 className="text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
               gonest
               <span className="block text-fd-muted-foreground">{t.heroTagline}</span>
