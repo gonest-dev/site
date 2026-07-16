@@ -18,32 +18,29 @@ const quickstart = `package main
 
 import "github.com/gonest-dev/gonest"
 
-type UserService struct{}
-
-func (s *UserService) List() []string { return []string{"Ada", "Grace"} }
-
-var UserProvider = gonest.NewProvider(func(provider *gonest.Provider) {
-  provider.Constructor(func() *UserService { return &UserService{} })
+type Service struct{}
+func (s *Service) Hello() string { return "Hello World" }
+var Provider = gonest.NewProvider(func(p *gonest.Provider) {
+  p.Constructor(func() *Service { return &Service{} })
 })
 
-var UserController = gonest.NewController(func(controller *gonest.Controller) {
-  controller.Path("/users")
-  userService := gonest.MustInject[*UserService](controller)
-
-  controller.RouteGet("/", func(route *gonest.Route) {
-    route.Handler(func(ctx *gonest.RestContext) {
-      ctx.Json(userService.List())
+var Controller = gonest.NewController(func(c *gonest.Controller) {
+  c.Path("/")
+  service := gonest.MustInject[*Service](c)
+  c.RouteGet("/", func(r *gonest.Route) {
+    r.Handler(func(ctx *gonest.RestContext) { 
+      ctx.Json(service.Hello()) 
     })
   })
 })
 
-var UserModule = gonest.NewModule(func(module *gonest.Module) {
-  module.Providers(UserProvider)
-  module.Controllers(UserController)
+var Module = gonest.NewModule(func(m *gonest.Module) {
+  m.Providers(Provider)
+  m.Controllers(Controller)
 })
 
 func main() {
-  app := gonest.MustNewApp[gonest.FiberApp](UserModule, gonest.AppOptions{})
+  app := gonest.MustNewApp[gonest.FiberApp](Module, gonest.AppOptions{})
   app.MustListen(":3000")
 }`;
 
@@ -53,17 +50,17 @@ const capabilities: {
   description: string;
   href: string;
 }[] = [
-  { icon: Box, title: 'Dependency Injection', description: 'Modules, providers, and 3 DI scopes.', href: '/docs/core-concepts' },
-  { icon: Workflow, title: 'Request Pipeline', description: 'Middleware, guards, interceptors, filters.', href: '/docs/request-pipeline' },
-  { icon: ShieldCheck, title: 'Validation & Schemas', description: 'Type-safe builders via generics, no struct tags.', href: '/docs/validation' },
-  { icon: Upload, title: 'Multipart Streaming', description: 'True streaming file uploads, no buffering.', href: '/docs/multipart' },
-  { icon: FileJson, title: 'OpenAPI & Swagger', description: 'Generate docs from the same schemas that validate.', href: '/docs/openapi' },
-  { icon: Radio, title: 'Event Emitter', description: 'Typed, fire-and-forget events between providers.', href: '/docs/emitter' },
-  { icon: Clock, title: 'Scheduler', description: 'Cron, interval, and timeout jobs.', href: '/docs/scheduler' },
-  { icon: HeartPulse, title: 'Health Checks', description: 'Terminus-style readiness and liveness routes.', href: '/docs/health-checks' },
-  { icon: FlaskConical, title: 'Testing', description: 'In-memory bootstrap, provider overrides, assertions.', href: '/docs/testing' },
-  { icon: Fingerprint, title: 'Type-safe Builders', description: 'Fields identified by pointer, not string tags.', href: '/docs/validation' },
-];
+    { icon: Box, title: 'Dependency Injection', description: 'Modules, providers, and 3 DI scopes.', href: '/docs/core-concepts' },
+    { icon: Workflow, title: 'Request Pipeline', description: 'Middleware, guards, interceptors, filters.', href: '/docs/request-pipeline' },
+    { icon: ShieldCheck, title: 'Validation & Schemas', description: 'Type-safe builders via generics, no struct tags.', href: '/docs/validation' },
+    { icon: Upload, title: 'Multipart Streaming', description: 'True streaming file uploads, no buffering.', href: '/docs/multipart' },
+    { icon: FileJson, title: 'OpenAPI & Swagger', description: 'Generate docs from the same schemas that validate.', href: '/docs/openapi' },
+    { icon: Radio, title: 'Event Emitter', description: 'Typed, fire-and-forget events between providers.', href: '/docs/emitter' },
+    { icon: Clock, title: 'Scheduler', description: 'Cron, interval, and timeout jobs.', href: '/docs/scheduler' },
+    { icon: HeartPulse, title: 'Health Checks', description: 'Terminus-style readiness and liveness routes.', href: '/docs/health-checks' },
+    { icon: FlaskConical, title: 'Testing', description: 'In-memory bootstrap, provider overrides, assertions.', href: '/docs/testing' },
+    { icon: Fingerprint, title: 'Type-safe Builders', description: 'Fields identified by pointer, not string tags.', href: '/docs/validation' },
+  ];
 
 export default function HomePage() {
   return (
@@ -74,7 +71,7 @@ export default function HomePage() {
           className="pointer-events-none absolute inset-0 -z-10 opacity-40"
           style={{
             backgroundImage:
-              'radial-gradient(circle at 15% 20%, hsla(158, 64%, 45%, 0.25), transparent 45%)',
+              'radial-gradient(circle at 15% 20%, hsla(198, 90%, 48%, 0.25), transparent 45%)',
           }}
         />
         <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 lg:grid-cols-2 lg:items-start lg:py-28">
