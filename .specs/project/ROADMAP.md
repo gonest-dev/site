@@ -87,9 +87,30 @@
 
 ---
 
+## M5 — Internationalization (en / pt / es)
+
+**Goal:** Site serves en (default), pt, and es under explicit locale-prefixed
+routes (`/en/...`, `/pt/...`, `/es/...`), static-export compatible (no
+Middleware). Home page + full Getting Started section translated; every
+other page falls back to English automatically. See
+`.specs/features/i18n/spec.md`.
+
+### Features
+
+**i18n** - PLANNED
+
+- `defineI18n` config + locale-aware source loader
+- Routes restructured under `app/[lang]/...` (home, docs, search, OG images, llms.\*)
+- Root `/` redirect page (browser-language-based, no Middleware)
+- Per-locale static search index
+- Home page + Getting Started (5 pages) translated to pt and es
+- Remaining ~38 pages ship infra-ready, English-fallback until translated (tracked below)
+
+---
+
 ## Future Considerations
 
 - Versioned docs once gonest ships a tagged release
-- i18n
+- Remaining ~38 pages translated to pt and es (Core Concepts, Request Pipeline, Validation, Multipart, OpenAPI, Emitter, Scheduler, Health Checks, Testing, API Reference)
 - Release notes / changelog page
 - Community/contribution pages
