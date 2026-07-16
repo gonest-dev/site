@@ -42,7 +42,7 @@ var Module = gonest.NewModule(func(m *gonest.Module) {
 })
 
 func main() {
-  app := gonest.MustNewApp[gonest.FiberApp](Module, gonest.AppOptions{})
+  app := gonest.MustNewApp[gonest.FiberApp](Module)
   app.MustListen(":3000")
 }`;
 
