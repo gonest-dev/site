@@ -1,0 +1,20 @@
+---
+title: Module
+description: gonest.NewModule reference
+---
+
+`gonest.NewModule(func(module *gonest.Module) {...})`
+
+| Method | Description |
+|---|---|
+| `Providers(...)` | Register providers owned by this module. |
+| `Controllers(...)` | Register controllers owned by this module. |
+| `Imports(...)` | Import other modules, gaining access to their exported providers. |
+| `Exports(...)` | Expose providers to modules that import this one. |
+| `Use(...)` | Register global middleware. Root module only. |
+| `Filters(...)` | Register global exception filters. Root module only. |
+| `Listeners(...)` | Register event listeners. |
+| `Schedulers(...)` | Register scheduler jobs. |
+| `Name("...")` | Set a readable name used in error messages. |
+
+See: [Modules](/docs/core-concepts/modules)

@@ -1,0 +1,15 @@
+---
+title: Filter
+description: gonest.NewFilter reference
+---
+
+`gonest.NewFilter(func(filter *gonest.Filter) {...})`
+
+| Method | Description |
+|---|---|
+| `Catch(exemplar, handler)` | Matches by exact concrete type of the panic value (`reflect.TypeOf`). |
+
+Applied via `Controller.Filters(...)` or `Module.Filters(...)` (global, root only).
+Controller-level wins over global for the same caught type. Wraps the entire pipeline.
+
+See: [Filters](/docs/request-pipeline/filters)

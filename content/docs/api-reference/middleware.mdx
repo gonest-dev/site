@@ -1,0 +1,14 @@
+---
+title: Middleware
+description: gonest.NewMiddleware reference
+---
+
+`gonest.NewMiddleware(func(middleware *gonest.Middleware) {...})`
+
+| Method | Description |
+|---|---|
+| `Handler(func(ctx *gonest.RestContext, next gonest.Next))` | `next(ctx)` continues the chain; omitting it short-circuits. |
+
+Applied via `Module.Use(...)` (global, root only) or `Controller.Use(...)` (controller-scoped).
+
+See: [Middleware](/docs/request-pipeline/middleware)

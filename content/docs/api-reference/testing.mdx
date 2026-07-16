@@ -1,0 +1,15 @@
+---
+title: Testing
+description: MustNewTestApp and TestResponse reference
+---
+
+| Symbol | Description |
+|---|---|
+| `MustNewTestApp(module, func(b *gonest.TestBuilder) {...})` | Runs the 3-phase bootstrap without starting a real listener. |
+| `MustOverride[T](builder, mockValue)` | Substitutes a provider's constructor with a mock. `T` must be an interface. |
+| `tester.MustRequest(method, path, body)` | In-memory request dispatch; `body` JSON-encoded if non-nil. |
+| `TestResponse.AssertStatus(t, want)` | Asserts response status. |
+| `TestResponse.AssertJsonPath(t, path, want)` | Asserts a dot-notation JSON path (e.g. `"address.zip"`). |
+| `gonest.HttpMethod`, `HttpGet`, `HttpPost`, `HttpPut`, `HttpDelete`, `HttpQuery` | HTTP verb aliases for dispatch. |
+
+See: [Testing](/docs/testing)

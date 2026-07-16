@@ -1,0 +1,14 @@
+---
+title: Interceptor
+description: gonest.NewInterceptor reference
+---
+
+`gonest.NewInterceptor(func(interceptor *gonest.Interceptor) {...})`
+
+| Method | Description |
+|---|---|
+| `Handler(func(ctx *gonest.RestContext, next gonest.InterceptorNext))` | Code before `next(ctx)` runs before the handler; code after runs after. |
+
+Applied via `Controller.Interceptors(...)`. Controller-scoped only.
+
+See: [Interceptors](/docs/request-pipeline/interceptors)

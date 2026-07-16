@@ -1,0 +1,20 @@
+---
+title: Provider
+description: gonest.NewProvider reference
+---
+
+`gonest.NewProvider(func(provider *gonest.Provider) {...})`
+
+| Method | Description |
+|---|---|
+| `Scope(gonest.ScopeSingleton \| ScopeTransient \| ScopeRequest)` | Set instance lifetime. |
+| `Constructor(fn)` | `fn` is one of `func() T`, `func() (T, error)`, `func(ctx) T`, `func(ctx) (T, error)`. |
+
+## Resolution functions
+
+| Function | Behavior |
+|---|---|
+| `MustInject[T](owner)` | Resolves exactly one match; panics on 0 or N. |
+| `MustInjectAll[T](owner)` | Resolves every match; never panics. |
+
+See: [Providers & DI Scopes](/docs/core-concepts/providers), [Dependency Injection](/docs/core-concepts/dependency-injection)

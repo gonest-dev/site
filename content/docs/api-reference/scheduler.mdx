@@ -1,0 +1,17 @@
+---
+title: Scheduler
+description: gonest.NewScheduler reference
+---
+
+`gonest.NewScheduler(func(scheduler *gonest.Scheduler) {...})`
+
+| Method | Description |
+|---|---|
+| `Cron(name, expr, fn)` | 5-field cron expression (via `robfig/cron/v3`). |
+| `Interval(name, dur, fn)` | Repeats every duration. |
+| `Timeout(name, dur, fn)` | Fires exactly once. |
+| `Stop(name)` | Cancels a running job. |
+
+Each job execution is isolated: its own `recover`, its own goroutine.
+
+See: [Scheduler](/docs/scheduler)
