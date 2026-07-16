@@ -12,6 +12,7 @@ import { getMDXComponents } from '@/components/mdx';
 import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { gitConfig } from '@/lib/shared';
+import { LocalizedLink } from '@/components/localized-link';
 
 export default async function Page(props: PageProps<'/[lang]/docs/[[...slug]]'>) {
   const params = await props.params;
@@ -35,8 +36,11 @@ export default async function Page(props: PageProps<'/[lang]/docs/[[...slug]]'>)
       <DocsBody>
         <MDX
           components={getMDXComponents({
-            // this allows you to link to other pages with relative file paths
-            a: createRelativeLink(source, page),
+            // this allows you to link to other pages with relative file paths;
+            // LocalizedLink then prefixes the current locale onto any
+            // hrefs that resolveHref left absolute (e.g. /docs/... links
+            // authored before i18n existed)
+            a: createRelativeLink(source, page, LocalizedLink),
           })}
         />
       </DocsBody>
