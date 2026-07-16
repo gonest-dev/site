@@ -73,7 +73,7 @@ export default async function HomePage({ params }: PageProps<'/[lang]'>) {
           className="pointer-events-none absolute inset-0 -z-10 opacity-40"
           style={{
             backgroundImage:
-              'radial-gradient(circle at 15% 20%, hsla(198, 90%, 48%, 0.25), transparent 45%)',
+              'radial-gradient(circle at 15% 20%, hsla(187, 81%, 41%, 0.22), transparent 45%), radial-gradient(circle at 85% 75%, hsla(347, 75%, 56%, 0.1), transparent 40%)',
           }}
         />
         <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 lg:grid-cols-2 lg:items-start lg:py-28">
