@@ -1,0 +1,62 @@
+---
+title: Estructura del Proyecto & Bootstrap
+description: Cómo MustNewApp conecta todo
+---
+
+`gonest.MustNewApp[gonest.FiberApp](RootModule, gonest.AppOptions{})` ejecuta una
+inicialización estricta en tres fases:
+
+<Steps>
+
+<Step>
+
+### Fase 1 — Resolución de proveedores (Providers)
+
+Cada `Provider` en todo el árbol de módulos se resuelve. Los proveedores independientes se
+resuelven **en paralelo** a través de `golang.org/x/sync/errgroup`.
+
+</Step>
+
+<Step>
+
+### Fase 2 — Declaración de controladores (Controllers)
+
+Cada builder de `Controller` se ejecuta exactamente una vez. Como la Fase 1 ya
+finalizó, las llamadas a `MustInject` dentro del builder del controlador siempre se resuelven
+con respecto a un grafo de inyección de dependencias completo y ya construido, nunca un placeholder.
+
+</Step>
+
+<Step>
+
+### Fase 3 — Declaración de las etapas del pipeline
+
+Cada builder de `Middleware`, `Guard`, `Interceptor` y `Filter` se ejecuta exactamente
+una vez, con un alcance limitado a la unión de todos los proveedores propios + exportados de los módulos que los referencian.
+
+</Step>
+
+</Steps>
+
+<Callout type="info">
+  Este orden es el motivo por el cual `MustInject` nunca requiere un mecanismo de resolución
+  perezosa/diferida (lazy/deferred-resolution): para cuando se ejecuta el cuerpo de cualquier builder, todo de lo que podría
+  depender legalmente ya existe.
+</Callout>
+
+## AppOptions
+
+`app.MustListen(":3000")` bloquea la goroutine que realiza la llamada. `AppOptions` acepta:
+
+- `BufferLogs` — almacena en búfer la salida de log durante el bootstrap.
+- `LogLevels` — configura la verbosidad del log.
+- `DisableBanner` — suprime el banner de inicio.
+- `DisableLoaded` — suprime el resumen de "rutas cargadas".
+- `EnableFormStreaming` — interruptor global de la app para streaming multipart (consulta
+  [Streaming de Formularios Multipart](/docs/multipart)).
+
+## Próximos pasos
+
+<Cards>
+  <Card title="Conceptos Básicos" href="/docs/core-concepts" />
+</Cards>

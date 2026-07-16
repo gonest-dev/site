@@ -1,0 +1,49 @@
+---
+title: Introducción
+description: Qué es gonest y por qué existe
+---
+
+**gonest** es un framework de inyección de dependencias y HTTP para Go inspirado en NestJS
+(`github.com/gonest-dev/gonest`). Aporta a Go la misma experiencia de desarrollo que
+NestJS ofrece a Node/TypeScript: módulos, proveedores, controladores, un pipeline de solicitudes
+(middleware/guard/interceptor/filter) y validación basada en metadatos + generación automática de OpenAPI
+— todo esto sin renunciar a un Go idiomático.
+
+<Callout type="warn">
+  gonest aún no tiene un lanzamiento etiquetado (`v0.x`, sin garantía de versión estable) y no
+  tiene un archivo de `LICENSE`. Realiza un seguimiento de esto antes de depender de él en producción.
+</Callout>
+
+## Por qué gonest
+
+Los frameworks web de Go existentes (Gin, Echo, Fiber puro) obligan a los equipos a reaprender un
+modelo mental desde cero: sin inyección de dependencias estructurada, sin módulos y sin convención de excepción para respuesta HTTP.
+gonest replica los patrones de Nest que los desarrolladores de JS/TS ya conocen, reduciendo la barrera de entrada para los equipos que migran un backend a Go.
+
+## Filosofía de diseño
+
+- **Sin decoradores, sin struct tags para dar forma.** Go no tiene macros ni
+  decoradores, por lo que gonest utiliza **generics + funciones constructoras (builder functions)**
+  (`gonest.NewX(func(x *gonest.X) {...})`) en lugar de la sintaxis `@Decorator()`.
+- **Los campos se identifican por su propio puntero.** `m.Property(&t.Id)` utiliza la
+  dirección del campo — no un nombre en cadena o una struct tag — por lo que los renombres siguen siendo type-safe y a prueba de refactorizaciones.
+- **Una declaración, múltiples consumidores.** El mismo `*Schema` construido a través de
+  `NewSchema[T]` gestiona tanto la validación en tiempo de ejecución (`MustParseRestXxx`) **como** la
+  generación de OpenAPI (`Route.RequestBody`/`Route.Response`), evitando la necesidad de mantener dos declaraciones paralelas sincronizadas.
+- **Cero magia en el camino crítico (hot path).** La reflexión (reflection) se utiliza únicamente donde Go realmente
+  lo requiere (por ejemplo, leer el tipo de un campo a través de `Property(&t.X)`), nunca como sustituto de una llamada explícita al builder.
+- **Bootstrap en tres fases.** Resolución de Proveedores → Declaración de Controladores →
+  Declaración de las Etapas del Pipeline, de modo que `MustInject` dentro de cualquier builder siempre realiza una búsqueda directa y ya resuelta, nunca un placeholder. Consulta
+  [Bootstrap](/docs/getting-started/bootstrap) para más detalles.
+
+## Alcance de la v1
+
+gonest v1 incluye exactamente un único `HttpAdapter`: `gonest.FiberApp` (basado en
+[Fiber](https://gofiber.io) v3). El soporte multiadaptador (`net/http`, Echo, Gin), scaffolding a través de CLI, capa de microservicios/transporte y GraphQL/gRPC están explícitamente fuera del alcance de la v1.
+
+## Próximos pasos
+
+<Cards>
+  <Card title="Instalación" href="/docs/getting-started/installation" />
+  <Card title="Inicio Rápido" href="/docs/getting-started/quickstart" />
+</Cards>

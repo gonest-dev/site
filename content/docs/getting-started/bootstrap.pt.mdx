@@ -1,0 +1,62 @@
+---
+title: Estrutura do Projeto & Bootstrap
+description: Como o MustNewApp conecta tudo
+---
+
+`gonest.MustNewApp[gonest.FiberApp](RootModule, gonest.AppOptions{})` executa uma
+inicialização estrita em três fases:
+
+<Steps>
+
+<Step>
+
+### Fase 1 — Resolução de Provedores (Providers)
+
+Cada `Provider` em toda a árvore de módulos é resolvido. Provedores independentes são
+resolvidos **em paralelo** via `golang.org/x/sync/errgroup`.
+
+</Step>
+
+<Step>
+
+### Fase 2 — Declaração de Controladores (Controllers)
+
+Cada builder de `Controller` é executado exatamente uma vez. Como a Fase 1 já
+foi concluída, as chamadas `MustInject` dentro do builder do controlador são sempre resolvidas
+em relação a um grafo de injeção de dependência completo e já construído — nunca um placeholder.
+
+</Step>
+
+<Step>
+
+### Fase 3 — Declaração dos Estágios do Pipeline
+
+Cada builder de `Middleware`, `Guard`, `Interceptor` e `Filter` roda exatamente
+uma vez, escopo limitado à união de todos os provedores próprios + exportados dos módulos que os referenciam.
+
+</Step>
+
+</Steps>
+
+<Callout type="info">
+  Essa ordenação é a razão pela qual o `MustInject` nunca precisa de um mecanismo de resolução
+  preguiçosa/adiada (lazy/deferred-resolution): no momento em que o corpo de qualquer builder executa, tudo do qual ele possa
+  legalmente depender já existe.
+</Callout>
+
+## AppOptions
+
+`app.MustListen(":3000")` bloqueia a goroutine chamadora. `AppOptions` aceita:
+
+- `BufferLogs` — armazena em buffer a saída de log durante o bootstrap.
+- `LogLevels` — configura a verbosidade do log.
+- `DisableBanner` — suprime o banner de inicialização.
+- `DisableLoaded` — suprime o resumo de "rotas carregadas".
+- `EnableFormStreaming` — alternador global do app para streaming multipart (veja
+  [Streaming de Formulários Multipart](/docs/multipart)).
+
+## Próximos passos
+
+<Cards>
+  <Card title="Conceitos Básicos" href="/docs/core-concepts" />
+</Cards>

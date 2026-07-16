@@ -1,0 +1,24 @@
+---
+title: Instalación
+description: Agregar gonest a un módulo Go
+---
+
+gonest requiere **Go 1.18+** (se utilizan generics en toda la API del builder).
+
+```bash
+go get github.com/gonest-dev/gonest
+```
+
+<Callout type="warn">
+  Aún no existe una etiqueta de versión estable. El esquema de versionado planejado es
+  `v0.{major}-{minor}.{release}` — v0 se mantiene fijo para evitar la regla de sufijo de ruta de importación v2+ de Go y para continuar señalando "sin garantía de estabilidad" hasta que se lance la primera versión etiquetada.
+</Callout>
+
+La única dependencia HTTP en tiempo de ejecución de gonest es [Fiber](https://gofiber.io) v3
+(`github.com/gofiber/fiber`), que se obtiene automáticamente a través de `gonest.FiberApp`.
+
+## Próximos pasos
+
+<Cards>
+  <Card title="Inicio Rápido" href="/docs/getting-started/quickstart" />
+</Cards>

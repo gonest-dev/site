@@ -1,0 +1,142 @@
+---
+title: Início Rápido
+description: Crie seu primeiro módulo gonest em poucos passos
+---
+
+<Steps>
+
+<Step>
+
+### Definir um provedor (provider)
+
+Um `Provider` constrói uma única instância para o grafo de injeção de dependência. O `Constructor` aceita
+apenas `func()`, `func() (T, error)`, `func(ctx) T` ou `func(ctx) (T, error)` —
+nunca uma função com parâmetros de dependência. As dependências são injetadas com
+`MustInject` **dentro** do builder, antes do `Constructor` ser executado.
+
+```go
+type UserService struct{}
+
+func (s *UserService) List() []string { return []string{"Ada", "Grace"} }
+
+var UserProvider = gonest.NewProvider(func(provider *gonest.Provider) {
+  provider.Constructor(func() *UserService { return &UserService{} })
+})
+```
+
+</Step>
+
+<Step>
+
+### Definir um controlador (controller)
+
+Um `Controller` agrupa rotas sob um prefixo de caminho. Resolva uma dependência uma única vez
+com `MustInject` e, em seguida, faça referência a ela a partir de qualquer manipulador de rota no mesmo builder.
+
+```go
+var UserController = gonest.NewController(func(controller *gonest.Controller) {
+  controller.Path("/users")
+  userService := gonest.MustInject[*UserService](controller)
+
+  controller.RouteGet("/", func(route *gonest.Route) {
+    route.Handler(func(ctx *gonest.RestContext) {
+      ctx.Json(userService.List())
+    })
+  })
+})
+```
+
+</Step>
+
+<Step>
+
+### Definir um módulo (module)
+
+Um `Module` conecta provedores e controladores. Essa é a unidade que você passa para o
+`MustNewApp`.
+
+```go
+var UserModule = gonest.NewModule(func(module *gonest.Module) {
+  module.Providers(UserProvider)
+  module.Controllers(UserController)
+})
+```
+
+</Step>
+
+<Step>
+
+### Inicializar a aplicação (bootstrap)
+
+`MustNewApp[gonest.FiberApp]` executa a inicialização em três fases (veja
+[Bootstrap](/docs/getting-started/bootstrap)) e retorna uma aplicação pronta para
+escutar requisições.
+
+```go
+func main() {
+  app := gonest.MustNewApp[gonest.FiberApp](UserModule, gonest.AppOptions{})
+  app.MustListen(":3000")
+}
+```
+
+</Step>
+
+</Steps>
+
+## Exemplo completo
+
+<Tabs items={['main.go']}>
+<Tab value="main.go">
+
+```go
+package main
+
+import "github.com/gonest-dev/gonest"
+
+type UserService struct{}
+
+func (s *UserService) List() []string { return []string{"Ada", "Grace"} }
+
+var UserProvider = gonest.NewProvider(func(provider *gonest.Provider) {
+  provider.Constructor(func() *UserService { return &UserService{} })
+})
+
+var UserController = gonest.NewController(func(controller *gonest.Controller) {
+  controller.Path("/users")
+  userService := gonest.MustInject[*UserService](controller)
+
+  controller.RouteGet("/", func(route *gonest.Route) {
+    route.Handler(func(ctx *gonest.RestContext) {
+      ctx.Json(userService.List())
+    })
+  })
+})
+
+var UserModule = gonest.NewModule(func(module *gonest.Module) {
+  module.Providers(UserProvider)
+  module.Controllers(UserController)
+})
+
+func main() {
+  app := gonest.MustNewApp[gonest.FiberApp](UserModule, gonest.AppOptions{})
+  app.MustListen(":3000")
+}
+```
+
+</Tab>
+</Tabs>
+
+<Callout type="info">
+  Dois exemplos executáveis estão disponíveis no repositório do gonest:
+  [`.examples/simple-todo`](https://github.com/gonest-dev/gonest/tree/main/.examples/simple-todo)
+  (MVC minimalista, sem dependências externas) e
+  [`.examples/blog-api`](https://github.com/gonest-dev/gonest/tree/main/.examples/blog-api)
+  (guards, interceptores, middlewares, filtros, OpenAPI/Swagger, persistência com SQLite e um domínio real de 3 módulos).
+</Callout>
+
+## Próximos passos
+
+<Cards>
+  <Card title="Bootstrap Explicado" href="/docs/getting-started/bootstrap" />
+  <Card title="Conceitos Básicos" href="/docs/core-concepts" />
+</Cards>
