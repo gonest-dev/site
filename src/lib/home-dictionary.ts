@@ -41,9 +41,53 @@ const en: HomeDictionary = {
   footerCreatedBy: 'Created by',
 };
 
-// Filled in by later tasks (T10, T11); default to English until translated.
-const pt: HomeDictionary = en;
-const es: HomeDictionary = en;
+const pt: HomeDictionary = {
+  badge: 'Inspirado no NestJS, feito para Go',
+  heroTagline: 'injeção de dependência para Go, do jeito certo.',
+  heroSubtitle:
+    'Módulos, provedores, controladores e um pipeline de requisição completo — a experiência de desenvolvimento que o NestJS oferece ao Node/TypeScript, sem abrir mão do Go idiomático.',
+  ctaGetStarted: 'Começar',
+  ctaGithub: 'Ver no GitHub',
+  capabilitiesSectionTitle: 'Tudo que um desenvolvedor NestJS espera encontrar',
+  capabilities: [
+    { title: 'Injeção de Dependência', description: 'Módulos, provedores e 3 escopos de DI.' },
+    { title: 'Pipeline de Requisição', description: 'Middleware, guards, interceptors, filters.' },
+    { title: 'Validação & Schemas', description: 'Builders type-safe via generics, sem struct tags.' },
+    { title: 'Streaming de Multipart', description: 'Upload de arquivos com streaming real, sem buffer.' },
+    { title: 'OpenAPI & Swagger', description: 'Gera documentação a partir dos mesmos schemas que validam.' },
+    { title: 'Event Emitter', description: 'Eventos tipados, fire-and-forget entre provedores.' },
+    { title: 'Scheduler', description: 'Jobs de cron, interval e timeout.' },
+    { title: 'Health Checks', description: 'Rotas de readiness e liveness no estilo Terminus.' },
+    { title: 'Testes', description: 'Bootstrap em memória, overrides de provider, assertions.' },
+    { title: 'Builders Type-safe', description: 'Campos identificados por ponteiro, não por string tags.' },
+  ],
+  footerLicenseNote: 'gonest é open source, ainda sem licença definida.',
+  footerCreatedBy: 'Criado por',
+};
+
+const es: HomeDictionary = {
+  badge: 'Inspirado en NestJS, hecho para Go',
+  heroTagline: 'inyección de dependencias para Go, como debe ser.',
+  heroSubtitle:
+    'Módulos, proveedores, controladores y un pipeline de peticiones completo — la experiencia de desarrollo que NestJS le da a Node/TypeScript, sin renunciar a un Go idiomático.',
+  ctaGetStarted: 'Comenzar',
+  ctaGithub: 'Ver en GitHub',
+  capabilitiesSectionTitle: 'Todo lo que un desarrollador de NestJS espera encontrar',
+  capabilities: [
+    { title: 'Inyección de Dependencias', description: 'Módulos, proveedores y 3 alcances de DI.' },
+    { title: 'Pipeline de Peticiones', description: 'Middleware, guards, interceptors, filters.' },
+    { title: 'Validación y Schemas', description: 'Builders type-safe mediante generics, sin struct tags.' },
+    { title: 'Streaming Multipart', description: 'Subida de archivos con streaming real, sin buffer.' },
+    { title: 'OpenAPI y Swagger', description: 'Genera documentación a partir de los mismos schemas que validan.' },
+    { title: 'Event Emitter', description: 'Eventos tipados, fire-and-forget entre proveedores.' },
+    { title: 'Scheduler', description: 'Tareas de cron, interval y timeout.' },
+    { title: 'Health Checks', description: 'Rutas de readiness y liveness al estilo Terminus.' },
+    { title: 'Testing', description: 'Bootstrap en memoria, overrides de provider, assertions.' },
+    { title: 'Builders Type-safe', description: 'Campos identificados por puntero, no por string tags.' },
+  ],
+  footerLicenseNote: 'gonest es open source, todavía sin licencia definida.',
+  footerCreatedBy: 'Creado por',
+};
 
 const dictionaries: Record<string, HomeDictionary> = { en, pt, es };
 
