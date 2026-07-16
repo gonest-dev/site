@@ -37,7 +37,7 @@ const en: HomeDictionary = {
     { title: 'Testing', description: 'In-memory bootstrap, provider overrides, assertions.' },
     { title: 'Type-safe Builders', description: 'Fields identified by pointer, not string tags.' },
   ],
-  footerLicenseNote: 'gonest is open source, released under no license yet.',
+  footerLicenseNote: 'gonest is open source, released under the MIT license.',
   footerCreatedBy: 'Created by',
 };
 
@@ -61,7 +61,7 @@ const pt: HomeDictionary = {
     { title: 'Testes', description: 'Bootstrap em memória, overrides de provider, assertions.' },
     { title: 'Builders Type-safe', description: 'Campos identificados por ponteiro, não por string tags.' },
   ],
-  footerLicenseNote: 'gonest é open source, ainda sem licença definida.',
+  footerLicenseNote: 'gonest é open source, distribuído sob a licença MIT.',
   footerCreatedBy: 'Criado por',
 };
 
@@ -85,7 +85,7 @@ const es: HomeDictionary = {
     { title: 'Testing', description: 'Bootstrap en memoria, overrides de provider, assertions.' },
     { title: 'Builders Type-safe', description: 'Campos identificados por puntero, no por string tags.' },
   ],
-  footerLicenseNote: 'gonest es open source, todavía sin licencia definida.',
+  footerLicenseNote: 'gonest es open source, distribuido bajo la licencia MIT.',
   footerCreatedBy: 'Creado por',
 };
 
