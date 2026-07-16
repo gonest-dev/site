@@ -19,7 +19,9 @@ const quickstart = `package main
 import "github.com/gonest-dev/gonest"
 
 type Service struct{}
+
 func (s *Service) Hello() string { return "Hello World" }
+
 var Provider = gonest.NewProvider(func(p *gonest.Provider) {
   p.Constructor(func() *Service { return &Service{} })
 })
