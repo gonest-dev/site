@@ -33,7 +33,7 @@ export default async function LangLayout({ children, params }: LayoutProps<'/[la
       >
         {children}
       </RootProvider>
-      <Footer />
+      <Footer lang={lang} />
     </>
   );
 }

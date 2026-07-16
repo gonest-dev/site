@@ -13,6 +13,7 @@ import {
   Fingerprint,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
+import { getHomeDictionary } from '@/lib/home-dictionary';
 
 const quickstart = `package main
 
@@ -30,8 +31,8 @@ var Controller = gonest.NewController(func(c *gonest.Controller) {
   c.Path("/")
   service := gonest.MustInject[*Service](c)
   c.RouteGet("/", func(r *gonest.Route) {
-    r.Handler(func(ctx *gonest.RestContext) { 
-      ctx.Json(service.Hello()) 
+    r.Handler(func(ctx *gonest.RestContext) {
+      ctx.Json(service.Hello())
     })
   })
 })
@@ -46,25 +47,23 @@ func main() {
   app.MustListen(":3000")
 }`;
 
-const capabilities: {
-  icon: ComponentType<{ className?: string }>;
-  title: string;
-  description: string;
-  href: string;
-}[] = [
-    { icon: Box, title: 'Dependency Injection', description: 'Modules, providers, and 3 DI scopes.', href: '/docs/core-concepts' },
-    { icon: Workflow, title: 'Request Pipeline', description: 'Middleware, guards, interceptors, filters.', href: '/docs/request-pipeline' },
-    { icon: ShieldCheck, title: 'Validation & Schemas', description: 'Type-safe builders via generics, no struct tags.', href: '/docs/validation' },
-    { icon: Upload, title: 'Multipart Streaming', description: 'True streaming file uploads, no buffering.', href: '/docs/multipart' },
-    { icon: FileJson, title: 'OpenAPI & Swagger', description: 'Generate docs from the same schemas that validate.', href: '/docs/openapi' },
-    { icon: Radio, title: 'Event Emitter', description: 'Typed, fire-and-forget events between providers.', href: '/docs/emitter' },
-    { icon: Clock, title: 'Scheduler', description: 'Cron, interval, and timeout jobs.', href: '/docs/scheduler' },
-    { icon: HeartPulse, title: 'Health Checks', description: 'Terminus-style readiness and liveness routes.', href: '/docs/health-checks' },
-    { icon: FlaskConical, title: 'Testing', description: 'In-memory bootstrap, provider overrides, assertions.', href: '/docs/testing' },
-    { icon: Fingerprint, title: 'Type-safe Builders', description: 'Fields identified by pointer, not string tags.', href: '/docs/validation' },
-  ];
+const capabilityIcons: { icon: ComponentType<{ className?: string }>; href: string }[] = [
+  { icon: Box, href: '/docs/core-concepts' },
+  { icon: Workflow, href: '/docs/request-pipeline' },
+  { icon: ShieldCheck, href: '/docs/validation' },
+  { icon: Upload, href: '/docs/multipart' },
+  { icon: FileJson, href: '/docs/openapi' },
+  { icon: Radio, href: '/docs/emitter' },
+  { icon: Clock, href: '/docs/scheduler' },
+  { icon: HeartPulse, href: '/docs/health-checks' },
+  { icon: FlaskConical, href: '/docs/testing' },
+  { icon: Fingerprint, href: '/docs/validation' },
+];
 
-export default function HomePage() {
+export default async function HomePage({ params }: PageProps<'/[lang]'>) {
+  const { lang } = await params;
+  const t = getHomeDictionary(lang);
+
   return (
     <div className="flex flex-col flex-1">
       <section className="relative overflow-hidden border-b border-fd-border">
@@ -79,31 +78,25 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 lg:grid-cols-2 lg:items-start lg:py-28">
           <div className="flex flex-col gap-6">
             <span className="w-fit rounded-full border border-fd-border bg-fd-secondary px-3 py-1 text-xs font-medium text-fd-secondary-foreground">
-              NestJS-inspired, built for Go
+              {t.badge}
             </span>
             <h1 className="text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
               gonest
-              <span className="block text-fd-muted-foreground">
-                dependency injection for Go, done right.
-              </span>
+              <span className="block text-fd-muted-foreground">{t.heroTagline}</span>
             </h1>
-            <p className="max-w-lg text-lg text-fd-muted-foreground">
-              Modules, providers, controllers, and a full request pipeline —
-              the developer experience NestJS gives Node/TypeScript, without
-              giving up idiomatic Go.
-            </p>
+            <p className="max-w-lg text-lg text-fd-muted-foreground">{t.heroSubtitle}</p>
             <div className="flex flex-wrap gap-3">
               <Link
-                href="/docs"
+                href={`/${lang}/docs`}
                 className="rounded-md bg-fd-primary px-5 py-2.5 font-medium text-fd-primary-foreground transition-opacity hover:opacity-90"
               >
-                Get Started
+                {t.ctaGetStarted}
               </Link>
               <Link
                 href="https://github.com/gonest-dev/gonest"
                 className="rounded-md border border-fd-border px-5 py-2.5 font-medium transition-colors hover:bg-fd-secondary"
               >
-                View on GitHub
+                {t.ctaGithub}
               </Link>
             </div>
           </div>
@@ -123,23 +116,24 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-6 py-16">
-        <h2 className="mb-8 text-center text-2xl font-semibold">
-          Everything a NestJS developer expects
-        </h2>
+        <h2 className="mb-8 text-center text-2xl font-semibold">{t.capabilitiesSectionTitle}</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          {capabilities.map(({ icon: Icon, title, description, href }) => (
-            <Link
-              key={title}
-              href={href}
-              className="group flex flex-col gap-3 rounded-lg border border-fd-border bg-fd-card p-5 transition-colors hover:border-fd-primary/40 hover:bg-fd-accent"
-            >
-              <span className="flex size-9 items-center justify-center rounded-md bg-fd-accent text-fd-accent-foreground">
-                <Icon className="size-5" />
-              </span>
-              <span className="font-medium">{title}</span>
-              <span className="text-sm text-fd-muted-foreground">{description}</span>
-            </Link>
-          ))}
+          {capabilityIcons.map(({ icon: Icon, href }, i) => {
+            const capability = t.capabilities[i];
+            return (
+              <Link
+                key={capability.title}
+                href={`/${lang}${href}`}
+                className="group flex flex-col gap-3 rounded-lg border border-fd-border bg-fd-card p-5 transition-colors hover:border-fd-primary/40 hover:bg-fd-accent"
+              >
+                <span className="flex size-9 items-center justify-center rounded-md bg-fd-accent text-fd-accent-foreground">
+                  <Icon className="size-5" />
+                </span>
+                <span className="font-medium">{capability.title}</span>
+                <span className="text-sm text-fd-muted-foreground">{capability.description}</span>
+              </Link>
+            );
+          })}
         </div>
       </section>
     </div>
