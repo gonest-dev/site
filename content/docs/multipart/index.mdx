@@ -1,6 +1,66 @@
 ---
 title: Multipart Form Streaming
-description: Streaming file uploads without buffering
+description: True streaming file uploads, no buffering
 ---
 
-Placeholder — content written in a later task (see `.specs/features/docs-site/tasks.md` T31).
+Most frameworks (including NestJS's own `multer`/`FileInterceptor`) buffer an
+uploaded file to memory or disk before handler code runs. gonest streams
+instead: `onFile` fires the instant a file part is seen in the raw multipart
+stream, letting the handler forward bytes directly to e.g. S3 without ever
+buffering the whole file.
+
+```go
+type CreatePostForm struct {
+  Title string `form:"title"`
+}
+
+var createPostFormSchema = gonest.NewSchema[CreatePostForm](func(t *CreatePostForm, m *gonest.Schema) {
+  m.Property(&t.Title).String().Required()
+})
+
+var PostController = gonest.NewController(func(controller *gonest.Controller) {
+  controller.RoutePost("/", func(route *gonest.Route) {
+    route.FormBody(createPostFormSchema, "file") // documents multipart/form-data in OpenAPI
+    route.Handler(func(ctx *gonest.RestContext) {
+      form := gonest.MustParseRestFormBody[*CreatePostForm](ctx, createPostFormSchema, func(f *gonest.FormFile) error {
+        return uploadToS3(f.Filename(), f.ContentType(), f.Reader())
+      })
+      ctx.Json(map[string]string{"title": form.Title})
+    })
+  })
+})
+
+func main() {
+  app := gonest.MustNewApp[gonest.FiberApp](AppModule, gonest.AppOptions{EnableFormStreaming: true})
+  app.MustListen(":3000")
+}
+```
+
+## `FormFile`
+
+The callback passed to `MustParseRestFormBody` receives a `*gonest.FormFile`
+with `Filename()`, `ContentType()`, and `Reader()`.
+
+## `AppOptions.EnableFormStreaming`
+
+This flag is **app-wide**, not per-route — it toggles Fiber's
+`StreamRequestBody` + `DisablePreParseMultipartForm` together. Existing
+JSON/param/query routes are unaffected.
+
+New tag family: `form:"..."`. The same [`Custom(fn)`](/docs/validation/custom-validators)
+escape hatch works here too, receiving the raw string value.
+
+<Callout type="warn">
+  Trade-off, not a bug: if `onFile` returns a non-nil error, the walk stops
+  and produces a `*BadRequestException` including the field name and the
+  callback's own error message. But if a **later** form field turns out to be
+  invalid, `onFile` may have **already fired** for files seen earlier in the
+  stream — design your own rollback (e.g. delete a partially-uploaded S3
+  object) for "upload started, but the request turned out invalid."
+</Callout>
+
+## Next steps
+
+<Cards>
+  <Card title="OpenAPI & Swagger" href="/docs/openapi" />
+</Cards>

@@ -1,4 +1,12 @@
 {
   "title": "Validation & Schemas",
-  "pages": ["index"]
+  "pages": [
+    "index",
+    "string-family",
+    "numeric-boolean-datetime",
+    "array-builder",
+    "object-builder",
+    "runtime-validation",
+    "custom-validators"
+  ]
 }

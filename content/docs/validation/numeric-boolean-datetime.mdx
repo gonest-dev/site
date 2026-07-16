@@ -1,0 +1,32 @@
+---
+title: Numeric, Boolean & Date/Time
+description: Integer, Float, Boolean, Date and DateTime branches
+---
+
+## Numeric
+
+`Integer()` (format `int64`), `Int32()`, `Float()`, `Double()` share
+`Min(int)`/`Max(int)`:
+
+```go
+m.Property(&t.Age).Integer().Required().Min(0).Max(150)
+```
+
+## Boolean, Date & DateTime — wrapper-less branches
+
+`Boolean()`, `Date()` (format `date`), and `DateTime()` (format `date-time`)
+are the first "wrapper-less" branches — no extra validators beyond the base
+four (`Required`/`Nullable`/`Description`/`Examples`). They return a bare
+`*PropertyBuilder` directly.
+
+```go
+m.Property(&t.Active).Boolean().Required()
+m.Property(&t.BornAt).Date().Required()
+m.Property(&t.CreatedAt).DateTime().Required()
+```
+
+## Next steps
+
+<Cards>
+  <Card title="Array Builder" href="/docs/validation/array-builder" />
+</Cards>

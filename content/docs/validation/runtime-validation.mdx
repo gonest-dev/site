@@ -1,0 +1,62 @@
+---
+title: Runtime Validation
+description: Validating path params, query string, and JSON body
+---
+
+Three separate tag families map to three separate sources: `param:"..."`,
+`query:"..."`, and `json:"..."`.
+
+```go
+type UserIdParams struct {
+  UserId int64 `param:"user_id"`
+}
+
+var userIdParamsSchema = gonest.NewSchema[UserIdParams](func(t *UserIdParams, m *gonest.Schema) {
+  m.Property(&t.UserId).Integer().Min(1).Required()
+})
+
+var UserController = gonest.NewController(func(controller *gonest.Controller) {
+  controller.RouteGet("/:user_id", func(route *gonest.Route) {
+    route.Params(userIdParamsSchema)
+    route.Response(gonest.HttpStatusOk, func(response *gonest.Response) {
+      response.Schema(userEntitySchema)
+    })
+    route.Handler(func(ctx *gonest.RestContext) {
+      params := gonest.MustParseRestParams[*UserIdParams](ctx, userIdParamsSchema)
+      ctx.Json(params)
+    })
+  })
+})
+```
+
+## Parsing functions
+
+Every `MustParseRestXxx[T](ctx, schema)` has a non-panicking twin
+`ParseRestXxx[T](ctx, schema) (T, error)`:
+
+| Panicking | Non-panicking |
+|---|---|
+| `MustParseRestParams[T]` | `ParseRestParams[T]` |
+| `MustParseRestQuery[T]` | `ParseRestQuery[T]` |
+| `MustParseRestJsonBody[T]` | `ParseRestJsonBody[T]` |
+| `MustParseRestFormBody[T]` | `ParseRestFormBody[T]` (see [Multipart](/docs/multipart)) |
+
+## Validation behavior
+
+- **Every** violation is collected — validation never fails fast on the
+  first error.
+- Validation is **recursive**: array items are each checked individually,
+  object `$ref`s are walked into.
+- `BadRequestException`'s `details` is an ordered list of `{field, message}`.
+
+<Callout type="warn">
+  `Nullable()` + a JSON `null` value is accepted even on a `Required` field.
+  But a `Required` field whose key is **entirely absent** from the payload is
+  always a violation — **absence is not the same as null**.
+</Callout>
+
+## Next steps
+
+<Cards>
+  <Card title="Custom Validators" href="/docs/validation/custom-validators" />
+</Cards>
