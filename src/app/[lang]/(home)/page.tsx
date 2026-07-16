@@ -20,31 +20,32 @@ const quickstart = `package main
 
 import "gonest.dev/gonest"
 
-type Service struct{}
+type UserService struct{}
 
-func (s *Service) Hello() string { return "Hello World" }
+func (s *UserService) List() []string { return []string{"Ada", "Grace"} }
 
-var Provider = gonest.NewProvider(func(provider *gonest.Provider) {
-  provider.Constructor(func() *Service { return &Service{} })
+var UserProvider = gonest.NewProvider(func(provider *gonest.Provider) {
+  provider.Constructor(func() *UserService { return &UserService{} })
 })
 
-var Controller = gonest.NewController(func(controller *gonest.Controller) {
-  controller.Path("/")
-  service := gonest.MustInject[*Service](controller)
-  controller.RouteGet("/", func(r *gonest.Route) {
-    r.Handler(func(ctx *gonest.RestContext) {
-      ctx.Json(service.Hello())
+var UserController = gonest.NewController(func(controller *gonest.Controller) {
+  controller.Path("/users")
+  userService := gonest.MustInject[*UserService](controller)
+
+  controller.RouteGet("/", func(route *gonest.Route) {
+    route.Handler(func(ctx *gonest.RestContext) {
+      ctx.Json(userService.List())
     })
   })
 })
 
-var Module = gonest.NewModule(func(module *gonest.Module) {
-  module.Providers(Provider)
-  module.Controllers(Controller)
+var UserModule = gonest.NewModule(func(module *gonest.Module) {
+  module.Providers(UserProvider)
+  module.Controllers(UserController)
 })
 
 func main() {
-  app := gonest.MustNewApp[gonest.FiberApp](Module)
+  app := gonest.MustNewApp[gonest.FiberApp](UserModule) // AppOptions is optional
   app.MustListen(":3000")
 }`;
 
