@@ -1,4 +1,4 @@
 {
   "title": "Core Concepts",
-  "pages": ["index"]
+  "pages": ["index", "modules", "providers", "controllers", "dependency-injection"]
 }
