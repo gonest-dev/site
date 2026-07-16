@@ -1,7 +1,7 @@
 # gonest Documentation Site Tasks
 
 **Design**: `.specs/features/docs-site/design.md`
-**Status**: Draft
+**Status**: In Progress — T1-T42 done (Phases 1-7: scaffold, theme, MDX components, hero, all 9 content sections, API reference). Remaining: T43-T53 (WASM playground, hosted demo API, polish/launch) — deferred pending hosting-platform decision.
 
 ---
 
