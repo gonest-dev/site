@@ -39,7 +39,7 @@ graph TD
 | Component | Location | How to Use |
 |---|---|---|
 | `source.ts` loader | `src/lib/source.ts` | Add `i18n` config to the existing `loader({...})` call — same file, same export shape |
-| `staticGET` search pattern | `src/app/api/search/route.ts` (from `docs-site`) | Same `createFromSource(source).staticGET` mechanism now naturally becomes per-locale once `source` is i18n-aware; move the route under `app/[lang]/api/search/` |
+| `staticGET` search pattern | `src/app/api/search/route.ts` (from `docs-site`) | Stays exactly where it is — `createFromSource(source).staticGET` already emits one combined `{type:'i18n', data:{...}}` file once `source` is i18n-aware (see Information Architecture correction note) |
 | `DocsLayout`/`HomeLayout` + `baseOptions()` | `src/lib/layout.shared.tsx` | Accept a `lang` param and pass Fumadocs' `i18n` prop through so nav chrome strings can localize |
 | `Footer`, hero `page.tsx` | `src/components/footer.tsx`, `src/app/(home)/page.tsx` | Move under `app/[lang]/(home)/`; extract hardcoded English strings into a small per-locale dictionary (see Data Models) |
 | All 43 existing `content/docs/**/*.mdx` files | `content/docs/` | **Zero renames required** — per Fumadocs' file-suffix convention, the default locale (`en`) needs no suffix at all; only `pt`/`es` overrides get `.pt.mdx`/`.es.mdx` siblings |
@@ -52,7 +52,7 @@ graph TD
 | Fumadocs source loader | `defineI18n({ defaultLanguage: 'en', languages: ['en', 'pt', 'es'], hideLocale: 'never' })` passed into `loader({ i18n, ... })` |
 | Root redirect page | New `app/page.tsx` (outside `[lang]`) — client component reading `navigator.language`, mapping to one of the 3 supported codes, `router.replace()`; a plain `<a href="/en/">` link as the no-JS fallback |
 | Language switcher | Fumadocs UI ships a built-in locale switcher for `RootProvider`/`DocsLayout` (`i18n` prop) — reuse it rather than hand-building one; verify exact prop name against `fumadocs-ui` during Tasks (Context7/local `node_modules` check) |
-| Static search per locale | `source.getPages(locale)` already locale-aware once `i18n` is configured; the existing `staticGET` route pattern needs one instance per `[lang]` segment |
+| Static search per locale | One shared `/api/search` route; `createFromSource(source, { localeMap: {...} })` builds one combined index, client picks the locale sub-index via `oramaStaticClient`'s `locale` option |
 | Translated content | `content/docs/getting-started/*.pt.mdx`, `*.es.mdx` (5 pages × 2 locales = 10 new files); home page strings in a small dictionary consumed by `app/[lang]/(home)/page.tsx` |
 
 ---
@@ -71,8 +71,17 @@ app/api/search/route.ts       ->  /api/search
 app/page.tsx                          ->  /                (client redirect only)
 app/[lang]/(home)/page.tsx            ->  /en/, /pt/, /es/
 app/[lang]/docs/[[...slug]]/page.tsx  ->  /en/docs/..., /pt/docs/..., /es/docs/...
-app/[lang]/api/search/route.ts        ->  /en/api/search, /pt/api/search, /es/api/search
+app/api/search/route.ts               ->  /api/search      (stays top-level, NOT moved under [lang] — see note below)
 ```
+
+**Correction from initial design (verified against installed `fumadocs-core` types
+during implementation, not assumed):** the search route does **not** move
+under `[lang]`. Once `source`'s loader has `i18n` configured,
+`createFromSource(source).staticGET()` already produces a single combined
+file shaped `{type: 'i18n', data: {en: {...}, pt: {...}, es: {...}}}`. The
+client (`oramaStaticClient`) picks the correct locale's sub-index at query
+time via its `locale` option, read from `useI18n()`. One shared route, not
+three — simpler than originally sketched below.
 
 The OG-image, `llms.txt`/`llms-full.txt`/`llms.mdx` routes (from `docs-site`)
 move under `app/[lang]/...` the same way, each gaining a `lang` param in

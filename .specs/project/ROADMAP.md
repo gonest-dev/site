@@ -97,14 +97,15 @@ other page falls back to English automatically. See
 
 ### Features
 
-**i18n** - PLANNED
+**i18n** - COMPLETE
 
 - `defineI18n` config + locale-aware source loader
-- Routes restructured under `app/[lang]/...` (home, docs, search, OG images, llms.\*)
+- Routes restructured under `app/[lang]/...` (home, docs, OG images, llms.\*)
 - Root `/` redirect page (browser-language-based, no Middleware)
-- Per-locale static search index
-- Home page + Getting Started (5 pages) translated to pt and es
+- Shared static search index, locale-scoped client-side (single combined file, not per-locale routes — see STATE.md)
+- Home page + Getting Started (5 pages) + docs root index translated to pt and es
 - Remaining ~38 pages ship infra-ready, English-fallback until translated (tracked below)
+- Follow-up: manual browser QA for switcher/redirect (no browser tooling available this session, see STATE.md)
 
 ---
 

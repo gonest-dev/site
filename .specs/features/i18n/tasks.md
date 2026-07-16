@@ -1,7 +1,7 @@
 # i18n Tasks
 
 **Design**: `.specs/features/i18n/design.md`
-**Status**: Draft
+**Status**: Done — T1-T17 implemented and verified (T18/T19 are this doc's own closing bookkeeping). One design correction made during implementation: search stays a single shared route, not per-locale (see T4).
 
 ---
 
@@ -130,27 +130,27 @@ T8 -----┼-> T14 -┼-> T17
 
 ---
 
-### T4: Move and adapt the search route under `app/[lang]/api/search`
+### T4: Adapt the search route for i18n-aware locale scoping ✅ DONE (design corrected)
 
-**What**: Move `src/app/api/search/route.ts` to `src/app/[lang]/api/search/route.ts`, confirming `createFromSource(source).staticGET` produces one distinct static index per locale segment.
-**Where**: `src/app/[lang]/api/search/route.ts` (new location); delete old `src/app/api/search/route.ts`
+**What**: ~~Move `src/app/api/search/route.ts` to `src/app/[lang]/api/search/route.ts`~~ — **corrected during implementation**: the route stays at the top-level `src/app/api/search/route.ts`. Once `source`'s loader has `i18n` configured, `createFromSource(source, { localeMap: {en:'english', pt:'portuguese', es:'spanish'} }).staticGET()` produces ONE combined file shaped `{type:'i18n', data:{en,pt,es}}` — verified against the installed `fumadocs-core` types (`ExportedData` type, `I18nOptions`/`localeMap`), not assumed from a docs snippet.
+**Where**: `src/app/api/search/route.ts` (unchanged location, `localeMap` option added); `src/components/search.tsx` (client reads `locale` from `useI18n()` to pick the right sub-index)
 **Depends on**: T3
-**Reuses**: The exact `staticGET` pattern from `docs-site` (`.specs/features/docs-site/design.md`) — only the file location and locale-scoping change
+**Reuses**: The exact `staticGET` pattern from `docs-site` (`.specs/features/docs-site/design.md`) — only the `language` option became `localeMap`
 **Requirement**: i18n-03
 
 **Tools**:
-- MCP: Context7 to confirm `createFromSource` naturally locale-scopes when the underlying `source` has `i18n` configured (vs. needing an explicit per-locale param)
+- MCP: Context7 + direct `node_modules` type inspection (the docs snippet suggested per-locale routes; the installed types revealed the simpler combined-index behavior)
 - Skill: NONE
 
 **Done when**:
-- [ ] `pnpm build` produces 3 distinct static search index files, one per locale path (e.g. `out/en/api/search`, `out/pt/api/search`, `out/es/api/search`)
-- [ ] The Portuguese index contains only Portuguese-or-fallback page entries scoped correctly (spot-check the JSON content, not just file existence)
-- [ ] Gate check passes: `pnpm build`
+- [x] `pnpm build` produces one static search index file at `out/api/search` containing all 3 locales' data under `data.en`/`data.pt`/`data.es`
+- [x] The Portuguese sub-index contains Portuguese-or-fallback page entries scoped correctly (spot-checked the JSON content: `{"type":"i18n","data":{"en":{...},"pt":{...},"es":{...}}}`)
+- [x] Gate check passes: `pnpm build`
 
 **Tests**: none
 **Gate**: full
 
-**Verify**: `pnpm build`; `find out -path "*api/search*"` shows 3 files; inspect one JSON file's page-title list matches that locale's page set.
+**Verify**: `pnpm build`; `out/api/search` exists as a single file; `head -c 400 out/api/search` shows the `{"type":"i18n","data":{"en":...` shape.
 
 ---
 
