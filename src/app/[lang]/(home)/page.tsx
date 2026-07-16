@@ -23,23 +23,23 @@ type Service struct{}
 
 func (s *Service) Hello() string { return "Hello World" }
 
-var Provider = gonest.NewProvider(func(p *gonest.Provider) {
-  p.Constructor(func() *Service { return &Service{} })
+var Provider = gonest.NewProvider(func(provider *gonest.Provider) {
+  provider.Constructor(func() *Service { return &Service{} })
 })
 
-var Controller = gonest.NewController(func(c *gonest.Controller) {
-  c.Path("/")
-  service := gonest.MustInject[*Service](c)
-  c.RouteGet("/", func(r *gonest.Route) {
+var Controller = gonest.NewController(func(controller *gonest.Controller) {
+  controller.Path("/")
+  service := gonest.MustInject[*Service](controller)
+  controller.RouteGet("/", func(r *gonest.Route) {
     r.Handler(func(ctx *gonest.RestContext) {
       ctx.Json(service.Hello())
     })
   })
 })
 
-var Module = gonest.NewModule(func(m *gonest.Module) {
-  m.Providers(Provider)
-  m.Controllers(Controller)
+var Module = gonest.NewModule(func(module *gonest.Module) {
+  module.Providers(Provider)
+  module.Controllers(Controller)
 })
 
 func main() {
