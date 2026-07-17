@@ -3,7 +3,7 @@ title: Visão Geral & Ordem de Execução
 description: Como Middleware, Guard, Interceptor e Filter se compõem
 ---
 
-Every request flows through a fixed, proven order:
+Toda requisição flui por uma ordem fixa e comprovada:
 
 ```mermaid
 graph LR
@@ -17,24 +17,24 @@ graph LR
     H -.-> G
 ```
 
-- **Global Middleware** (`Module.Use`) always runs before **Controller
-  Middleware** (`Controller.Use`).
-- **Guard** returning `false` short-circuits with an automatic 403 — the
-  request never reaches an Interceptor or the Handler.
-- **Interceptor** wraps the Handler AOP-style: code before `next(ctx)` runs
-  before the Handler, code after runs after.
-- **Filter** wraps the **entire** chain — it catches panics from anywhere
-  inside it (Middleware, Guard, Interceptor, or Handler), not just the
+- O **Middleware global** (`Module.Use`) sempre é executado antes do **Middleware de
+  Controller** (`Controller.Use`).
+- Um **Guard** que retorna `false` faz um curto-circuito (short-circuit) com um 403 automático — a
+  requisição nunca alcança um Interceptor ou o Handler.
+- O **Interceptor** envolve o Handler no estilo AOP: o código antes de `next(ctx)` roda
+  antes do Handler, o código depois roda depois.
+- O **Filter** envolve a cadeia **inteira** — ele captura panics de qualquer lugar
+  dentro dela (Middleware, Guard, Interceptor ou Handler), não apenas do
   Handler.
 
-## Try it
+## Experimente (Try it)
 
 <Callout type="info">
-  A live "Try it" panel against a real gonest demo API lands here once the
-  hosted demo is deployed (see `.specs/features/docs-site/tasks.md` T47-T49).
+  Um painel interativo "Try it" rodando em uma API de demonstração do gonest real ficará aqui assim que a
+  demo hospedada for implantada (veja `.specs/features/docs-site/tasks.md` T47-T49).
 </Callout>
 
-## Next steps
+## Próximos passos
 
 <Cards>
   <Card title="Middleware" href="/docs/request-pipeline/middleware" />

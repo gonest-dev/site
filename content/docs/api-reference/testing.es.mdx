@@ -3,13 +3,13 @@ title: Pruebas
 description: Referencia de MustNewTestApp y TestResponse
 ---
 
-| Symbol | Description |
+| Símbolo | Descripción |
 |---|---|
-| `MustNewTestApp(module, func(b *gonest.TestBuilder) {...})` | Runs the 3-phase bootstrap without starting a real listener. |
-| `MustOverride[T](builder, mockValue)` | Substitutes a provider's constructor with a mock. `T` must be an interface. |
-| `tester.MustRequest(method, path, body)` | In-memory request dispatch; `body` JSON-encoded if non-nil. |
-| `TestResponse.AssertStatus(t, want)` | Asserts response status. |
-| `TestResponse.AssertJsonPath(t, path, want)` | Asserts a dot-notation JSON path (e.g. `"address.zip"`). |
-| `gonest.HttpMethod`, `HttpGet`, `HttpPost`, `HttpPut`, `HttpDelete`, `HttpQuery` | HTTP verb aliases for dispatch. |
+| `MustNewTestApp(module, func(b *gonest.TestBuilder) {...})` | Ejecuta el bootstrap de 3 fases sin iniciar un listener real. |
+| `MustOverride[T](builder, mockValue)` | Sustituye el constructor de un Provider por un mock. `T` debe ser una interfaz. |
+| `tester.MustRequest(method, path, body)` | Despacho (dispatch) de solicitud en memoria; `body` está codificado en JSON si no es nil. |
+| `TestResponse.AssertStatus(t, want)` | Afirma (asserts) el estado de la respuesta. |
+| `TestResponse.AssertJsonPath(t, path, want)` | Afirma una ruta JSON de notación de puntos (ej: `"address.zip"`). |
+| `gonest.HttpMethod`, `HttpGet`, `HttpPost`, `HttpPut`, `HttpDelete`, `HttpQuery` | Atajos de verbos HTTP para despacho. |
 
-See: [Testing](/docs/testing)
+Consulta: [Testing](/docs/testing)

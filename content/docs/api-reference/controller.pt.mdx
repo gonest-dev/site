@@ -5,23 +5,23 @@ description: Referência de gonest.NewController e gonest.Route
 
 `gonest.NewController(func(controller *gonest.Controller) {...})`
 
-| Method | Description |
+| Método | Descrição |
 |---|---|
-| `Path("/prefix")` | Path prefix for every route in this controller. |
-| `Tags("...")` | OpenAPI tags, inherited by every route unless overridden. |
-| `BearerAuth()` | Mark every route as requiring bearer auth, unless overridden. |
-| `Use(...)` | Controller-scoped middleware. |
-| `Guards(...)` | Controller-scoped guards. |
-| `Interceptors(...)` | Controller-scoped interceptors. |
-| `Filters(...)` | Controller-scoped exception filters. |
-| `Route(method, path, fn)` | Generic route declaration. |
-| `RouteGet/RoutePost/RoutePut/RoutePatch/RouteDelete/RouteHead/RouteOptions/RouteTrace/RouteConnect/RouteQuery(path, fn)` | Per-verb shorthands. |
+| `Path("/prefix")` | Prefixo de caminho para todas as rotas neste Controller. |
+| `Tags("...")` | Tags do OpenAPI, herdadas por todas as rotas, a menos que sobrescritas. |
+| `BearerAuth()` | Marca todas as rotas como requerendo autenticação bearer, a menos que sobrescritas. |
+| `Use(...)` | Middleware no escopo do Controller. |
+| `Guards(...)` | Guards no escopo do Controller. |
+| `Interceptors(...)` | Interceptors no escopo do Controller. |
+| `Filters(...)` | Filters de exceção no escopo do Controller. |
+| `Route(method, path, fn)` | Declaração genérica de rota. |
+| `RouteGet/RoutePost/RoutePut/RoutePatch/RouteDelete/RouteHead/RouteOptions/RouteTrace/RouteConnect/RouteQuery(path, fn)` | Atalhos por verbo HTTP. |
 
-## `Route` methods
+## Métodos do `Route`
 
 `Summary`, `Description`, `OperationId`, `Tags`, `BearerAuth`, `RequestBody(schema)`,
 `Response(status, schema...)`, `PathParams(schema)`, `QueryParams(schema)`,
 `ExcludeFromDocs()`, `Deprecated()`, `Params(schema)`, `FormBody(schema, fieldName)`,
 `Handler(func(req *gonest.Request, res *gonest.Response) {...})`.
 
-See: [Controllers & Routes](/docs/core-concepts/controllers), [OpenAPI & Swagger](/docs/openapi)
+Veja: [Controllers & Routes](/docs/core-concepts/controllers), [OpenAPI & Swagger](/docs/openapi)

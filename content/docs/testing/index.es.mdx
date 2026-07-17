@@ -18,41 +18,40 @@ func TestUserController_Get(t *testing.T) {
 
 ## `MustNewTestApp(module, fn)`
 
-Runs the **same** three-phase bootstrap as `MustNewApp`, minus starting a
-real HTTP listener — routes are registered for in-memory dispatch.
+Ejecuta el **mismo** bootstrap de tres fases que `MustNewApp`, con la excepción de que no inicia un
+listener HTTP real — las rutas se registran para su despacho en memoria.
 
 ## `MustOverride[T](builder, mockValue)`
 
-Substitutes a provider's real constructor with a mock, keyed by `T`'s
-`reflect.Type`.
+Sustituye el constructor real de un provider por un mock, codificado por el `reflect.Type` de `T`.
 
 <Callout type="warn">
-  `T` **must be an interface**. Go can't swap a concrete `*struct`'s behavior
-  at runtime — there's no vtable to redirect. Services meant to be mockable
-  in tests must be injected/exposed by interface, not by concrete pointer.
+  `T` **debe ser una interfaz**. Go no puede cambiar el comportamiento de un `*struct` concreto
+  en tiempo de ejecución — no hay vtable para redirigir. Los servicios que están destinados a ser simulados (mocked)
+  en las pruebas deben ser inyectados/expuestos por interfaz, no por puntero concreto.
 </Callout>
 
-## Dispatching requests
+## Despachando solicitudes
 
-`tester.MustRequest(method, path, body)` dispatches an in-memory request — no
-real network port — against the test app. `body` is JSON-encoded if non-nil.
+`tester.MustRequest(method, path, body)` despacha una solicitud en memoria — sin
+puerto de red real — contra la aplicación de prueba. `body` está codificado en JSON si no es nil.
 
-Root HTTP-verb aliases used in tests/dispatch:
+Atajos de verbos HTTP raíz utilizados en pruebas/despacho:
 `gonest.HttpMethod`, `HttpGet`, `HttpPost`, `HttpPut`, `HttpDelete`, `HttpQuery`.
 
-## Assertions
+## Asserções (Assertions)
 
-`TestResponse.AssertStatus(t, want)` and `AssertJsonPath(t, path, want)`
-(dot-notation, e.g. `"id"`, `"address.zip"`) fail the test with a clear
-message on mismatch.
+`TestResponse.AssertStatus(t, want)` y `AssertJsonPath(t, path, want)`
+(notación de punto, ej: `"id"`, `"address.zip"`) fallan la prueba con un mensaje
+claro en caso de discordancia.
 
 <Callout type="info">
-  See [`.examples`](https://github.com/gonest-dev/gonest/tree/main/.examples)
-  in the gonest repo for both a minimal and a denser full example exercising
-  these testing helpers.
+  Consulta [`.examples`](https://github.com/gonest-dev/gonest/tree/main/.examples)
+  en el repositorio gonest tanto para un ejemplo mínimo como uno completo más denso ejerciendo
+  estos auxiliares de prueba.
 </Callout>
 
-## Next steps
+## Próximos pasos
 
 <Cards>
   <Card title="API Reference" href="/docs/api-reference" />

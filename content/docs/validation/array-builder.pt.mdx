@@ -3,17 +3,17 @@ title: Array Builder
 description: O padrão de duplo estado container/item
 ---
 
-`Property(&t.Tags).Array()` returns a `*ArrayMetadata` — a **dual-state**
-builder. It configures either the container field or the item, depending on
-where you call things.
+`Property(&t.Tags).Array()` retorna um `*ArrayMetadata` — um construtor
+**de duplo estado** (dual-state). Ele configura o campo contêiner ou o item, dependendo de
+onde você chamar as funções.
 
 <Callout type="warn">
-  This is the most common point of confusion in the schema API. `.Items(func(m
-  *gonest.ArrayMetadata) {...})` is a **callback**, not a variadic list.
-  **Inside** the callback, `m.String()`/`m.Integer()`/`m.Object(ref)` etc.
-  configure the **item**. Calling `m.Required()`/`m.Nullable()`/`m.Description()`/`m.Examples()`
-  **outside** the callback (directly on the return of `.Array()`) always
-  configures the **container field**, never the item.
+  Este é o ponto mais comum de confusão na API de schema. `.Items(func(m
+  *gonest.ArrayMetadata) {...})` é um **callback**, não uma lista variádica.
+  **Dentro** do callback, `m.String()`/`m.Integer()`/`m.Object(ref)` etc.
+  configuram o **item**. Chamar `m.Required()`/`m.Nullable()`/`m.Description()`/`m.Examples()`
+  **fora** do callback (diretamente no retorno de `.Array()`) sempre
+  configura o **campo contêiner**, nunca o item.
 </Callout>
 
 ```go
@@ -25,11 +25,11 @@ m.Property(&t.Tags).Array().Items(func(m *gonest.ArrayMetadata) {
 })
 ```
 
-## Item-count bounds vs. item bounds
+## Limites de contagem de itens vs. limites do item
 
-`Items(fn)` returns the array metadata itself, so chaining `.Min(n)`/`.Max(n)`
-**after** `Items(fn)` sets bounds on the **number of items** in the array —
-distinct from the item's own `Min`/`Max` set inside the callback.
+`Items(fn)` retorna o próprio metadata do array, portanto, encadear `.Min(n)`/`.Max(n)`
+**depois** de `Items(fn)` define os limites no **número de itens** no array —
+distinto dos próprios `Min`/`Max` do item definidos dentro do callback.
 
 ```go
 m.Property(&t.Tags).Array().Items(func(m *gonest.ArrayMetadata) {
@@ -37,7 +37,7 @@ m.Property(&t.Tags).Array().Items(func(m *gonest.ArrayMetadata) {
 }).Min(1).Max(10) // the array itself: 1-10 items
 ```
 
-## Nested object arrays ($ref reuse)
+## Arrays de objetos aninhados (reuso de $ref)
 
 ```go
 m.Property(&t.Addresses).Array().Items(func(m *gonest.ArrayMetadata) {
@@ -46,15 +46,15 @@ m.Property(&t.Addresses).Array().Items(func(m *gonest.ArrayMetadata) {
 }).Min(1)
 ```
 
-## Try it
+## Experimente (Try it)
 
 <Callout type="info">
-  An in-browser WASM playground demonstrating a nested-array-item violation
-  lands here once the playground is built (see
+  Um playground WASM no navegador demonstrando uma violação de item de array aninhado
+  ficará aqui assim que o playground for construído (veja
   `.specs/features/docs-site/tasks.md` T43-T46).
 </Callout>
 
-## Next steps
+## Próximos passos
 
 <Cards>
   <Card title="Object Builder" href="/docs/validation/object-builder" />

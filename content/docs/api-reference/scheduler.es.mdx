@@ -5,13 +5,13 @@ description: Referencia de gonest.NewScheduler
 
 `gonest.NewScheduler(func(scheduler *gonest.Scheduler) {...})`
 
-| Method | Description |
+| Método | Descripción |
 |---|---|
-| `Cron(name, expr, fn)` | 5-field cron expression (via `robfig/cron/v3`). |
-| `Interval(name, dur, fn)` | Repeats every duration. |
-| `Timeout(name, dur, fn)` | Fires exactly once. |
-| `Stop(name)` | Cancels a running job. |
+| `Cron(name, expr, fn)` | Expresión cron de 5 campos (vía `robfig/cron/v3`). |
+| `Interval(name, dur, fn)` | Se repite en cada intervalo (duration). |
+| `Timeout(name, dur, fn)` | Se dispara exactamente una vez. |
+| `Stop(name)` | Cancela un trabajo (job) en ejecución. |
 
-Each job execution is isolated: its own `recover`, its own goroutine.
+Cada ejecución de trabajo está aislada: tiene su propio `recover`, su propia goroutine.
 
-See: [Scheduler](/docs/scheduler)
+Consulta: [Scheduler](/docs/scheduler)

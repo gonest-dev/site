@@ -3,8 +3,8 @@ title: Middleware
 description: Middleware de solicitudes al estilo Express
 ---
 
-`Middleware` runs before routing — the same mental model as Express
-middleware. Build one with `gonest.NewMiddleware(func(middleware *gonest.Middleware) {...})`.
+El `Middleware` se ejecuta antes del enrutamiento — el mismo modelo mental que el middleware
+de Express. Construye uno con `gonest.NewMiddleware(func(middleware *gonest.Middleware) {...})`.
 
 ```go
 var RequestIdMiddleware = gonest.NewMiddleware(func(middleware *gonest.Middleware) {
@@ -15,10 +15,10 @@ var RequestIdMiddleware = gonest.NewMiddleware(func(middleware *gonest.Middlewar
 })
 ```
 
-Calling `next(req, res)` continues the chain. **Omitting it short-circuits**
-the request — nothing downstream runs.
+Llamar a `next(req, res)` continúa la cadena. **Omitirlo cortocircuita**
+la solicitud — nada de flujo posterior (downstream) se ejecuta.
 
-## Global vs. controller-scoped
+## Global vs. ámbito de controller
 
 ```go
 var AppModule = gonest.NewModule(func(module *gonest.Module) {
@@ -30,10 +30,10 @@ var UserController = gonest.NewController(func(controller *gonest.Controller) {
 })
 ```
 
-Global middleware (`Module.Use`, root module only) always runs **before**
-controller-level middleware (`Controller.Use`).
+El middleware global (`Module.Use`, solo en el Module raíz) siempre se ejecuta **antes** que
+el middleware a nivel de Controller (`Controller.Use`).
 
-## Next steps
+## Próximos pasos
 
 <Cards>
   <Card title="Guards" href="/docs/request-pipeline/guards" />

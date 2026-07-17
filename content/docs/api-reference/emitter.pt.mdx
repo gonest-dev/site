@@ -3,14 +3,14 @@ title: Emitter
 description: Referência de gonest.Emitter e Listener
 ---
 
-`gonest.Emitter` — framework singleton, resolvable via `MustInject[*gonest.Emitter]` in any module.
+`gonest.Emitter` — singleton do framework, que pode ser resolvido via `MustInject[*gonest.Emitter]` em qualquer Module.
 
-| Symbol | Description |
+| Símbolo | Descrição |
 |---|---|
-| `NewListener(func(listener *gonest.Listener) {...})` | Build a listener. |
-| `MustOn[EventType](listener, handler)` | Free function (not a method) registering a typed handler. |
-| `Emitter.Emit(event)` | Fire-and-forget; one goroutine per listener; panics/errors recovered internally. |
+| `NewListener(func(listener *gonest.Listener) {...})` | Constrói um Listener. |
+| `MustOn[EventType](listener, handler)` | Função livre (não um método) que registra um Handler tipado. |
+| `Emitter.Emit(event)` | Dispara e esquece (fire-and-forget); uma goroutine por Listener; panics/erros são recuperados internamente. |
 
-No wildcard/string-pattern events — events are typed by Go struct.
+Sem eventos por padrão de string (wildcard/string-pattern) — os eventos são tipados por struct Go.
 
-See: [Event Emitter](/docs/emitter)
+Veja: [Event Emitter](/docs/emitter)

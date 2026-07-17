@@ -3,8 +3,8 @@ title: Filters
 description: Capturando tipos específicos de exception y sobrescribiendo su respuesta
 ---
 
-A `Filter` catches one **specific** exception type and overrides its default
-response. Build one with `gonest.NewFilter(func(filter *gonest.Filter) {...})`.
+Un `Filter` captura un tipo de exception **específico** y sobrescribe su respuesta
+predeterminada. Construye uno con `gonest.NewFilter(func(filter *gonest.Filter) {...})`.
 
 ```go
 var FooFilter = gonest.NewFilter(func(filter *gonest.Filter) {
@@ -14,12 +14,12 @@ var FooFilter = gonest.NewFilter(func(filter *gonest.Filter) {
 })
 ```
 
-`Catch(exemplar, handler)` matches by the exact **concrete type** of the
-panic value (via `reflect.TypeOf`) — not an interface or a type hierarchy.
-Uncaught types fall through to the default `{name, message, details}` panic
-handler (see [Exceptions](/docs/request-pipeline/exceptions)).
+`Catch(exemplar, handler)` coincide por el **tipo concreto** exacto del
+valor de panic (a través de `reflect.TypeOf`) — no por una interfaz o una jerarquía de tipos.
+Los tipos no capturados pasan al handler de panic predeterminado `{name, message, details}`
+(consulta [Exceptions](/docs/request-pipeline/exceptions)).
 
-## Applying a filter
+## Aplicando un filter
 
 ```go
 var UserController = gonest.NewController(func(controller *gonest.Controller) {
@@ -32,13 +32,13 @@ var AppModule = gonest.NewModule(func(module *gonest.Module) {
 ```
 
 <Callout type="info">
-  A controller-level filter wins over a global one for the same caught type.
-  `Filter` wraps the **entire** pipeline — Middleware, Guard, Interceptor, and
-  Handler — so it catches panics from anywhere inside that chain, not just
-  the Handler. See [Overview & Execution Order](/docs/request-pipeline).
+  Un filter a nivel de Controller le gana a uno global para el mismo tipo capturado.
+  `Filter` envuelve (wraps) **todo** el pipeline — Middleware, Guard, Interceptor, y
+  Handler — por lo que captura panics desde cualquier lugar dentro de esa cadena, no solo
+  desde el Handler. Consulta [Visión General y Orden de Ejecución](/docs/request-pipeline).
 </Callout>
 
-## Next steps
+## Próximos pasos
 
 <Cards>
   <Card title="Exceptions & Panic Recovery" href="/docs/request-pipeline/exceptions" />

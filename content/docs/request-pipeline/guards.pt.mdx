@@ -3,7 +3,7 @@ title: Guards
 description: Controle de acesso booleano antes da execução do handler
 ---
 
-A `Guard` decides whether a request is allowed to proceed. Build one with
+Um `Guard` decide se uma requisição tem permissão para prosseguir. Construa um com
 `gonest.NewGuard(func(guard *gonest.Guard) {...})`.
 
 ```go
@@ -14,14 +14,14 @@ var AuthGuard = gonest.NewGuard(func(guard *gonest.Guard) {
 })
 ```
 
-- Returning `false` produces an automatic **403 Forbidden** — no Interceptor
-  or Handler runs.
-- Panicking with an `Exception` inside a guard produces that exception's own
-  response instead of a generic 403.
-- Multiple guards are evaluated in registration order and **short-circuit on
-  the first `false`**.
+- Retornar `false` produz um **403 Forbidden** automático — nenhum Interceptor
+  ou Handler é executado.
+- Dar um panic com uma `Exception` dentro de um guard produz a própria resposta
+  da exception em vez de um 403 genérico.
+- Múltiplos guards são avaliados na ordem de registro e **encerram a avaliação precocemente (short-circuit) no
+  primeiro `false`**.
 
-## Applying a guard
+## Aplicando um guard
 
 ```go
 var UserController = gonest.NewController(func(controller *gonest.Controller) {
@@ -30,21 +30,21 @@ var UserController = gonest.NewController(func(controller *gonest.Controller) {
 ```
 
 <Callout type="warn">
-  Guards are **controller-scoped only** — there is no `Module.Guards`. They
-  also have **no `MustInject` support** inside the builder: a single guard can
-  be attached across many controllers/modules, so there's no single "owner"
-  to resolve dependencies against.
+  Os Guards têm escopo **apenas de Controller** — não há `Module.Guards`. Eles
+  também **não têm suporte a `MustInject`** dentro do builder: um único guard pode
+  ser anexado a vários controllers/modules, de modo que não há um "proprietário" (owner) único
+  para resolver dependências a partir dele.
 </Callout>
 
-## Try it
+## Experimente (Try it)
 
 <Callout type="info">
-  A live "Try it" panel demonstrating a 403 from a guarded route lands here
-  once the hosted demo is deployed (see
+  Um painel interativo "Try it" demonstrando um 403 de uma rota protegida por um guard ficará aqui
+  assim que a demo hospedada for implantada (veja
   `.specs/features/docs-site/tasks.md` T47-T49).
 </Callout>
 
-## Next steps
+## Próximos passos
 
 <Cards>
   <Card title="Interceptors" href="/docs/request-pipeline/interceptors" />

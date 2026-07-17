@@ -3,7 +3,7 @@ title: Providers e Escopos de DI
 description: Como o gonest constrói e define o escopo das instâncias de dependência
 ---
 
-A `Provider` builds one instance for the DI graph. Build one with
+Um `Provider` constrói uma instância para o grafo de DI. Construa um com
 `gonest.NewProvider(func(provider *gonest.Provider) {...})`.
 
 ```go
@@ -13,36 +13,36 @@ var UserProvider = gonest.NewProvider(func(provider *gonest.Provider) {
 })
 ```
 
-## Constructor signatures
+## Assinaturas de construtor
 
-`Constructor` accepts exactly one of these four function shapes — **never** a
-function with dependency parameters:
+`Constructor` aceita exatamente uma dessas quatro formas de função — **nunca** uma
+função com parâmetros de dependência:
 
 - `func() T`
 - `func() (T, error)`
 - `func(ctx) T`
 - `func(ctx) (T, error)`
 
-Dependencies are resolved with `MustInject`/`MustInjectAll` **inside** the
-builder, before `Constructor` is called — not as parameters to the
-constructor function itself.
+As dependências são resolvidas com `MustInject`/`MustInjectAll` **dentro** do
+construtor (builder), antes que o `Constructor` seja chamado — não como parâmetros para a
+própria função do construtor.
 
-## Scopes
+## Escopos (Scopes)
 
-| Scope | Behavior |
+| Escopo | Comportamento |
 |---|---|
-| `gonest.ScopeSingleton` | One instance for the whole app (default). |
-| `gonest.ScopeTransient` | A new instance on every resolve. |
-| `gonest.ScopeRequest` | One instance per HTTP request. |
+| `gonest.ScopeSingleton` | Uma instância para todo o aplicativo (padrão). |
+| `gonest.ScopeTransient` | Uma nova instância a cada resolução. |
+| `gonest.ScopeRequest` | Uma instância por requisição HTTP. |
 
-## Resolving dependencies
+## Resolvendo dependências
 
-`MustInject[T](owner)` resolves by type and panics unless exactly one match is
-found. Pointer types (`*UserService`) require an exact match; interface types
-match exactly **or** fall back to `reflect.Type.Implements()`.
+`MustInject[T](owner)` resolve por tipo e dá panic a menos que exatamente uma correspondência seja
+encontrada. Tipos de ponteiro (`*UserService`) exigem uma correspondência exata; tipos de interface
+correspondem exatamente **ou** utilizam `reflect.Type.Implements()` como alternativa.
 
-`MustInjectAll[T](owner)` returns every match for `T` — used for
-plugin/strategy patterns — and never panics on 0 or N matches.
+`MustInjectAll[T](owner)` retorna todas as correspondências para `T` — usado para
+padrões de plugin/estratégia — e nunca dá panic em 0 ou N correspondências.
 
 ```go
 type Connectable interface{ Ping() bool }
@@ -53,7 +53,7 @@ var SystemController = gonest.NewController(func(controller *gonest.Controller) 
 })
 ```
 
-## Next steps
+## Próximos passos
 
 <Cards>
   <Card title="Controllers & Routes" href="/docs/core-concepts/controllers" />

@@ -3,7 +3,7 @@ title: Exceptions & Recuperação de Panic
 description: HttpException, exceptions internas e o contrato de recuperação de panic
 ---
 
-`gonest.HttpException` is the base type every gonest exception embeds.
+O `gonest.HttpException` é o tipo base que toda exception do gonest embute (embeds).
 
 ```go
 gonest.NewHttpException().
@@ -13,11 +13,11 @@ gonest.NewHttpException().
   SetDetails(details)
 ```
 
-Any type embedding `HttpException` structurally satisfies the `Exception`
-interface — the recovery layer uses a type-assertion, never a closed
-type-switch.
+Qualquer tipo que embuta `HttpException` satisfaz estruturalmente a interface `Exception`
+— a camada de recuperação usa uma asserção de tipo (type-assertion), nunca um
+type-switch fechado.
 
-## Built-in exceptions
+## Exceptions embutidas (Built-in exceptions)
 
 | Exception | Status |
 |---|---|
@@ -27,11 +27,11 @@ type-switch.
 | `UnauthorizedException` | 401 |
 | `ForbiddenException` | 403 |
 
-Each has a `New*Exception(details any)` constructor.
+Cada uma possui um construtor `New*Exception(details any)`.
 
-## Custom exceptions
+## Exceptions customizadas
 
-Embed `gonest.HttpException` exactly like a built-in:
+Embuta `gonest.HttpException` exatamente como uma embutida (built-in):
 
 ```go
 type FooError struct{ gonest.HttpException }
@@ -47,23 +47,23 @@ func NewFooError(details any) *FooError {
 }
 ```
 
-## Panic → response contract
+## Contrato de Panic → resposta
 
 <Callout type="info">
-  Any panic with a value satisfying `Exception` becomes
-  `{"name": ..., "message": ..., "details": ...}` JSON at that exception's own
-  status code. Any **other** panic (nil pointer, index out of range, etc.)
-  becomes a generic 500 with **zero leaked internal detail** — the process
-  never crashes.
+  Qualquer panic com um valor que satisfaça `Exception` torna-se um JSON
+  `{"name": ..., "message": ..., "details": ...}` no próprio código de status daquela
+  exception. Qualquer **outro** panic (ponteiro nulo, índice fora dos limites, etc.)
+  torna-se um erro 500 genérico com **zero detalhe interno vazado** — o processo
+  nunca trava (crashes).
 </Callout>
 
-## HTTP status constants
+## Constantes de status HTTP
 
-`gonest.HttpStatus*` re-exports all 63 standard `net/http.StatusXxx`
-constants under the `gonest` namespace (e.g. `gonest.HttpStatusNotFound`), so
-handler code never needs to import `net/http` just for status codes.
+`gonest.HttpStatus*` reexporta todas as 63 constantes padrão `net/http.StatusXxx`
+sob o namespace `gonest` (ex: `gonest.HttpStatusNotFound`), para que
+o código do handler nunca precise importar `net/http` apenas para códigos de status.
 
-## Next steps
+## Próximos passos
 
 <Cards>
   <Card title="Validation & Schemas" href="/docs/validation" />

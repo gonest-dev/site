@@ -3,7 +3,7 @@ title: Interceptors
 description: Envoltura antes/después del handler al estilo AOP
 ---
 
-An `Interceptor` wraps the Handler AOP-style. Build one with
+Un `Interceptor` envuelve el Handler al estilo AOP. Construye uno con
 `gonest.NewInterceptor(func(interceptor *gonest.Interceptor) {...})`.
 
 ```go
@@ -16,10 +16,10 @@ var TimingInterceptor = gonest.NewInterceptor(func(interceptor *gonest.Intercept
 })
 ```
 
-Interceptors run after Guards and wrap the Handler plus everything nested in
-it. They're **controller-scoped only**.
+Los Interceptors se ejecutan después de los Guards y envuelven al Handler más todo lo anidado en
+él. Son **solo del ámbito de Controller**.
 
-## Applying an interceptor
+## Aplicando un interceptor
 
 ```go
 var UserController = gonest.NewController(func(controller *gonest.Controller) {
@@ -27,7 +27,7 @@ var UserController = gonest.NewController(func(controller *gonest.Controller) {
 })
 ```
 
-## Next steps
+## Próximos pasos
 
 <Cards>
   <Card title="Filters & Exceptions" href="/docs/request-pipeline/filters" />

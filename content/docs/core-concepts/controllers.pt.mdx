@@ -3,7 +3,7 @@ title: Controllers e Rotas
 description: Agrupando rotas sob um prefixo de caminho
 ---
 
-A `Controller` groups routes under a path prefix. Build one with
+Um `Controller` agrupa rotas sob um prefixo de caminho. Construa um com
 `gonest.NewController(func(controller *gonest.Controller) {...})`.
 
 ```go
@@ -20,22 +20,22 @@ var UserController = gonest.NewController(func(controller *gonest.Controller) {
 })
 ```
 
-## Controller methods
+## Métodos do Controller
 
-| Method | Description |
+| Método | Descrição |
 |---|---|
-| `Path("/prefix")` | Set the path prefix for every route in this controller. |
-| `Tags("...")` | OpenAPI tags, inherited by every route unless overridden. |
-| `BearerAuth()` | Mark every route as requiring bearer auth in OpenAPI, unless overridden. |
-| `Use(...)` | Controller-scoped middleware. |
-| `Guards(...)` | Controller-scoped guards. |
-| `Interceptors(...)` | Controller-scoped interceptors. |
-| `Filters(...)` | Controller-scoped exception filters. |
+| `Path("/prefix")` | Define o prefixo de caminho para todas as rotas neste Controller. |
+| `Tags("...")` | Tags do OpenAPI, herdadas por todas as rotas a menos que sobrescritas. |
+| `BearerAuth()` | Marca todas as rotas como requerendo autenticação bearer no OpenAPI, a menos que sobrescritas. |
+| `Use(...)` | Middleware no escopo do Controller. |
+| `Guards(...)` | Guards no escopo do Controller. |
+| `Interceptors(...)` | Interceptors no escopo do Controller. |
+| `Filters(...)` | Filters de exceção no escopo do Controller. |
 
-## Declaring routes
+## Declarando rotas
 
-`controller.Route(method, path, fn)` is the generic form. Per-verb shorthands
-exist for every HTTP method:
+`controller.Route(method, path, fn)` é a forma genérica. Atalhos por verbo
+existem para todo método HTTP:
 
 `RouteGet`, `RoutePost`, `RoutePut`, `RoutePatch`, `RouteDelete`, `RouteHead`,
 `RouteOptions`, `RouteTrace`, `RouteConnect`, `RouteQuery`.
@@ -49,7 +49,7 @@ controller.RouteGet("/:user_id", func(route *gonest.Route) {
 })
 ```
 
-## Next steps
+## Próximos passos
 
 <Cards>
   <Card title="Dependency Injection" href="/docs/core-concepts/dependency-injection" />

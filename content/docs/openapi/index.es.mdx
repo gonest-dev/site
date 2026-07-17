@@ -3,8 +3,8 @@ title: OpenAPI y Swagger
 description: Generando documentación OpenAPI a partir de los mismos schemas que validan
 ---
 
-The same `*Schema` that validates a request also generates OpenAPI —
-never a second, parallel declaration.
+El mismo `*Schema` que valida una solicitud también genera OpenAPI —
+nunca una segunda declaración paralela.
 
 ```go
 doc := gonest.NewOpenAPI("3.1.0", func(b *gonest.OpenAPI) {
@@ -13,7 +13,7 @@ doc := gonest.NewOpenAPI("3.1.0", func(b *gonest.OpenAPI) {
   b.BearerAuth()
 })
 
-gonest.GenerateOpenApiSchema(app, doc) // walks the whole module tree
+gonest.GenerateOpenApiSchema(app, doc) // recorre todo el árbol de módulos
 
 gonest.SetupSwagger(app, "/docs", doc, gonest.SwaggerOptions{
   JsonDocumentUrl: "/openapi.json",
@@ -21,56 +21,56 @@ gonest.SetupSwagger(app, "/docs", doc, gonest.SwaggerOptions{
 })
 ```
 
-## `OpenAPI` builder
+## Constructor `OpenAPI`
 
 `Title`/`Description`/`Version`/`Contact(name, url, email)`/`License(name, url)`/`BearerAuth()`,
-each with a matching getter (`TitleText()`, `ContactInfo()`, `HasBearerAuth()`, etc.).
+cada uno con un getter correspondiente (`TitleText()`, `ContactInfo()`, `HasBearerAuth()`, etc.).
 
-## Route documentation methods
+## Métodos de documentación de rutas
 
-| Method | Description |
+| Método | Descripción |
 |---|---|
-| `Summary(...)` | Short operation summary. |
-| `Description(...)` | Longer operation description. |
-| `OperationId(...)` | OpenAPI `operationId`. |
-| `Tags(...)` | Overrides the controller's tags for this route. |
-| `BearerAuth()` | Overrides the controller's bearer-auth setting for this route. |
-| `RequestBody(schema)` | Document the request body schema. |
-| `Response(status, schema...)` | Document a response; variadic — 0 args documents a bodyless status; repeat for multiple statuses (same status overwrites). |
-| `PathParams(schema)` | Document path parameters. |
-| `QueryParams(schema)` | Document query parameters. |
-| `ExcludeFromDocs()` | Hide this route from generated docs. |
-| `Deprecated()` | Mark this route as deprecated. |
+| `Summary(...)` | Resumen corto de la operación. |
+| `Description(...)` | Descripción más larga de la operación. |
+| `OperationId(...)` | `operationId` de OpenAPI. |
+| `Tags(...)` | Sobrescribe las etiquetas del Controller para esta ruta. |
+| `BearerAuth()` | Sobrescribe la configuración bearer-auth del Controller para esta ruta. |
+| `RequestBody(schema)` | Documenta el schema del cuerpo de la solicitud. |
+| `Response(status, schema...)` | Documenta una respuesta; variádico — 0 argumentos documenta un estado sin cuerpo; repite para múltiples estados (el mismo estado sobrescribe). |
+| `PathParams(schema)` | Documenta los parámetros de ruta (path). |
+| `QueryParams(schema)` | Documenta los parámetros de query. |
+| `ExcludeFromDocs()` | Oculta esta ruta de las documentaciones generadas. |
+| `Deprecated()` | Marca esta ruta como obsoleta (deprecated). |
 
-## Schema generation
+## Generación de Schema
 
-`GenerateOpenApiSchema` walks the full module tree (root + imported,
-recursively), dedups repeated `*Schema` references **by pointer identity**
-(emitting `$ref` reuse in `components.schemas`), and covers every branch
-family (String/Numeric/Boolean/DateTime/Array/Object).
+`GenerateOpenApiSchema` recorre todo el árbol de módulos (raíz + importados,
+recursivamente), deduplica las referencias repetidas de `*Schema` **por identidad de puntero**
+(emitiendo reutilización de `$ref` en `components.schemas`), y cubre cada familia de ramas
+(String/Numeric/Boolean/DateTime/Array/Object).
 
 <Callout type="warn">
-  [`Custom(fn)`](/docs/validation/custom-validators) fields appear in
-  generated schemas with name/required/nullable/description, but **no
-  type/format** — a closure has no declarative shape to infer from. This is a
-  known, permanent limitation, not a bug to be fixed.
+  Los campos [`Custom(fn)`](/docs/validation/custom-validators) aparecen en
+  los schemas generados con name/required/nullable/description, pero **sin
+  type/format** — un closure no tiene forma declarativa de la cual inferir. Esta es una
+  limitación conocida y permanente, no un error a corregir.
 </Callout>
 
 ## Swagger UI
 
-`SetupSwagger` registers 2 plain routes directly on the adapter — no
-DI/Module involvement — one serving `doc.Document()` JSON, one serving an
-HTML page loading Swagger UI via CDN (no vendored assets). Configure via
+`SetupSwagger` registra 2 rutas simples directamente en el adaptador — sin
+participación de DI/Module — una sirviendo el JSON `doc.Document()`, otra sirviendo una
+página HTML que carga Swagger UI a través de CDN (sin recursos locales/vendored). Configura a través de
 `SwaggerOptions{JsonDocumentUrl, PersistAuth, DocExpansion}`.
 
-## Try it
+## Pruébalo (Try it)
 
 <Callout type="info">
-  A live "Try it" panel against a documented route lands here once the
-  hosted demo is deployed (see `.specs/features/docs-site/tasks.md` T47-T49).
+  Un panel interactivo "Try it" para probar una ruta documentada aterrizará aquí una vez que se
+  implemente la demo alojada (consulta `.specs/features/docs-site/tasks.md` T47-T49).
 </Callout>
 
-## Next steps
+## Próximos pasos
 
 <Cards>
   <Card title="Event Emitter" href="/docs/emitter" />

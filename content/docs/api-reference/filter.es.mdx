@@ -5,11 +5,11 @@ description: Referencia de gonest.NewFilter
 
 `gonest.NewFilter(func(filter *gonest.Filter) {...})`
 
-| Method | Description |
+| Método | Descripción |
 |---|---|
-| `Catch(exemplar, handler)` | Matches by exact concrete type of the panic value (`reflect.TypeOf`). |
+| `Catch(exemplar, handler)` | Coincide con el tipo concreto exacto del valor de panic (`reflect.TypeOf`). |
 
-Applied via `Controller.Filters(...)` or `Module.Filters(...)` (global, root only).
-Controller-level wins over global for the same caught type. Wraps the entire pipeline.
+Aplicado a través de `Controller.Filters(...)` o `Module.Filters(...)` (global, solo en la raíz).
+El nivel de Controller tiene precedencia sobre el global para el mismo tipo capturado. Envuelve todo el pipeline.
 
-See: [Filters](/docs/request-pipeline/filters)
+Consulta: [Filters](/docs/request-pipeline/filters)

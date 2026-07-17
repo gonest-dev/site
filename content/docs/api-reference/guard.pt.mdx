@@ -5,10 +5,10 @@ description: Referência de gonest.NewGuard
 
 `gonest.NewGuard(func(guard *gonest.Guard) {...})`
 
-| Method | Description |
+| Método | Descrição |
 |---|---|
-| `Handler(func(req *gonest.Request, res *gonest.Response) bool)` | `false` produces an automatic 403; panicking with an `Exception` produces that exception's response. |
+| `Handler(func(req *gonest.Request, res *gonest.Response) bool)` | `false` produz um erro 403 automático; dar panic com uma `Exception` produz a resposta dessa Exception. |
 
-Applied via `Controller.Guards(...)`. Controller-scoped only — no `Module.Guards`, no `MustInject` inside the builder.
+Aplicado via `Controller.Guards(...)`. Apenas no escopo do Controller — sem `Module.Guards`, sem `MustInject` dentro do construtor (builder).
 
-See: [Guards](/docs/request-pipeline/guards)
+Veja: [Guards](/docs/request-pipeline/guards)

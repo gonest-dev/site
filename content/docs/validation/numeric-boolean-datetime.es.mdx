@@ -5,19 +5,19 @@ description: Ramas Integer, Float, Boolean, Date y DateTime
 
 ## Numeric
 
-`Integer()` (format `int64`), `Int32()`, `Float()`, `Double()` share
+`Integer()` (formato `int64`), `Int32()`, `Float()`, `Double()` comparten
 `Min(int)`/`Max(int)`:
 
 ```go
 m.Property(&t.Age).Integer().Required().Min(0).Max(150)
 ```
 
-## Boolean, Date & DateTime — wrapper-less branches
+## Boolean, Date y DateTime — ramas sin wrappers
 
-`Boolean()`, `Date()` (format `date`), and `DateTime()` (format `date-time`)
-are the first "wrapper-less" branches — no extra validators beyond the base
-four (`Required`/`Nullable`/`Description`/`Examples`). They return a bare
-`*PropertyBuilder` directly.
+`Boolean()`, `Date()` (formato `date`), y `DateTime()` (formato `date-time`)
+son las primeras ramas "sin wrappers" — sin validadores adicionales más allá de los cuatro
+base (`Required`/`Nullable`/`Description`/`Examples`). Devuelven un
+`*PropertyBuilder` simple directamente.
 
 ```go
 m.Property(&t.Active).Boolean().Required()
@@ -25,7 +25,7 @@ m.Property(&t.BornAt).Date().Required()
 m.Property(&t.CreatedAt).DateTime().Required()
 ```
 
-## Next steps
+## Próximos pasos
 
 <Cards>
   <Card title="Array Builder" href="/docs/validation/array-builder" />

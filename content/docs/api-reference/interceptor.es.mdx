@@ -5,10 +5,10 @@ description: Referencia de gonest.NewInterceptor
 
 `gonest.NewInterceptor(func(interceptor *gonest.Interceptor) {...})`
 
-| Method | Description |
+| Método | Descripción |
 |---|---|
-| `Handler(func(req *gonest.Request, res *gonest.Response, next gonest.InterceptorNext))` | Code before `next(req, res)` runs before the handler; code after runs after. |
+| `Handler(func(req *gonest.Request, res *gonest.Response, next gonest.InterceptorNext))` | El código antes de `next(req, res)` se ejecuta antes del Handler; el código después se ejecuta después. |
 
-Applied via `Controller.Interceptors(...)`. Controller-scoped only.
+Aplicado a través de `Controller.Interceptors(...)`. Solo en el ámbito del Controller.
 
-See: [Interceptors](/docs/request-pipeline/interceptors)
+Consulta: [Interceptors](/docs/request-pipeline/interceptors)

@@ -3,7 +3,7 @@ title: Fundamentos del Schema Builder
 description: NewSchema, campos identificados por puntero y las restricciones base
 ---
 
-Every gonest validation and OpenAPI feature builds on one foundation:
+Toda funcionalidad de validación y OpenAPI de gonest se basa en un fundamento:
 `gonest.NewSchema[T](func(t *T, m *gonest.Schema) {...})`.
 
 ```go
@@ -22,39 +22,39 @@ var userEntitySchema = gonest.NewSchema[UserEntity](func(t *UserEntity, m *gones
 ```
 
 <Callout type="info">
-  Fields are identified by their own **pointer address**
-  (`m.Property(&t.Name)`) — not a struct tag, not a string field name. Rename
-  the field and the compiler catches every reference; there's no string to
-  fall out of sync.
+  Los campos se identifican por su propia **dirección de puntero**
+  (`m.Property(&t.Name)`) — no una struct tag, ni un nombre de campo de cadena. Renombra
+  el campo y el compilador capta todas las referencias; no hay una cadena (string) que
+  se desincronice.
 </Callout>
 
-## Base constraints
+## Restricciones base
 
-Every branch (`String()`, `Integer()`, `Array()`, `Object()`, ...) returns a
-chainable builder that always has these four:
+Cada rama (`String()`, `Integer()`, `Array()`, `Object()`, ...) devuelve un
+constructor encadenable (chainable builder) que siempre tiene estos cuatro:
 
-| Method | Effect |
+| Método | Efecto |
 |---|---|
-| `Required()` | Field must be present (and non-null unless `Nullable()`). |
-| `Nullable()` | Accept JSON `null` even when `Required()`. |
-| `Description("...")` | OpenAPI field description. |
-| `Examples(...)` | OpenAPI example values. |
+| `Required()` | El campo debe estar presente (y no nulo a menos que `Nullable()`). |
+| `Nullable()` | Acepta `null` de JSON incluso cuando está `Required()`. |
+| `Description("...")` | Descripción del campo OpenAPI. |
+| `Examples(...)` | Valores de ejemplo OpenAPI. |
 
-`m.Title("...")` sets the name this schema appears under in OpenAPI's
-`components.schemas` — defaults to the Go type name.
+`m.Title("...")` establece el nombre bajo el cual aparece este schema en
+`components.schemas` de OpenAPI — por defecto es el nombre del tipo de Go.
 
 <Callout type="warn">
-  Historical note: earlier `.specs` design docs used `NewMetadata[T]` /
-  `*Metadata` and `MustJsonBody[T]`, then a later pre-release revision used
-  a family of body/params/query-specific `Must...`-prefixed parsing functions.
-  All of these were superseded before release — `NewSchema[T]` / `*Schema`
-  and `gonest.MustParse[T](src, schema)` (with `src` from
-  `req.Body().Json()`, `req.Params()`, `req.Query()`, `req.Headers()`, or
-  `req.Body().Form(onFile)`) are the current, correct names. This site uses
-  only the current API.
+  Nota histórica: los documentos de diseño de `.specs` anteriores usaban `NewMetadata[T]` /
+  `*Metadata` y `MustJsonBody[T]`, luego una revisión posterior previa al lanzamiento usó
+  una familia de funciones de análisis prefijadas con `Must...` específicas de body/params/query.
+  Todas estas fueron reemplazadas antes del lanzamiento — `NewSchema[T]` / `*Schema`
+  y `gonest.MustParse[T](src, schema)` (con `src` de
+  `req.Body().Json()`, `req.Params()`, `req.Query()`, `req.Headers()`, o
+  `req.Body().Form(onFile)`) son los nombres correctos actuales. Este sitio utiliza
+  solo la API actual.
 </Callout>
 
-## Next steps
+## Próximos pasos
 
 <Cards>
   <Card title="String Family" href="/docs/validation/string-family" />

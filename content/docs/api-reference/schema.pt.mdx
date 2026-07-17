@@ -5,30 +5,30 @@ description: Referência de gonest.NewSchema e das ramificações do PropertyBui
 
 `gonest.NewSchema[T](func(t *T, m *gonest.Schema) {...})`
 
-| Method | Description |
+| Método | Descrição |
 |---|---|
-| `Title("...")` | Name in `components.schemas` (defaults to Go type name). |
-| `Property(&t.X)` | Identify a field by pointer, returns a `*PropertyBuilder`. |
+| `Title("...")` | Nome em `components.schemas` (por padrão, o nome do tipo Go). |
+| `Property(&t.X)` | Identifica um campo por ponteiro, retorna um `*PropertyBuilder`. |
 
-## Base constraints (every branch)
+## Restrições base (todos os ramos)
 
 `Required()`, `Nullable()`, `Description("...")`, `Examples(...)`
 
-## Branches
+## Ramos (Branches)
 
-| Branch | Returns | Notes |
+| Ramo | Retorna | Notas |
 |---|---|---|
 | `String()`, `Email()`, `Uuid()`, `Uri()`, `Hostname()`, `Ipv4()`, `Ipv6()`, `Password()`, `Byte()`, `Binary()` | `*StringMetadata` | `Min`/`Max`/`Pattern` |
 | `Integer()`, `Int32()`, `Float()`, `Double()` | `*NumericMetadata` | `Min`/`Max` |
-| `Boolean()`, `Date()`, `DateTime()` | `*PropertyBuilder` | wrapper-less, base constraints only |
-| `Array()` | `*ArrayMetadata` | dual-state (container vs. item), see `.Items(fn)` |
-| `Object(fn)` | `*ObjectMetadata` | single-state, `.Metadata(ref)` / `.AdditionalProperties()` |
-| `Custom(fn func(raw any) (any, error))` | `*PropertyBuilder` | universal escape hatch |
+| `Boolean()`, `Date()`, `DateTime()` | `*PropertyBuilder` | sem wrapper (wrapper-less), apenas restrições base |
+| `Array()` | `*ArrayMetadata` | estado duplo (contêiner vs. item), veja `.Items(fn)` |
+| `Object(fn)` | `*ObjectMetadata` | estado único, `.Metadata(ref)` / `.AdditionalProperties()` |
+| `Custom(fn func(raw any) (any, error))` | `*PropertyBuilder` | saída de escape universal (universal escape hatch) |
 
-## Parsing functions
+## Funções de parsing
 
 `gonest.MustParse[T](src, schema) T` / `gonest.Parse[T](src, schema) (T, error)`,
-where `src` is one of `req.Params()`, `req.Query()`, `req.Headers()`,
-`req.Body().Json()`, or `req.Body().Form(onFile)`.
+onde `src` é um de `req.Params()`, `req.Query()`, `req.Headers()`,
+`req.Body().Json()`, ou `req.Body().Form(onFile)`.
 
-See: [Schema Builder Basics](/docs/validation), [Array Builder](/docs/validation/array-builder), [Object Builder](/docs/validation/object-builder), [Runtime Validation](/docs/validation/runtime-validation)
+Veja: [Schema Builder Basics](/docs/validation), [Array Builder](/docs/validation/array-builder), [Object Builder](/docs/validation/object-builder), [Runtime Validation](/docs/validation/runtime-validation)

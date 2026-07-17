@@ -3,11 +3,11 @@ title: Object Builder
 description: Campos de objeto aninhado de estado único
 ---
 
-`Property(&t.Address).Object(func(om *gonest.ObjectMetadata) {...})` is
-**single-state** — unlike [Array](/docs/validation/array-builder), there's no
-separate "item" concept. The whole field *is* the object.
+`Property(&t.Address).Object(func(om *gonest.ObjectMetadata) {...})` é
+**estado único (single-state)** — diferente de [Array](/docs/validation/array-builder), não há
+um conceito de "item" separado. O campo inteiro *é* o objeto.
 
-## Reusing a registered schema (`$ref`)
+## Reusando um schema registrado (`$ref`)
 
 ```go
 m.Property(&t.Address).Object(func(om *gonest.ObjectMetadata) {
@@ -17,7 +17,7 @@ m.Property(&t.Address).Object(func(om *gonest.ObjectMetadata) {
 })
 ```
 
-## Open / free-form objects
+## Objetos abertos / forma livre (free-form)
 
 ```go
 m.Property(&t.Metadata).Object(func(om *gonest.ObjectMetadata) {
@@ -25,10 +25,10 @@ m.Property(&t.Metadata).Object(func(om *gonest.ObjectMetadata) {
 }).Nullable().Description("Metadados abertos do usuário")
 ```
 
-`om.AdditionalProperties()` marks the schema as open, appropriate for
-`map[string]any`-shaped data with no fixed key set.
+`om.AdditionalProperties()` marca o schema como aberto, apropriado para
+dados no formato `map[string]any` sem um conjunto fixo de chaves.
 
-## Next steps
+## Próximos passos
 
 <Cards>
   <Card title="Runtime Validation" href="/docs/validation/runtime-validation" />

@@ -21,19 +21,19 @@ var AppModule = gonest.NewModule(func(module *gonest.Module) {
 })
 ```
 
-- `Cron(name, expr, fn)` parses a standard 5-field cron expression via
+- `Cron(name, expr, fn)` faz o parse de uma expressão cron padrão de 5 campos via
   `github.com/robfig/cron/v3`.
-- `Interval(name, dur, fn)` repeats every duration.
-- `Timeout(name, dur, fn)` fires exactly once.
-- `Scheduler.Stop(name)` cancels a running job.
+- `Interval(name, dur, fn)` repete a cada intervalo (duration).
+- `Timeout(name, dur, fn)` dispara exatamente uma vez.
+- `Scheduler.Stop(name)` cancela um job em execução.
 
 <Callout type="info">
-  Each job execution is fully isolated — its own `recover`, its own
-  goroutine. A panic in one job never derails the process or blocks the next
-  scheduled run.
+  Cada execução de job é totalmente isolada — tem seu próprio `recover`, sua própria
+  goroutine. Um panic em um job nunca derruba o processo ou bloqueia a próxima
+  execução agendada.
 </Callout>
 
-## Next steps
+## Próximos passos
 
 <Cards>
   <Card title="Health Checks" href="/docs/health-checks" />

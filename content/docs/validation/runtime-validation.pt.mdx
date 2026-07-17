@@ -3,8 +3,8 @@ title: Validação em Tempo de Execução
 description: Validando parâmetros de rota, query string e corpo JSON
 ---
 
-Three separate tag families map to three separate sources: `param:"..."`,
-`query:"..."`, and `json:"..."`.
+Três famílias de tags separadas mapeiam para três fontes separadas: `param:"..."`,
+`query:"..."`, e `json:"..."`.
 
 ```go
 type UserIdParams struct {
@@ -29,41 +29,41 @@ var UserController = gonest.NewController(func(controller *gonest.Controller) {
 })
 ```
 
-## Parsing functions
+## Funções de parsing (Parsing functions)
 
-Validation always goes through one unified pair:
+A validação sempre passa por um par unificado:
 
-- `gonest.Parse[T](src, schema) (T, error)` — non-panicking.
-- `gonest.MustParse[T](src, schema) T` — panics on validation failure (the
-  panic is turned into a `BadRequestException` response by the framework).
+- `gonest.Parse[T](src, schema) (T, error)` — sem panic.
+- `gonest.MustParse[T](src, schema) T` — dá panic em falha de validação (o
+  panic é transformado em uma resposta `BadRequestException` pelo framework).
 
-`T` is the plain struct type (e.g. `UserIdParams`), not a pointer.
+`T` é o tipo struct simples (ex: `UserIdParams`), não um ponteiro.
 
-`src` is a `Parseable` obtained from one of five sources on `*gonest.Request`:
+`src` é um `Parseable` obtido a partir de uma das cinco fontes em `*gonest.Request`:
 
-| Source | Reads from |
+| Fonte (Source) | Lê de |
 |---|---|
-| `req.Params()` | Path parameters (`param:"..."` tags) |
-| `req.Query()` | Query string (`query:"..."` tags) |
-| `req.Headers()` | HTTP headers |
-| `req.Body().Json()` | JSON request body (`json:"..."` tags) |
-| `req.Body().Form(onFile)` | Multipart form body (see [Multipart](/docs/multipart)) |
+| `req.Params()` | Parâmetros de rota (tags `param:"..."`) |
+| `req.Query()` | Query string (tags `query:"..."`) |
+| `req.Headers()` | Cabeçalhos HTTP |
+| `req.Body().Json()` | Corpo JSON da requisição (tags `json:"..."`) |
+| `req.Body().Form(onFile)` | Corpo de formulário multipart (veja [Multipart](/docs/multipart)) |
 
-## Validation behavior
+## Comportamento da validação
 
-- **Every** violation is collected — validation never fails fast on the
-  first error.
-- Validation is **recursive**: array items are each checked individually,
-  object `$ref`s are walked into.
-- `BadRequestException`'s `details` is an ordered list of `{field, message}`.
+- **Toda** violação é coletada — a validação nunca falha rapidamente (fails fast) no
+  primeiro erro.
+- A validação é **recursiva**: itens de array são checados individualmente, e
+  `$ref`s de objetos são adentrados.
+- Os `details` da `BadRequestException` contêm uma lista ordenada de `{field, message}`.
 
 <Callout type="warn">
-  `Nullable()` + a JSON `null` value is accepted even on a `Required` field.
-  But a `Required` field whose key is **entirely absent** from the payload is
-  always a violation — **absence is not the same as null**.
+  `Nullable()` + um valor `null` no JSON é aceito mesmo em um campo `Required`.
+  Mas um campo `Required` cuja chave está **totalmente ausente** no payload é
+  sempre uma violação — **ausência não é a mesma coisa que nulo**.
 </Callout>
 
-## Next steps
+## Próximos passos
 
 <Cards>
   <Card title="Custom Validators" href="/docs/validation/custom-validators" />

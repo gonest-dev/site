@@ -18,41 +18,40 @@ func TestUserController_Get(t *testing.T) {
 
 ## `MustNewTestApp(module, fn)`
 
-Runs the **same** three-phase bootstrap as `MustNewApp`, minus starting a
-real HTTP listener — routes are registered for in-memory dispatch.
+Executa o **mesmo** bootstrap de três fases que `MustNewApp`, com exceção de não iniciar um
+listener HTTP real — as rotas são registradas para despacho em memória.
 
 ## `MustOverride[T](builder, mockValue)`
 
-Substitutes a provider's real constructor with a mock, keyed by `T`'s
-`reflect.Type`.
+Substitui o construtor real de um provider por um mock, usando o `reflect.Type` de `T` como chave.
 
 <Callout type="warn">
-  `T` **must be an interface**. Go can't swap a concrete `*struct`'s behavior
-  at runtime — there's no vtable to redirect. Services meant to be mockable
-  in tests must be injected/exposed by interface, not by concrete pointer.
+  `T` **deve ser uma interface**. O Go não pode trocar o comportamento de um `*struct` concreto
+  em tempo de execução — não há vtable para redirecionar. Os serviços que se destinam a ser mockados
+  em testes devem ser injetados/expostos por interface, não por ponteiro concreto.
 </Callout>
 
-## Dispatching requests
+## Despachando requisições
 
-`tester.MustRequest(method, path, body)` dispatches an in-memory request — no
-real network port — against the test app. `body` is JSON-encoded if non-nil.
+`tester.MustRequest(method, path, body)` despacha uma requisição em memória — sem
+porta de rede real — contra o app de teste. `body` é codificado em JSON se não for nil.
 
-Root HTTP-verb aliases used in tests/dispatch:
+Atalhos de verbos HTTP na raiz usados em testes/despacho:
 `gonest.HttpMethod`, `HttpGet`, `HttpPost`, `HttpPut`, `HttpDelete`, `HttpQuery`.
 
-## Assertions
+## Asserções
 
-`TestResponse.AssertStatus(t, want)` and `AssertJsonPath(t, path, want)`
-(dot-notation, e.g. `"id"`, `"address.zip"`) fail the test with a clear
-message on mismatch.
+`TestResponse.AssertStatus(t, want)` e `AssertJsonPath(t, path, want)`
+(notação de ponto, ex: `"id"`, `"address.zip"`) falham o teste com uma mensagem
+clara na divergência.
 
 <Callout type="info">
-  See [`.examples`](https://github.com/gonest-dev/gonest/tree/main/.examples)
-  in the gonest repo for both a minimal and a denser full example exercising
-  these testing helpers.
+  Veja [`.examples`](https://github.com/gonest-dev/gonest/tree/main/.examples)
+  no repositório do gonest para um exemplo mínimo e um mais denso completo testando
+  esses auxiliares (helpers) de teste.
 </Callout>
 
-## Next steps
+## Próximos passos
 
 <Cards>
   <Card title="API Reference" href="/docs/api-reference" />

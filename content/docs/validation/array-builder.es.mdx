@@ -3,17 +3,17 @@ title: Array Builder
 description: El patrón de doble estado container/item
 ---
 
-`Property(&t.Tags).Array()` returns a `*ArrayMetadata` — a **dual-state**
-builder. It configures either the container field or the item, depending on
-where you call things.
+`Property(&t.Tags).Array()` devuelve un `*ArrayMetadata` — un constructor
+**de doble estado** (dual-state). Configura el campo contenedor o el elemento, dependiendo de
+dónde llames a las funciones.
 
 <Callout type="warn">
-  This is the most common point of confusion in the schema API. `.Items(func(m
-  *gonest.ArrayMetadata) {...})` is a **callback**, not a variadic list.
-  **Inside** the callback, `m.String()`/`m.Integer()`/`m.Object(ref)` etc.
-  configure the **item**. Calling `m.Required()`/`m.Nullable()`/`m.Description()`/`m.Examples()`
-  **outside** the callback (directly on the return of `.Array()`) always
-  configures the **container field**, never the item.
+  Este es el punto más común de confusión en la API de schema. `.Items(func(m
+  *gonest.ArrayMetadata) {...})` es un **callback**, no una lista variádica.
+  **Dentro** del callback, `m.String()`/`m.Integer()`/`m.Object(ref)` etc.
+  configuran el **elemento (item)**. Llamar a `m.Required()`/`m.Nullable()`/`m.Description()`/`m.Examples()`
+  **fuera** del callback (directamente en el retorno de `.Array()`) siempre
+  configura el **campo contenedor**, nunca el elemento.
 </Callout>
 
 ```go
@@ -25,11 +25,11 @@ m.Property(&t.Tags).Array().Items(func(m *gonest.ArrayMetadata) {
 })
 ```
 
-## Item-count bounds vs. item bounds
+## Límites de cantidad de elementos vs. límites del elemento
 
-`Items(fn)` returns the array metadata itself, so chaining `.Min(n)`/`.Max(n)`
-**after** `Items(fn)` sets bounds on the **number of items** in the array —
-distinct from the item's own `Min`/`Max` set inside the callback.
+`Items(fn)` devuelve los metadatos del array en sí, por lo que encadenar `.Min(n)`/`.Max(n)`
+**después** de `Items(fn)` establece los límites en el **número de elementos** en el array —
+distinto de los propios `Min`/`Max` del elemento establecidos dentro del callback.
 
 ```go
 m.Property(&t.Tags).Array().Items(func(m *gonest.ArrayMetadata) {
@@ -37,7 +37,7 @@ m.Property(&t.Tags).Array().Items(func(m *gonest.ArrayMetadata) {
 }).Min(1).Max(10) // the array itself: 1-10 items
 ```
 
-## Nested object arrays ($ref reuse)
+## Arrays de objetos anidados (reutilización de $ref)
 
 ```go
 m.Property(&t.Addresses).Array().Items(func(m *gonest.ArrayMetadata) {
@@ -46,15 +46,15 @@ m.Property(&t.Addresses).Array().Items(func(m *gonest.ArrayMetadata) {
 }).Min(1)
 ```
 
-## Try it
+## Pruébalo (Try it)
 
 <Callout type="info">
-  An in-browser WASM playground demonstrating a nested-array-item violation
-  lands here once the playground is built (see
+  Un playground WASM en el navegador que demuestra una violación de elemento de array anidado
+  aterrizará aquí una vez que el playground esté construido (consulta
   `.specs/features/docs-site/tasks.md` T43-T46).
 </Callout>
 
-## Next steps
+## Próximos pasos
 
 <Cards>
   <Card title="Object Builder" href="/docs/validation/object-builder" />

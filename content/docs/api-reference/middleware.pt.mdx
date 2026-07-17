@@ -5,10 +5,10 @@ description: Referência de gonest.NewMiddleware
 
 `gonest.NewMiddleware(func(middleware *gonest.Middleware) {...})`
 
-| Method | Description |
+| Método | Descrição |
 |---|---|
-| `Handler(func(req *gonest.Request, res *gonest.Response, next gonest.Next))` | `next(req, res)` continues the chain; omitting it short-circuits. |
+| `Handler(func(req *gonest.Request, res *gonest.Response, next gonest.Next))` | `next(req, res)` continua a cadeia; omiti-lo causa curto-circuito (short-circuit). |
 
-Applied via `Module.Use(...)` (global, root only) or `Controller.Use(...)` (controller-scoped).
+Aplicado via `Module.Use(...)` (global, apenas no raiz) ou `Controller.Use(...)` (escopo do Controller).
 
-See: [Middleware](/docs/request-pipeline/middleware)
+Veja: [Middleware](/docs/request-pipeline/middleware)

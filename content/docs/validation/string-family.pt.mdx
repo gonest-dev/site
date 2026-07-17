@@ -3,12 +3,12 @@ title: Família de Strings
 description: 10 ramificações de string compartilhando Min/Max/Pattern
 ---
 
-All string-family branches share `Min(n)`, `Max(n)`, and `Pattern(regex)`, and
-each sets an OpenAPI `format` value.
+Todas as ramificações da família de strings compartilham `Min(n)`, `Max(n)`, e `Pattern(regex)`, e
+cada uma define um valor `format` no OpenAPI.
 
-| Branch | OpenAPI `format` |
+| Ramificação (Branch) | OpenAPI `format` |
 |---|---|
-| `String()` | *(none)* |
+| `String()` | *(nenhum)* |
 | `Email()` | `email` |
 | `Uuid()` | `uuid` |
 | `Uri()` | `uri` |
@@ -25,7 +25,7 @@ m.Property(&t.Email).Email().Required()
 m.Property(&t.Id).Uuid().Required()
 ```
 
-## Next steps
+## Próximos passos
 
 <Cards>
   <Card title="Numeric, Boolean & Date/Time" href="/docs/validation/numeric-boolean-datetime" />

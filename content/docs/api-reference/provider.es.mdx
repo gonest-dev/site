@@ -5,16 +5,16 @@ description: Referencia de gonest.NewProvider
 
 `gonest.NewProvider(func(provider *gonest.Provider) {...})`
 
-| Method | Description |
+| Método | Descripción |
 |---|---|
-| `Scope(gonest.ScopeSingleton \| ScopeTransient \| ScopeRequest)` | Set instance lifetime. |
-| `Constructor(fn)` | `fn` is one of `func() T`, `func() (T, error)`, `func(ctx) T`, `func(ctx) (T, error)`. |
+| `Scope(gonest.ScopeSingleton \| ScopeTransient \| ScopeRequest)` | Establece el tiempo de vida (lifetime) de la instancia. |
+| `Constructor(fn)` | `fn` es uno de `func() T`, `func() (T, error)`, `func(ctx) T`, `func(ctx) (T, error)`. |
 
-## Resolution functions
+## Funciones de resolución
 
-| Function | Behavior |
+| Función | Comportamiento |
 |---|---|
-| `MustInject[T](owner)` | Resolves exactly one match; panics on 0 or N. |
-| `MustInjectAll[T](owner)` | Resolves every match; never panics. |
+| `MustInject[T](owner)` | Resuelve exactamente una coincidencia; da panic si hay 0 o N. |
+| `MustInjectAll[T](owner)` | Resuelve cada coincidencia; nunca da panic. |
 
-See: [Providers & DI Scopes](/docs/core-concepts/providers), [Dependency Injection](/docs/core-concepts/dependency-injection)
+Consulta: [Providers & DI Scopes](/docs/core-concepts/providers), [Dependency Injection](/docs/core-concepts/dependency-injection)

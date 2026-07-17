@@ -5,16 +5,16 @@ description: Referência de gonest.NewModule
 
 `gonest.NewModule(func(module *gonest.Module) {...})`
 
-| Method | Description |
+| Método | Descrição |
 |---|---|
-| `Providers(...)` | Register providers owned by this module. |
-| `Controllers(...)` | Register controllers owned by this module. |
-| `Imports(...)` | Import other modules, gaining access to their exported providers. |
-| `Exports(...)` | Expose providers to modules that import this one. |
-| `Use(...)` | Register global middleware. Root module only. |
-| `Filters(...)` | Register global exception filters. Root module only. |
-| `Listeners(...)` | Register event listeners. |
-| `Schedulers(...)` | Register scheduler jobs. |
-| `Name("...")` | Set a readable name used in error messages. |
+| `Providers(...)` | Registra Providers de propriedade deste Module. |
+| `Controllers(...)` | Registra Controllers de propriedade deste Module. |
+| `Imports(...)` | Importa outros Modules, obtendo acesso aos seus Providers exportados. |
+| `Exports(...)` | Expõe Providers para Modules que importam este. |
+| `Use(...)` | Registra Middleware global. Apenas no Module raiz. |
+| `Filters(...)` | Registra Filters de exceção globais. Apenas no Module raiz. |
+| `Listeners(...)` | Registra ouvintes (Listeners) de eventos. |
+| `Schedulers(...)` | Registra tarefas (jobs) do Scheduler. |
+| `Name("...")` | Define um nome legível usado em mensagens de erro. |
 
-See: [Modules](/docs/core-concepts/modules)
+Veja: [Modules](/docs/core-concepts/modules)

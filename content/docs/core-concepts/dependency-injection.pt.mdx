@@ -3,16 +3,16 @@ title: Injeção de Dependência
 description: MustInject, MustInjectAll e multi-binding
 ---
 
-gonest resolves dependencies by **type**, not by name or string token.
+O gonest resolve dependências pelo **tipo**, não por nome ou token de string.
 
 ## `MustInject[T](owner)`
 
-Resolves exactly one instance of `T`. Panics if zero or more than one match is
-found.
+Resolve exatamente uma instância de `T`. Dá panic se zero ou mais de uma correspondência for
+encontrada.
 
-- **Pointer types** (`*UserService`) require an exact type match.
-- **Interface types** match an exact registration, or fall back to
-  `reflect.Type.Implements()` if exactly one provider satisfies the interface.
+- **Tipos de ponteiro** (`*UserService`) exigem uma correspondência exata de tipo.
+- **Tipos de interface** correspondem a um registro exato, ou utilizam
+  `reflect.Type.Implements()` como alternativa se exatamente um Provider satisfizer a interface.
 
 ```go
 userService := gonest.MustInject[*UserService](controller)
@@ -20,9 +20,9 @@ userService := gonest.MustInject[*UserService](controller)
 
 ## `MustInjectAll[T](owner)`
 
-Resolves **every** provider matching `T`. Never panics on 0 or N matches — use
-it for plugin/strategy patterns where multiple providers legitimately
-implement the same interface.
+Resolve **todos** os Providers que correspondem a `T`. Nunca dá panic em 0 ou N correspondências — use-o
+para padrões de plugin/estratégia (plugin/strategy patterns) onde vários Providers validamente
+implementam a mesma interface.
 
 ```go
 type Pingable interface {
@@ -38,22 +38,21 @@ var HealthController = gonest.NewController(func(controller *gonest.Controller) 
 ```
 
 <Callout type="info">
-  This is the same pattern used for [Health Checks](/docs/health-checks): any
-  number of services can implement `Pingable`, and the health controller
-  discovers all of them automatically.
+  Esse é o mesmo padrão usado para [Health Checks](/docs/health-checks): qualquer
+  número de serviços pode implementar `Pingable`, e o Controller de saúde descobre todos eles automaticamente.
 </Callout>
 
-## Where `MustInject` can be called
+## Onde `MustInject` pode ser chamado
 
-`MustInject`/`MustInjectAll` are legal inside `Provider`, `Controller`
-builders — anywhere the framework guarantees Phase 1 (provider resolution) has
-already completed. See [Bootstrap](/docs/getting-started/bootstrap).
+`MustInject`/`MustInjectAll` são legais dentro de construtores de `Provider`, `Controller`
+— em qualquer lugar que o framework garanta que a Fase 1 (resolução de Providers) já
+foi concluída. Veja [Bootstrap](/docs/getting-started/bootstrap).
 
-`Guard` builders are the one exception: they have **no** `MustInject` support,
-because a single guard can be attached across multiple controllers/modules —
-there's no single "owner" to resolve against.
+Os construtores de `Guard` são a única exceção: eles **não** têm suporte a `MustInject`,
+porque um único Guard pode ser anexado em vários Controllers/Modules —
+não há um único "proprietário" (owner) para resolver em relação a ele.
 
-## Next steps
+## Próximos passos
 
 <Cards>
   <Card title="Request Pipeline" href="/docs/request-pipeline" />

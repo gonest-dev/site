@@ -3,7 +3,7 @@ title: Módulos
 description: Conectando providers, controllers e estágios do pipeline
 ---
 
-A `Module` is the unit gonest bootstraps. Build one with
+Um `Module` é a unidade que o gonest inicializa. Construa um com
 `gonest.NewModule(func(module *gonest.Module) {...})`.
 
 ```go
@@ -13,28 +13,27 @@ var UserModule = gonest.NewModule(func(module *gonest.Module) {
 })
 ```
 
-## Methods
+## Métodos
 
-| Method | Description |
+| Método | Descrição |
 |---|---|
-| `Providers(...)` | Register providers owned by this module. |
-| `Controllers(...)` | Register controllers owned by this module. |
-| `Imports(...)` | Import other modules, gaining access to their exported providers. |
-| `Exports(...)` | Expose providers to modules that import this one. |
-| `Use(...)` | Register global middleware. **Root module only.** |
-| `Filters(...)` | Register global exception filters. **Root module only.** |
-| `Listeners(...)` | Register event listeners for the [Event Emitter](/docs/emitter). |
-| `Schedulers(...)` | Register [Scheduler](/docs/scheduler) jobs. |
-| `Name("...")` | Set a readable name used in error messages. |
+| `Providers(...)` | Registra Providers de propriedade deste Module. |
+| `Controllers(...)` | Registra Controllers de propriedade deste Module. |
+| `Imports(...)` | Importa outros Modules, obtendo acesso aos seus Providers exportados. |
+| `Exports(...)` | Expõe Providers para Modules que importam este. |
+| `Use(...)` | Registra Middleware global. **Apenas no Module raiz.** |
+| `Filters(...)` | Registra Filters de exceção globais. **Apenas no Module raiz.** |
+| `Listeners(...)` | Registra ouvintes de eventos para o [Event Emitter](/docs/emitter). |
+| `Schedulers(...)` | Registra tarefas do [Scheduler](/docs/scheduler). |
+| `Name("...")` | Define um nome legível usado em mensagens de erro. |
 
 <Callout type="warn">
-  `Use` and `Filters` are root-only when applied at the module level — they
-  apply globally to every request. Per-controller `Use`/`Filters` also exist
-  (see [Request Pipeline](/docs/request-pipeline)) and combine with the
-  global ones.
+  `Use` e `Filters` são apenas para a raiz quando aplicados no nível do Module — eles
+  se aplicam globalmente a todas as requisições. `Use`/`Filters` por Controller também existem
+  (veja [Request Pipeline](/docs/request-pipeline)) e são combinados com os globais.
 </Callout>
 
-## Applying global middleware and filters
+## Aplicando Middleware e Filters globais
 
 ```go
 var AppModule = gonest.NewModule(func(module *gonest.Module) {
@@ -43,7 +42,7 @@ var AppModule = gonest.NewModule(func(module *gonest.Module) {
 })
 ```
 
-## Next steps
+## Próximos passos
 
 <Cards>
   <Card title="Providers" href="/docs/core-concepts/providers" />

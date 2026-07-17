@@ -3,9 +3,9 @@ title: Verificações de Saúde
 description: Rotas de readiness e liveness no estilo Terminus
 ---
 
-There's no dedicated bootstrap type for health checks — a health check is
-deliberately just a normal `Controller`, mirroring how NestJS's own Terminus
-module works conceptually.
+Não há um tipo de bootstrap dedicado para health checks — um health check é
+deliberadamente apenas um `Controller` normal, espelhando como o próprio módulo Terminus do NestJS
+funciona conceitualmente.
 
 ```go
 type Pingable interface {
@@ -37,18 +37,17 @@ var HealthController = gonest.NewController(func(controller *gonest.Controller) 
 })
 ```
 
-- **`/readyz`** (readiness): pings every registered `Pingable` via
-  [`MustInjectAll`](/docs/core-concepts/dependency-injection) — 200 if all are
-  up, 503 if any is down.
-- **`/livez`** (liveness): a static 200 via `res.Status(...).Text("OK")` —
-  `Text` forces `Content-Type: text/plain`, a raw, non-JSON body proving the
-  process isn't deadlocked.
+- **`/readyz`** (readiness): faz ping em todo `Pingable` registrado via
+  [`MustInjectAll`](/docs/core-concepts/dependency-injection) — 200 se todos estiverem
+  operantes, 503 se algum estiver inoperante.
+- **`/livez`** (liveness): um 200 estático via `res.Status(...).Text("OK")` —
+  `Text` força `Content-Type: text/plain`, um corpo bruto e não-JSON provando que o
+  processo não está em deadlock (travado).
 
-`Response.Text(s string) error` and the `gonest.HttpStatusOk` /
-`gonest.HttpStatusServiceUnavailable` constants are general-purpose
-primitives, not Terminus-specific.
+`Response.Text(s string) error` e as constantes `gonest.HttpStatusOk` /
+`gonest.HttpStatusServiceUnavailable` são primitivas de propósito geral, não específicas do Terminus.
 
-## Next steps
+## Próximos passos
 
 <Cards>
   <Card title="Testing" href="/docs/testing" />
