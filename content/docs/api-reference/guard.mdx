@@ -7,7 +7,7 @@ description: gonest.NewGuard reference
 
 | Method | Description |
 |---|---|
-| `Handler(func(ctx *gonest.RestContext) bool)` | `false` produces an automatic 403; panicking with an `Exception` produces that exception's response. |
+| `Handler(func(req *gonest.Request, res *gonest.Response) bool)` | `false` produces an automatic 403; panicking with an `Exception` produces that exception's response. |
 
 Applied via `Controller.Guards(...)`. Controller-scoped only — no `Module.Guards`, no `MustInject` inside the builder.
 

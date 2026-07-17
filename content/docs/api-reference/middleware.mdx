@@ -7,7 +7,7 @@ description: gonest.NewMiddleware reference
 
 | Method | Description |
 |---|---|
-| `Handler(func(ctx *gonest.RestContext, next gonest.Next))` | `next(ctx)` continues the chain; omitting it short-circuits. |
+| `Handler(func(req *gonest.Request, res *gonest.Response, next gonest.Next))` | `next(req, res)` continues the chain; omitting it short-circuits. |
 
 Applied via `Module.Use(...)` (global, root only) or `Controller.Use(...)` (controller-scoped).
 

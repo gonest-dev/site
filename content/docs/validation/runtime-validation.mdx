@@ -21,9 +21,9 @@ var UserController = gonest.NewController(func(controller *gonest.Controller) {
     route.Response(gonest.HttpStatusOk, func(response *gonest.Response) {
       response.Schema(userEntitySchema)
     })
-    route.Handler(func(ctx *gonest.RestContext) {
-      params := gonest.MustParseRestParams[*UserIdParams](ctx, userIdParamsSchema)
-      ctx.Json(params)
+    route.Handler(func(req *gonest.Request, res *gonest.Response) {
+      params := gonest.MustParse[UserIdParams](req.Params(), userIdParamsSchema)
+      res.Json(params)
     })
   })
 })
@@ -31,15 +31,23 @@ var UserController = gonest.NewController(func(controller *gonest.Controller) {
 
 ## Parsing functions
 
-Every `MustParseRestXxx[T](ctx, schema)` has a non-panicking twin
-`ParseRestXxx[T](ctx, schema) (T, error)`:
+Validation always goes through one unified pair:
 
-| Panicking | Non-panicking |
+- `gonest.Parse[T](src, schema) (T, error)` — non-panicking.
+- `gonest.MustParse[T](src, schema) T` — panics on validation failure (the
+  panic is turned into a `BadRequestException` response by the framework).
+
+`T` is the plain struct type (e.g. `UserIdParams`), not a pointer.
+
+`src` is a `Parseable` obtained from one of five sources on `*gonest.Request`:
+
+| Source | Reads from |
 |---|---|
-| `MustParseRestParams[T]` | `ParseRestParams[T]` |
-| `MustParseRestQuery[T]` | `ParseRestQuery[T]` |
-| `MustParseRestJsonBody[T]` | `ParseRestJsonBody[T]` |
-| `MustParseRestFormBody[T]` | `ParseRestFormBody[T]` (see [Multipart](/docs/multipart)) |
+| `req.Params()` | Path parameters (`param:"..."` tags) |
+| `req.Query()` | Query string (`query:"..."` tags) |
+| `req.Headers()` | HTTP headers |
+| `req.Body().Json()` | JSON request body (`json:"..."` tags) |
+| `req.Body().Form(onFile)` | Multipart form body (see [Multipart](/docs/multipart)) |
 
 ## Validation behavior
 

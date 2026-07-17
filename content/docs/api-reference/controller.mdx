@@ -22,6 +22,6 @@ description: gonest.NewController and gonest.Route reference
 `Summary`, `Description`, `OperationId`, `Tags`, `BearerAuth`, `RequestBody(schema)`,
 `Response(status, schema...)`, `PathParams(schema)`, `QueryParams(schema)`,
 `ExcludeFromDocs()`, `Deprecated()`, `Params(schema)`, `FormBody(schema, fieldName)`,
-`Handler(func(ctx *gonest.RestContext) {...})`.
+`Handler(func(req *gonest.Request, res *gonest.Response) {...})`.
 
 See: [Controllers & Routes](/docs/core-concepts/controllers), [OpenAPI & Swagger](/docs/openapi)

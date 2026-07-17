@@ -21,11 +21,11 @@ var createPostFormSchema = gonest.NewSchema[CreatePostForm](func(t *CreatePostFo
 var PostController = gonest.NewController(func(controller *gonest.Controller) {
   controller.RoutePost("/", func(route *gonest.Route) {
     route.FormBody(createPostFormSchema, "file") // documents multipart/form-data in OpenAPI
-    route.Handler(func(ctx *gonest.RestContext) {
-      form := gonest.MustParseRestFormBody[*CreatePostForm](ctx, createPostFormSchema, func(f *gonest.FormFile) error {
+    route.Handler(func(req *gonest.Request, res *gonest.Response) {
+      form := gonest.MustParse[CreatePostForm](req.Body().Form(func(f *gonest.FormFile) error {
         return uploadToS3(f.Filename(), f.ContentType(), f.Reader())
-      })
-      ctx.Json(map[string]string{"title": form.Title})
+      }), createPostFormSchema)
+      res.Json(map[string]string{"title": form.Title})
     })
   })
 })
@@ -38,7 +38,7 @@ func main() {
 
 ## `FormFile`
 
-The callback passed to `MustParseRestFormBody` receives a `*gonest.FormFile`
+The callback passed to `req.Body().Form(...)` receives a `*gonest.FormFile`
 with `Filename()`, `ContentType()`, and `Reader()`.
 
 ## `AppOptions.EnableFormStreaming`

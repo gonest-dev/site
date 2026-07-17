@@ -27,7 +27,8 @@ description: gonest.NewSchema and PropertyBuilder branch reference
 
 ## Parsing functions
 
-`MustParseRestParams[T]`/`ParseRestParams[T]`, `MustParseRestQuery[T]`/`ParseRestQuery[T]`,
-`MustParseRestJsonBody[T]`/`ParseRestJsonBody[T]`, `MustParseRestFormBody[T]`/`ParseRestFormBody[T]`.
+`gonest.MustParse[T](src, schema) T` / `gonest.Parse[T](src, schema) (T, error)`,
+where `src` is one of `req.Params()`, `req.Query()`, `req.Headers()`,
+`req.Body().Json()`, or `req.Body().Form(onFile)`.
 
 See: [Schema Builder Basics](/docs/validation), [Array Builder](/docs/validation/array-builder), [Object Builder](/docs/validation/object-builder), [Runtime Validation](/docs/validation/runtime-validation)

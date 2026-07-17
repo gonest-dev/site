@@ -7,7 +7,7 @@ description: gonest.NewInterceptor reference
 
 | Method | Description |
 |---|---|
-| `Handler(func(ctx *gonest.RestContext, next gonest.InterceptorNext))` | Code before `next(ctx)` runs before the handler; code after runs after. |
+| `Handler(func(req *gonest.Request, res *gonest.Response, next gonest.InterceptorNext))` | Code before `next(req, res)` runs before the handler; code after runs after. |
 
 Applied via `Controller.Interceptors(...)`. Controller-scoped only.
 

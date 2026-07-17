@@ -8,8 +8,8 @@ A `Guard` decides whether a request is allowed to proceed. Build one with
 
 ```go
 var AuthGuard = gonest.NewGuard(func(guard *gonest.Guard) {
-  guard.Handler(func(ctx *gonest.RestContext) bool {
-    return ctx.Header("Authorization") != ""
+  guard.Handler(func(req *gonest.Request, res *gonest.Response) bool {
+    return req.Header("Authorization") != ""
   })
 })
 ```

@@ -45,9 +45,13 @@ chainable builder that always has these four:
 
 <Callout type="warn">
   Historical note: earlier `.specs` design docs used `NewMetadata[T]` /
-  `*Metadata` and `MustJsonBody[T]`. These were renamed before release —
-  `NewSchema[T]` / `*Schema` and `MustParseRestJsonBody[T]` are the current,
-  correct names. This site uses only the current API.
+  `*Metadata` and `MustJsonBody[T]`, then a later pre-release revision used
+  a family of body/params/query-specific `Must...`-prefixed parsing functions.
+  All of these were superseded before release — `NewSchema[T]` / `*Schema`
+  and `gonest.MustParse[T](src, schema)` (with `src` from
+  `req.Body().Json()`, `req.Params()`, `req.Query()`, `req.Headers()`, or
+  `req.Body().Form(onFile)`) are the current, correct names. This site uses
+  only the current API.
 </Callout>
 
 ## Next steps

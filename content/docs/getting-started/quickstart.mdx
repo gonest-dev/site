@@ -40,8 +40,8 @@ var UserController = gonest.NewController(func(controller *gonest.Controller) {
   userService := gonest.MustInject[*UserService](controller)
 
   controller.RouteGet("/", func(route *gonest.Route) {
-    route.Handler(func(ctx *gonest.RestContext) {
-      ctx.Json(userService.List())
+    route.Handler(func(req *gonest.Request, res *gonest.Response) {
+      res.Json(userService.List())
     })
   })
 })
@@ -107,8 +107,8 @@ var UserController = gonest.NewController(func(controller *gonest.Controller) {
   userService := gonest.MustInject[*UserService](controller)
 
   controller.RouteGet("/", func(route *gonest.Route) {
-    route.Handler(func(ctx *gonest.RestContext) {
-      ctx.Json(userService.List())
+    route.Handler(func(req *gonest.Request, res *gonest.Response) {
+      res.Json(userService.List())
     })
   })
 })

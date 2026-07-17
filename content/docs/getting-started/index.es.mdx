@@ -28,7 +28,7 @@ gonest replica los patrones de Nest que los desarrolladores de JS/TS ya conocen,
 - **Los campos se identifican por su propio puntero.** `m.Property(&t.Id)` utiliza la
   dirección del campo — no un nombre en cadena o una struct tag — por lo que los renombres siguen siendo type-safe y a prueba de refactorizaciones.
 - **Una declaración, múltiples consumidores.** El mismo `*Schema` construido a través de
-  `NewSchema[T]` gestiona tanto la validación en tiempo de ejecución (`MustParseRestXxx`) **como** la
+  `NewSchema[T]` gestiona tanto la validación en tiempo de ejecución (`gonest.Parse`/`gonest.MustParse`) **como** la
   generación de OpenAPI (`Route.RequestBody`/`Route.Response`), evitando la necesidad de mantener dos declaraciones paralelas sincronizadas.
 - **Cero magia en el camino crítico (hot path).** La reflexión (reflection) se utiliza únicamente donde Go realmente
   lo requiere (por ejemplo, leer el tipo de un campo a través de `Property(&t.X)`), nunca como sustituto de una llamada explícita al builder.

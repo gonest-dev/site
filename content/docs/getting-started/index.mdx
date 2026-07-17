@@ -31,7 +31,7 @@ backend to Go.
   field's address — not a string name or a struct tag — so renames stay
   type-safe and refactor-proof.
 - **One declaration, multiple consumers.** The same `*Schema` built via
-  `NewSchema[T]` drives both runtime validation (`MustParseRestXxx`) **and**
+  `NewSchema[T]` drives both runtime validation (`gonest.Parse`/`gonest.MustParse`) **and**
   OpenAPI generation (`Route.RequestBody`/`Route.Response`) — never two
   parallel declarations to keep in sync.
 - **Zero magic in the hot path.** Reflection is used only where Go genuinely
