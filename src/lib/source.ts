@@ -17,7 +17,13 @@ export function getPageImage(page: (typeof source)['$inferPage']) {
 
   return {
     segments,
-    url: `${docsImageRoute}/${segments.join('/')}`,
+    // The route lives under /[lang]/og/docs/... (see src/app/[lang]/og/docs) --
+    // segments themselves stay locale-free (that's what generateStaticParams'
+    // own `slug` param expects, with `lang` passed separately), but the
+    // browser-facing url must carry the locale prefix explicitly since
+    // hideLocale is 'never' (i18n.ts) and there's no middleware/rewrite here
+    // (static export) to fill it in otherwise.
+    url: `/${page.locale}${docsImageRoute}/${segments.join('/')}`,
   };
 }
 
@@ -26,7 +32,9 @@ export function getPageMarkdownUrl(page: (typeof source)['$inferPage']) {
 
   return {
     segments,
-    url: `${docsContentRoute}/${segments.join('/')}`,
+    // Same locale-prefix requirement as getPageImage above -- the route is
+    // /[lang]/llms.mdx/docs/... (src/app/[lang]/llms.mdx/docs).
+    url: `/${page.locale}${docsContentRoute}/${segments.join('/')}`,
   };
 }
 
