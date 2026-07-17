@@ -113,7 +113,7 @@ export default async function HomePage({ params }: PageProps<'/[lang]'>) {
               <span className="size-2.5 rounded-full bg-green-500/70" />
               <span className="ml-2 text-xs text-fd-muted-foreground">main.go</span>
             </div>
-            <div className="max-h-[420px] overflow-y-auto text-left text-xs leading-relaxed [&_pre]:!m-0 [&_pre]:!bg-transparent [&_pre]:!py-4">
+            <div className="text-left text-xs leading-relaxed [&_pre]:!m-0 [&_pre]:!max-h-[420px] [&_pre]:!bg-transparent [&_pre]:!py-4">
               <DynamicCodeBlock lang="go" code={quickstart} />
             </div>
           </div>
