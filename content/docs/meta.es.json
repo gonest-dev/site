@@ -1,0 +1,17 @@
+{
+  "title": "Documentación",
+  "pages": [
+    "index",
+    "getting-started",
+    "core-concepts",
+    "request-pipeline",
+    "validation",
+    "multipart",
+    "openapi",
+    "emitter",
+    "scheduler",
+    "health-checks",
+    "testing",
+    "api-reference"
+  ]
+}

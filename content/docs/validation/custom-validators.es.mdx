@@ -1,0 +1,52 @@
+---
+title: Validadores Personalizados
+description: La válvula de escape Custom(fn)
+---
+
+`Custom(fn func(raw any) (any, error))` is a universal escape hatch available
+on every `PropertyBuilder` — it works identically across JSON body, path
+params, query string, and form fields.
+
+```go
+m.Property(&t.Slug).Custom(func(raw any) (any, error) {
+  s, ok := raw.(string)
+  if !ok || !slugPattern.MatchString(s) {
+    return nil, fmt.Errorf("must be a URL-safe slug")
+  }
+  return s, nil
+})
+```
+
+`fn`'s returned error becomes a violation on that field. Its returned value
+populates the struct field.
+
+Use `Custom` for domain-specific formats or transforms the fixed vocabulary
+(String/Numeric/Boolean/DateTime/Array/Object) can't express.
+
+<Callout type="info">
+  This absorbed the intent of an earlier, now-removed pipeline stage called
+  `Pipe`/`NewPipe`. If you've seen `Pipe` mentioned in older gonest design
+  docs, `Custom(fn)` is its replacement — `Pipe` no longer exists in the
+  current API.
+</Callout>
+
+<Callout type="warn">
+  Known limitation: `Custom(fn)` fields appear in generated OpenAPI schemas
+  with their name/required/nullable/description, but **no type or format** —
+  a closure has no declarative shape to infer from. See
+  [OpenAPI & Swagger](/docs/openapi).
+</Callout>
+
+## Try it
+
+<Callout type="info">
+  An in-browser WASM playground demonstrating a custom transform lands here
+  once the playground is built (see
+  `.specs/features/docs-site/tasks.md` T43-T46).
+</Callout>
+
+## Next steps
+
+<Cards>
+  <Card title="Multipart Form Streaming" href="/docs/multipart" />
+</Cards>

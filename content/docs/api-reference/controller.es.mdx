@@ -1,0 +1,27 @@
+---
+title: Controller & Route
+description: Referencia de gonest.NewController y gonest.Route
+---
+
+`gonest.NewController(func(controller *gonest.Controller) {...})`
+
+| Method | Description |
+|---|---|
+| `Path("/prefix")` | Path prefix for every route in this controller. |
+| `Tags("...")` | OpenAPI tags, inherited by every route unless overridden. |
+| `BearerAuth()` | Mark every route as requiring bearer auth, unless overridden. |
+| `Use(...)` | Controller-scoped middleware. |
+| `Guards(...)` | Controller-scoped guards. |
+| `Interceptors(...)` | Controller-scoped interceptors. |
+| `Filters(...)` | Controller-scoped exception filters. |
+| `Route(method, path, fn)` | Generic route declaration. |
+| `RouteGet/RoutePost/RoutePut/RoutePatch/RouteDelete/RouteHead/RouteOptions/RouteTrace/RouteConnect/RouteQuery(path, fn)` | Per-verb shorthands. |
+
+## `Route` methods
+
+`Summary`, `Description`, `OperationId`, `Tags`, `BearerAuth`, `RequestBody(schema)`,
+`Response(status, schema...)`, `PathParams(schema)`, `QueryParams(schema)`,
+`ExcludeFromDocs()`, `Deprecated()`, `Params(schema)`, `FormBody(schema, fieldName)`,
+`Handler(func(req *gonest.Request, res *gonest.Response) {...})`.
+
+See: [Controllers & Routes](/docs/core-concepts/controllers), [OpenAPI & Swagger](/docs/openapi)

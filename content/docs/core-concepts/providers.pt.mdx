@@ -1,0 +1,61 @@
+---
+title: Providers e Escopos de DI
+description: Como o gonest constrói e define o escopo das instâncias de dependência
+---
+
+A `Provider` builds one instance for the DI graph. Build one with
+`gonest.NewProvider(func(provider *gonest.Provider) {...})`.
+
+```go
+var UserProvider = gonest.NewProvider(func(provider *gonest.Provider) {
+  provider.Scope(gonest.ScopeSingleton)
+  provider.Constructor(func() *UserService { return &UserService{} })
+})
+```
+
+## Constructor signatures
+
+`Constructor` accepts exactly one of these four function shapes — **never** a
+function with dependency parameters:
+
+- `func() T`
+- `func() (T, error)`
+- `func(ctx) T`
+- `func(ctx) (T, error)`
+
+Dependencies are resolved with `MustInject`/`MustInjectAll` **inside** the
+builder, before `Constructor` is called — not as parameters to the
+constructor function itself.
+
+## Scopes
+
+| Scope | Behavior |
+|---|---|
+| `gonest.ScopeSingleton` | One instance for the whole app (default). |
+| `gonest.ScopeTransient` | A new instance on every resolve. |
+| `gonest.ScopeRequest` | One instance per HTTP request. |
+
+## Resolving dependencies
+
+`MustInject[T](owner)` resolves by type and panics unless exactly one match is
+found. Pointer types (`*UserService`) require an exact match; interface types
+match exactly **or** fall back to `reflect.Type.Implements()`.
+
+`MustInjectAll[T](owner)` returns every match for `T` — used for
+plugin/strategy patterns — and never panics on 0 or N matches.
+
+```go
+type Connectable interface{ Ping() bool }
+
+var SystemController = gonest.NewController(func(controller *gonest.Controller) {
+  connectables := gonest.MustInjectAll[Connectable](controller)
+  _ = connectables
+})
+```
+
+## Next steps
+
+<Cards>
+  <Card title="Controllers & Routes" href="/docs/core-concepts/controllers" />
+  <Card title="Dependency Injection" href="/docs/core-concepts/dependency-injection" />
+</Cards>

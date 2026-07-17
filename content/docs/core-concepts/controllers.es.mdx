@@ -1,0 +1,57 @@
+---
+title: Controllers y Rutas
+description: Agrupando rutas bajo un prefijo de ruta
+---
+
+A `Controller` groups routes under a path prefix. Build one with
+`gonest.NewController(func(controller *gonest.Controller) {...})`.
+
+```go
+var UserController = gonest.NewController(func(controller *gonest.Controller) {
+  controller.Path("/users")
+  controller.Tags("Users")
+  userService := gonest.MustInject[*UserService](controller)
+
+  controller.RouteGet("/", func(route *gonest.Route) {
+    route.Handler(func(req *gonest.Request, res *gonest.Response) {
+      res.Json(userService.List())
+    })
+  })
+})
+```
+
+## Controller methods
+
+| Method | Description |
+|---|---|
+| `Path("/prefix")` | Set the path prefix for every route in this controller. |
+| `Tags("...")` | OpenAPI tags, inherited by every route unless overridden. |
+| `BearerAuth()` | Mark every route as requiring bearer auth in OpenAPI, unless overridden. |
+| `Use(...)` | Controller-scoped middleware. |
+| `Guards(...)` | Controller-scoped guards. |
+| `Interceptors(...)` | Controller-scoped interceptors. |
+| `Filters(...)` | Controller-scoped exception filters. |
+
+## Declaring routes
+
+`controller.Route(method, path, fn)` is the generic form. Per-verb shorthands
+exist for every HTTP method:
+
+`RouteGet`, `RoutePost`, `RoutePut`, `RoutePatch`, `RouteDelete`, `RouteHead`,
+`RouteOptions`, `RouteTrace`, `RouteConnect`, `RouteQuery`.
+
+```go
+controller.RouteGet("/:user_id", func(route *gonest.Route) {
+  route.Summary("Get a user by id")
+  route.Handler(func(req *gonest.Request, res *gonest.Response) {
+    res.Json(map[string]string{"id": req.Param("user_id")})
+  })
+})
+```
+
+## Next steps
+
+<Cards>
+  <Card title="Dependency Injection" href="/docs/core-concepts/dependency-injection" />
+  <Card title="Request Pipeline" href="/docs/request-pipeline" />
+</Cards>

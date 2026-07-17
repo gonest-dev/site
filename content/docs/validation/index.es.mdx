@@ -1,0 +1,64 @@
+---
+title: Fundamentos del Schema Builder
+description: NewSchema, campos identificados por puntero y las restricciones base
+---
+
+Every gonest validation and OpenAPI feature builds on one foundation:
+`gonest.NewSchema[T](func(t *T, m *gonest.Schema) {...})`.
+
+```go
+type UserEntity struct {
+  Id    int64  `json:"id"`
+  Name  string `json:"name"`
+  Email string `json:"email"`
+}
+
+var userEntitySchema = gonest.NewSchema[UserEntity](func(t *UserEntity, m *gonest.Schema) {
+  m.Title("UserEntity")
+  m.Property(&t.Id).Integer().Required()
+  m.Property(&t.Name).String().Required().Min(1).Max(50)
+  m.Property(&t.Email).Email().Required()
+})
+```
+
+<Callout type="info">
+  Fields are identified by their own **pointer address**
+  (`m.Property(&t.Name)`) — not a struct tag, not a string field name. Rename
+  the field and the compiler catches every reference; there's no string to
+  fall out of sync.
+</Callout>
+
+## Base constraints
+
+Every branch (`String()`, `Integer()`, `Array()`, `Object()`, ...) returns a
+chainable builder that always has these four:
+
+| Method | Effect |
+|---|---|
+| `Required()` | Field must be present (and non-null unless `Nullable()`). |
+| `Nullable()` | Accept JSON `null` even when `Required()`. |
+| `Description("...")` | OpenAPI field description. |
+| `Examples(...)` | OpenAPI example values. |
+
+`m.Title("...")` sets the name this schema appears under in OpenAPI's
+`components.schemas` — defaults to the Go type name.
+
+<Callout type="warn">
+  Historical note: earlier `.specs` design docs used `NewMetadata[T]` /
+  `*Metadata` and `MustJsonBody[T]`, then a later pre-release revision used
+  a family of body/params/query-specific `Must...`-prefixed parsing functions.
+  All of these were superseded before release — `NewSchema[T]` / `*Schema`
+  and `gonest.MustParse[T](src, schema)` (with `src` from
+  `req.Body().Json()`, `req.Params()`, `req.Query()`, `req.Headers()`, or
+  `req.Body().Form(onFile)`) are the current, correct names. This site uses
+  only the current API.
+</Callout>
+
+## Next steps
+
+<Cards>
+  <Card title="String Family" href="/docs/validation/string-family" />
+  <Card title="Numeric, Boolean & Date/Time" href="/docs/validation/numeric-boolean-datetime" />
+  <Card title="Array Builder" href="/docs/validation/array-builder" />
+  <Card title="Object Builder" href="/docs/validation/object-builder" />
+</Cards>

@@ -1,0 +1,34 @@
+---
+title: Schema
+description: Referencia de gonest.NewSchema y las ramas de PropertyBuilder
+---
+
+`gonest.NewSchema[T](func(t *T, m *gonest.Schema) {...})`
+
+| Method | Description |
+|---|---|
+| `Title("...")` | Name in `components.schemas` (defaults to Go type name). |
+| `Property(&t.X)` | Identify a field by pointer, returns a `*PropertyBuilder`. |
+
+## Base constraints (every branch)
+
+`Required()`, `Nullable()`, `Description("...")`, `Examples(...)`
+
+## Branches
+
+| Branch | Returns | Notes |
+|---|---|---|
+| `String()`, `Email()`, `Uuid()`, `Uri()`, `Hostname()`, `Ipv4()`, `Ipv6()`, `Password()`, `Byte()`, `Binary()` | `*StringMetadata` | `Min`/`Max`/`Pattern` |
+| `Integer()`, `Int32()`, `Float()`, `Double()` | `*NumericMetadata` | `Min`/`Max` |
+| `Boolean()`, `Date()`, `DateTime()` | `*PropertyBuilder` | wrapper-less, base constraints only |
+| `Array()` | `*ArrayMetadata` | dual-state (container vs. item), see `.Items(fn)` |
+| `Object(fn)` | `*ObjectMetadata` | single-state, `.Metadata(ref)` / `.AdditionalProperties()` |
+| `Custom(fn func(raw any) (any, error))` | `*PropertyBuilder` | universal escape hatch |
+
+## Parsing functions
+
+`gonest.MustParse[T](src, schema) T` / `gonest.Parse[T](src, schema) (T, error)`,
+where `src` is one of `req.Params()`, `req.Query()`, `req.Headers()`,
+`req.Body().Json()`, or `req.Body().Form(onFile)`.
+
+See: [Schema Builder Basics](/docs/validation), [Array Builder](/docs/validation/array-builder), [Object Builder](/docs/validation/object-builder), [Runtime Validation](/docs/validation/runtime-validation)

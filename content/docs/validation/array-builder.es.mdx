@@ -1,0 +1,61 @@
+---
+title: Array Builder
+description: El patrón de doble estado container/item
+---
+
+`Property(&t.Tags).Array()` returns a `*ArrayMetadata` — a **dual-state**
+builder. It configures either the container field or the item, depending on
+where you call things.
+
+<Callout type="warn">
+  This is the most common point of confusion in the schema API. `.Items(func(m
+  *gonest.ArrayMetadata) {...})` is a **callback**, not a variadic list.
+  **Inside** the callback, `m.String()`/`m.Integer()`/`m.Object(ref)` etc.
+  configure the **item**. Calling `m.Required()`/`m.Nullable()`/`m.Description()`/`m.Examples()`
+  **outside** the callback (directly on the return of `.Array()`) always
+  configures the **container field**, never the item.
+</Callout>
+
+```go
+m.Property(&t.Tags).Array().Items(func(m *gonest.ArrayMetadata) {
+  m.String().Min(1).Max(50) // item: each string 1-50 chars
+  m.Required()              // item: required (non-null entries)
+  m.Description("Tags do usuário")
+  m.Examples("admin", "beta")
+})
+```
+
+## Item-count bounds vs. item bounds
+
+`Items(fn)` returns the array metadata itself, so chaining `.Min(n)`/`.Max(n)`
+**after** `Items(fn)` sets bounds on the **number of items** in the array —
+distinct from the item's own `Min`/`Max` set inside the callback.
+
+```go
+m.Property(&t.Tags).Array().Items(func(m *gonest.ArrayMetadata) {
+  m.String().Min(1).Max(50) // each item: 1-50 characters
+}).Min(1).Max(10) // the array itself: 1-10 items
+```
+
+## Nested object arrays ($ref reuse)
+
+```go
+m.Property(&t.Addresses).Array().Items(func(m *gonest.ArrayMetadata) {
+  m.Object(addressMetadata) // reuse an already-registered schema
+  m.Required()
+}).Min(1)
+```
+
+## Try it
+
+<Callout type="info">
+  An in-browser WASM playground demonstrating a nested-array-item violation
+  lands here once the playground is built (see
+  `.specs/features/docs-site/tasks.md` T43-T46).
+</Callout>
+
+## Next steps
+
+<Cards>
+  <Card title="Object Builder" href="/docs/validation/object-builder" />
+</Cards>

@@ -1,0 +1,77 @@
+---
+title: OpenAPI & Swagger
+description: Gerando documentação OpenAPI a partir dos mesmos schemas que validam
+---
+
+The same `*Schema` that validates a request also generates OpenAPI —
+never a second, parallel declaration.
+
+```go
+doc := gonest.NewOpenAPI("3.1.0", func(b *gonest.OpenAPI) {
+  b.Title("Example API")
+  b.Version("1.0.0")
+  b.BearerAuth()
+})
+
+gonest.GenerateOpenApiSchema(app, doc) // walks the whole module tree
+
+gonest.SetupSwagger(app, "/docs", doc, gonest.SwaggerOptions{
+  JsonDocumentUrl: "/openapi.json",
+  PersistAuth:     true,
+})
+```
+
+## `OpenAPI` builder
+
+`Title`/`Description`/`Version`/`Contact(name, url, email)`/`License(name, url)`/`BearerAuth()`,
+each with a matching getter (`TitleText()`, `ContactInfo()`, `HasBearerAuth()`, etc.).
+
+## Route documentation methods
+
+| Method | Description |
+|---|---|
+| `Summary(...)` | Short operation summary. |
+| `Description(...)` | Longer operation description. |
+| `OperationId(...)` | OpenAPI `operationId`. |
+| `Tags(...)` | Overrides the controller's tags for this route. |
+| `BearerAuth()` | Overrides the controller's bearer-auth setting for this route. |
+| `RequestBody(schema)` | Document the request body schema. |
+| `Response(status, schema...)` | Document a response; variadic — 0 args documents a bodyless status; repeat for multiple statuses (same status overwrites). |
+| `PathParams(schema)` | Document path parameters. |
+| `QueryParams(schema)` | Document query parameters. |
+| `ExcludeFromDocs()` | Hide this route from generated docs. |
+| `Deprecated()` | Mark this route as deprecated. |
+
+## Schema generation
+
+`GenerateOpenApiSchema` walks the full module tree (root + imported,
+recursively), dedups repeated `*Schema` references **by pointer identity**
+(emitting `$ref` reuse in `components.schemas`), and covers every branch
+family (String/Numeric/Boolean/DateTime/Array/Object).
+
+<Callout type="warn">
+  [`Custom(fn)`](/docs/validation/custom-validators) fields appear in
+  generated schemas with name/required/nullable/description, but **no
+  type/format** — a closure has no declarative shape to infer from. This is a
+  known, permanent limitation, not a bug to be fixed.
+</Callout>
+
+## Swagger UI
+
+`SetupSwagger` registers 2 plain routes directly on the adapter — no
+DI/Module involvement — one serving `doc.Document()` JSON, one serving an
+HTML page loading Swagger UI via CDN (no vendored assets). Configure via
+`SwaggerOptions{JsonDocumentUrl, PersistAuth, DocExpansion}`.
+
+## Try it
+
+<Callout type="info">
+  A live "Try it" panel against a documented route lands here once the
+  hosted demo is deployed (see `.specs/features/docs-site/tasks.md` T47-T49).
+</Callout>
+
+## Next steps
+
+<Cards>
+  <Card title="Event Emitter" href="/docs/emitter" />
+</Cards>

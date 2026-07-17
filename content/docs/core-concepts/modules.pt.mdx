@@ -1,0 +1,51 @@
+---
+title: Módulos
+description: Conectando providers, controllers e estágios do pipeline
+---
+
+A `Module` is the unit gonest bootstraps. Build one with
+`gonest.NewModule(func(module *gonest.Module) {...})`.
+
+```go
+var UserModule = gonest.NewModule(func(module *gonest.Module) {
+  module.Providers(UserProvider)
+  module.Controllers(UserController)
+})
+```
+
+## Methods
+
+| Method | Description |
+|---|---|
+| `Providers(...)` | Register providers owned by this module. |
+| `Controllers(...)` | Register controllers owned by this module. |
+| `Imports(...)` | Import other modules, gaining access to their exported providers. |
+| `Exports(...)` | Expose providers to modules that import this one. |
+| `Use(...)` | Register global middleware. **Root module only.** |
+| `Filters(...)` | Register global exception filters. **Root module only.** |
+| `Listeners(...)` | Register event listeners for the [Event Emitter](/docs/emitter). |
+| `Schedulers(...)` | Register [Scheduler](/docs/scheduler) jobs. |
+| `Name("...")` | Set a readable name used in error messages. |
+
+<Callout type="warn">
+  `Use` and `Filters` are root-only when applied at the module level — they
+  apply globally to every request. Per-controller `Use`/`Filters` also exist
+  (see [Request Pipeline](/docs/request-pipeline)) and combine with the
+  global ones.
+</Callout>
+
+## Applying global middleware and filters
+
+```go
+var AppModule = gonest.NewModule(func(module *gonest.Module) {
+  module.Use(RequestIdMiddleware)
+  module.Filters(FooFilter)
+})
+```
+
+## Next steps
+
+<Cards>
+  <Card title="Providers" href="/docs/core-concepts/providers" />
+  <Card title="Controllers & Routes" href="/docs/core-concepts/controllers" />
+</Cards>

@@ -1,0 +1,70 @@
+---
+title: Validación en Tiempo de Ejecución
+description: Validando parámetros de ruta, query string y cuerpo JSON
+---
+
+Three separate tag families map to three separate sources: `param:"..."`,
+`query:"..."`, and `json:"..."`.
+
+```go
+type UserIdParams struct {
+  UserId int64 `param:"user_id"`
+}
+
+var userIdParamsSchema = gonest.NewSchema[UserIdParams](func(t *UserIdParams, m *gonest.Schema) {
+  m.Property(&t.UserId).Integer().Min(1).Required()
+})
+
+var UserController = gonest.NewController(func(controller *gonest.Controller) {
+  controller.RouteGet("/:user_id", func(route *gonest.Route) {
+    route.Params(userIdParamsSchema)
+    route.Response(gonest.HttpStatusOk, func(response *gonest.Response) {
+      response.Schema(userEntitySchema)
+    })
+    route.Handler(func(req *gonest.Request, res *gonest.Response) {
+      params := gonest.MustParse[UserIdParams](req.Params(), userIdParamsSchema)
+      res.Json(params)
+    })
+  })
+})
+```
+
+## Parsing functions
+
+Validation always goes through one unified pair:
+
+- `gonest.Parse[T](src, schema) (T, error)` — non-panicking.
+- `gonest.MustParse[T](src, schema) T` — panics on validation failure (the
+  panic is turned into a `BadRequestException` response by the framework).
+
+`T` is the plain struct type (e.g. `UserIdParams`), not a pointer.
+
+`src` is a `Parseable` obtained from one of five sources on `*gonest.Request`:
+
+| Source | Reads from |
+|---|---|
+| `req.Params()` | Path parameters (`param:"..."` tags) |
+| `req.Query()` | Query string (`query:"..."` tags) |
+| `req.Headers()` | HTTP headers |
+| `req.Body().Json()` | JSON request body (`json:"..."` tags) |
+| `req.Body().Form(onFile)` | Multipart form body (see [Multipart](/docs/multipart)) |
+
+## Validation behavior
+
+- **Every** violation is collected — validation never fails fast on the
+  first error.
+- Validation is **recursive**: array items are each checked individually,
+  object `$ref`s are walked into.
+- `BadRequestException`'s `details` is an ordered list of `{field, message}`.
+
+<Callout type="warn">
+  `Nullable()` + a JSON `null` value is accepted even on a `Required` field.
+  But a `Required` field whose key is **entirely absent** from the payload is
+  always a violation — **absence is not the same as null**.
+</Callout>
+
+## Next steps
+
+<Cards>
+  <Card title="Custom Validators" href="/docs/validation/custom-validators" />
+</Cards>

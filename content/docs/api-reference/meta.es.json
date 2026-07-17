@@ -1,0 +1,18 @@
+{
+  "title": "Referencia de la API",
+  "pages": [
+    "index",
+    "module",
+    "provider",
+    "controller",
+    "schema",
+    "exceptions",
+    "middleware",
+    "guard",
+    "interceptor",
+    "filter",
+    "emitter",
+    "scheduler",
+    "testing"
+  ]
+}

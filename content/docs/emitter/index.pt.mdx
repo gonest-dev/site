@@ -1,0 +1,47 @@
+---
+title: Emissor de Eventos
+description: Eventos tipados e fire-and-forget entre providers
+---
+
+`gonest.Emitter` is a **framework singleton** — always resolvable via
+`MustInject[*gonest.Emitter]` in any module, with zero explicit registration.
+
+```go
+type UserCreatedEvent struct{ UserID int64 }
+
+var UserCreatedListener = gonest.NewListener(func(listener *gonest.Listener) {
+  gonest.MustOn[UserCreatedEvent](listener, func(ctx context.Context, event UserCreatedEvent) {
+    // handle the event
+  })
+})
+
+var UserModule = gonest.NewModule(func(module *gonest.Module) {
+  module.Listeners(UserCreatedListener)
+})
+
+var UserProvider = gonest.NewProvider(func(provider *gonest.Provider) {
+  emitter := gonest.MustInject[*gonest.Emitter](provider)
+  provider.Constructor(func() *UserService { return &UserService{emitter: emitter} })
+})
+```
+
+<Callout type="info">
+  `MustOn[EventType](listener, handler)` is a free **function**, not a
+  method — Go disallows type parameters on methods.
+</Callout>
+
+## Emit semantics
+
+`Emitter.Emit(event)` is **fire-and-forget**: one goroutine per registered
+listener for that exact event type, returns immediately, never blocks the
+caller. A listener's panic or error is recovered internally and never
+propagates.
+
+There is **no wildcard/string-pattern** event matching — events are typed by
+Go struct.
+
+## Next steps
+
+<Cards>
+  <Card title="Scheduler" href="/docs/scheduler" />
+</Cards>

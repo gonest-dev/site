@@ -1,0 +1,60 @@
+---
+title: Inyección de Dependencias
+description: MustInject, MustInjectAll y multi-binding
+---
+
+gonest resolves dependencies by **type**, not by name or string token.
+
+## `MustInject[T](owner)`
+
+Resolves exactly one instance of `T`. Panics if zero or more than one match is
+found.
+
+- **Pointer types** (`*UserService`) require an exact type match.
+- **Interface types** match an exact registration, or fall back to
+  `reflect.Type.Implements()` if exactly one provider satisfies the interface.
+
+```go
+userService := gonest.MustInject[*UserService](controller)
+```
+
+## `MustInjectAll[T](owner)`
+
+Resolves **every** provider matching `T`. Never panics on 0 or N matches — use
+it for plugin/strategy patterns where multiple providers legitimately
+implement the same interface.
+
+```go
+type Pingable interface {
+  Name() string
+  Ping(ctx context.Context) error
+}
+
+var HealthController = gonest.NewController(func(controller *gonest.Controller) {
+  controller.Path("/health")
+  pingables := gonest.MustInjectAll[Pingable](controller)
+  _ = pingables
+})
+```
+
+<Callout type="info">
+  This is the same pattern used for [Health Checks](/docs/health-checks): any
+  number of services can implement `Pingable`, and the health controller
+  discovers all of them automatically.
+</Callout>
+
+## Where `MustInject` can be called
+
+`MustInject`/`MustInjectAll` are legal inside `Provider`, `Controller`
+builders — anywhere the framework guarantees Phase 1 (provider resolution) has
+already completed. See [Bootstrap](/docs/getting-started/bootstrap).
+
+`Guard` builders are the one exception: they have **no** `MustInject` support,
+because a single guard can be attached across multiple controllers/modules —
+there's no single "owner" to resolve against.
+
+## Next steps
+
+<Cards>
+  <Card title="Request Pipeline" href="/docs/request-pipeline" />
+</Cards>

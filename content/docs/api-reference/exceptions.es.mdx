@@ -1,0 +1,20 @@
+---
+title: Exceptions
+description: Referencia de HttpException y excepciones integradas
+---
+
+`gonest.HttpException` — base type. `NewHttpException().SetStatus(...).SetName(...).SetMessage(...).SetDetails(...)`
+
+## Built-ins
+
+| Type | Status | Constructor |
+|---|---|---|
+| `NotFoundException` | 404 | `NewNotFoundException(details any)` |
+| `BadRequestException` | 400 | `NewBadRequestException(details any)` |
+| `ConflictException` | 409 | `NewConflictException(details any)` |
+| `UnauthorizedException` | 401 | `NewUnauthorizedException(details any)` |
+| `ForbiddenException` | 403 | `NewForbiddenException(details any)` |
+
+`gonest.HttpStatus*` — all 63 standard `net/http.StatusXxx` constants re-exported.
+
+See: [Exceptions & Panic Recovery](/docs/request-pipeline/exceptions)

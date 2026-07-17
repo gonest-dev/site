@@ -1,0 +1,40 @@
+---
+title: Scheduler
+description: Jobs de cron, interval e timeout
+---
+
+```go
+var CleanupScheduler = gonest.NewScheduler(func(scheduler *gonest.Scheduler) {
+  scheduler.Cron("cleanup", "0 0 * * *", func(ctx context.Context) {
+    // runs every day at midnight
+  })
+  scheduler.Interval("ping", time.Minute, func(ctx context.Context) {
+    // runs every minute
+  })
+  scheduler.Timeout("warmup", 5*time.Second, func(ctx context.Context) {
+    // runs once, 5 seconds after bootstrap
+  })
+})
+
+var AppModule = gonest.NewModule(func(module *gonest.Module) {
+  module.Schedulers(CleanupScheduler)
+})
+```
+
+- `Cron(name, expr, fn)` parses a standard 5-field cron expression via
+  `github.com/robfig/cron/v3`.
+- `Interval(name, dur, fn)` repeats every duration.
+- `Timeout(name, dur, fn)` fires exactly once.
+- `Scheduler.Stop(name)` cancels a running job.
+
+<Callout type="info">
+  Each job execution is fully isolated — its own `recover`, its own
+  goroutine. A panic in one job never derails the process or blocks the next
+  scheduled run.
+</Callout>
+
+## Next steps
+
+<Cards>
+  <Card title="Health Checks" href="/docs/health-checks" />
+</Cards>
