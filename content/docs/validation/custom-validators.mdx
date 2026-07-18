@@ -37,6 +37,60 @@ Use `Custom` for domain-specific formats or transforms the fixed vocabulary
   [OpenAPI & Swagger](/docs/openapi).
 </Callout>
 
+## Sanitize: pre-processing that composes
+
+`Custom(fn)` **replaces** every built-in check (Min/Max/Pattern never run
+afterwards). `Sanitize(fn func(raw any) any)` is different: it transforms
+`raw` **before** anything else runs, but the built-in checks (or `Custom`,
+if both are set) still run afterwards, on the transformed value:
+
+```go
+m.Property(&t.Cpf).String().Min(11).Max(11).Pattern(`^\d{11}$`).Sanitize(func(raw any) any {
+  s, _ := raw.(string)
+  return strings.TrimSpace(s) // "  12345678901  " still passes Min/Max/Pattern
+}).Required()
+```
+
+`Sanitize` must come **after** `Min`/`Max`/`Pattern` in the chain (it
+returns a bare `*PropertyBuilder`, same as `Custom` — those two live on the
+branch-specific wrapper, e.g. `*StringSchema`).
+
+<Callout type="info">
+  `fn` may run twice per request (once during validation, once during
+  population) — it must be idempotent, same contract as `Custom(fn)`.
+</Callout>
+
+## Refine: cross-field checks
+
+Some checks need more than one field — e.g. a password confirmation.
+`Schema.Refine(fn func(dst any) (field string, err error))` registers a
+check that runs only **after** every individual field has validated and
+been populated:
+
+```go
+var updateUserSchema = gonest.NewSchema[UpdateUserDTO](func(t *UpdateUserDTO, m *gonest.Schema) {
+  m.Property(&t.Password).String().Min(8).Required()
+  m.Property(&t.ConfirmPassword).String().Min(8).Required()
+
+  m.Refine(func(dst any) (field string, err error) {
+    d := dst.(*UpdateUserDTO)
+    if d.Password != d.ConfirmPassword {
+      return "confirmPassword", errors.New("must match password")
+    }
+    return "", nil
+  })
+})
+```
+
+Calling `Refine` more than once accumulates checks — every one runs
+(never stops at the first failure), each contributing at most one
+violation.
+
+<Callout type="warn">
+  V1 scope: `Refine` only runs for JSON body (`req.Body().Json()`).
+  Params/query/form/headers aren't covered yet.
+</Callout>
+
 ## Try it
 
 <Callout type="info">

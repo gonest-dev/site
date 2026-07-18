@@ -23,7 +23,31 @@ description: gonest.NewSchema and PropertyBuilder branch reference
 | `Boolean()`, `Date()`, `DateTime()` | `*PropertyBuilder` | wrapper-less, base constraints only |
 | `Array()` | `*ArrayMetadata` | dual-state (container vs. item), see `.Items(fn)` |
 | `Object(fn)` | `*ObjectMetadata` | single-state, `.Metadata(ref)` / `.AdditionalProperties()` |
-| `Custom(fn func(raw any) (any, error))` | `*PropertyBuilder` | universal escape hatch |
+| `Custom(fn func(raw any) (any, error))` | `*PropertyBuilder` | universal escape hatch, replaces built-in checks |
+| `Sanitize(fn func(raw any) any)` | `*PropertyBuilder` | pre-processing, composes with built-in checks (doesn't replace them) |
+
+## Cross-field checks
+
+`Schema.Refine(fn func(dst any) (field string, err error)) *Schema` registers a
+check run after every individual field validates and populates — for
+comparisons no single field can know on its own (e.g. password
+confirmation). Multiple `Refine` calls accumulate; all run (collect-all).
+See [Custom Validators](/docs/validation/custom-validators) for the full
+example.
+
+## Standalone values (no struct)
+
+`gonest.NewValue[T any](fn func(m *gonest.Value)) *gonest.Schema` builds a
+`*Schema` for a single primitive value — no struct wrapping it. `Value` is
+an alias of `PropertyBuilder`, reusing the same branch methods:
+
+```go
+var cpfSchema = gonest.NewValue[string](func(m *gonest.Value) {
+  m.String().Min(11).Max(11).Pattern(`^\d{11}$`).Required()
+})
+
+cpf := gonest.MustParse[string](req.Body().Json(), cpfSchema)
+```
 
 ## Parsing functions
 

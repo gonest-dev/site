@@ -63,6 +63,26 @@ Validation always goes through one unified pair:
   always a violation — **absence is not the same as null**.
 </Callout>
 
+## Partial updates (`Accessor[T]`)
+
+`gonest.Accessor[T]` tracks whether a field was explicitly present in the
+JSON body — including explicit `null` — for PATCH-style handlers that
+should only touch what the client actually sent:
+
+```go
+type UpdateUserDTO struct {
+  Name  gonest.Accessor[string] `json:"name"`
+  Email gonest.Accessor[string] `json:"email"`
+}
+
+body := gonest.MustParse[*UpdateUserDTO](req.Body().Json(), updateUserSchema)
+body.Name.OnDirty(func(name string) { user.Name = name })
+body.Email.Apply(&user.Email)
+
+// or build a partial-update map directly, keyed by json tag
+changes := gonest.AccessorsToDirtyMap(body)
+```
+
 ## Next steps
 
 <Cards>
