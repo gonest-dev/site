@@ -59,7 +59,7 @@ const pt: HomeDictionary = {
     { title: 'Event Emitter', description: 'Eventos tipados, fire-and-forget entre provedores.' },
     { title: 'Scheduler', description: 'Jobs de cron, interval e timeout.' },
     { title: 'Health Checks', description: 'Rotas de readiness e liveness no estilo Terminus.' },
-    { title: 'Testes', description: 'Bootstrap em memória, overrides de provider, assertions.' },
+    { title: 'Testing', description: 'Bootstrap em memória, overrides de provider, assertions.' },
     { title: 'Builders Type-safe', description: 'Campos identificados por ponteiro, não por string tags.' },
   ],
   footerLicenseNote: 'gonest é open source, distribuído sob a licença MIT.',
