@@ -14,8 +14,8 @@ type CreatePostForm struct {
   Title string `form:"title"`
 }
 
-var createPostFormSchema = gonest.NewSchema[CreatePostForm](func(t *CreatePostForm, m *gonest.Schema) {
-  m.Property(&t.Title).String().Required()
+var createPostFormSchema = gonest.NewSchema[CreatePostForm](func(t *CreatePostForm, s *gonest.Schema) {
+  s.Property(&t.Title).String().Required()
 })
 
 var PostController = gonest.NewController(func(controller *gonest.Controller) {

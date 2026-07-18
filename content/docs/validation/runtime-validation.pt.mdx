@@ -11,8 +11,8 @@ type UserIdParams struct {
   UserId int64 `param:"user_id"`
 }
 
-var userIdParamsSchema = gonest.NewSchema[UserIdParams](func(t *UserIdParams, m *gonest.Schema) {
-  m.Property(&t.UserId).Integer().Min(1).Required()
+var userIdParamsSchema = gonest.NewSchema[UserIdParams](func(t *UserIdParams, s *gonest.Schema) {
+  s.Property(&t.UserId).Integer().Min(1).Required()
 })
 
 var UserController = gonest.NewController(func(controller *gonest.Controller) {
