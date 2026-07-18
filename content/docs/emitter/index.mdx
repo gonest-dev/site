@@ -40,6 +40,21 @@ propagates.
 There is **no wildcard/string-pattern** event matching — events are typed by
 Go struct.
 
+## Dynamic subscriptions (`Subscribe[T]`)
+
+`MustOn` registers a static, app-lifetime handler. `gonest.Subscribe[T](emitter, done)` is its dynamic
+counterpart — a channel that lives only as long as `done` stays open (typically one connection's
+lifetime), closed automatically once it fires. This is what GraphQL Subscriptions
+(see [GraphQL](/docs/graphql)) are built on:
+
+```go
+func(ctx *gonest.GraphqlContext, emit func(any)) {
+  for event := range gonest.Subscribe[OrderCreatedEvent](emitter, ctx.Done()) {
+    emit(event)
+  }
+}
+```
+
 ## Next steps
 
 <Cards>

@@ -40,6 +40,21 @@ se propaga.
 **No hay coincidencia de eventos por patrón de cadena/wildcard** — los eventos están tipados por
 struct de Go.
 
+## Subscriptions dinámicas (`Subscribe[T]`)
+
+`MustOn` registra un handler estático, de por vida de la app. `gonest.Subscribe[T](emitter, done)` es
+su contraparte dinámica — un canal que vive solo mientras `done` permanezca abierto (típicamente la
+duración de una conexión), cerrado automáticamente en cuanto se dispara. Sobre esto se construyen las
+Subscriptions de GraphQL (ver [GraphQL](/docs/graphql)):
+
+```go
+func(ctx *gonest.GraphqlContext, emit func(any)) {
+  for event := range gonest.Subscribe[OrderCreatedEvent](emitter, ctx.Done()) {
+    emit(event)
+  }
+}
+```
+
 ## Próximos pasos
 
 <Cards>

@@ -8,6 +8,7 @@
     "validation",
     "multipart",
     "openapi",
+    "graphql",
     "emitter",
     "scheduler",
     "health-checks",
