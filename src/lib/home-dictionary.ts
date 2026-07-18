@@ -21,7 +21,8 @@ const en: HomeDictionary = {
   badge: 'NestJS-inspired, built for Go',
   heroTagline: 'dependency injection for Go, done right.',
   heroSubtitle:
-    'Modules, providers, controllers, and a full request pipeline — the developer experience NestJS gives Node/TypeScript, without giving up idiomatic Go.',
+    'Modules, providers, controllers, and a full request pipeline — ' +
+    'the developer experience NestJS gives Node/TypeScript, without giving up idiomatic Go.',
   ctaGetStarted: 'Get Started',
   ctaGithub: 'View on GitHub',
   capabilitiesSectionTitle: 'Everything a NestJS developer expects',
