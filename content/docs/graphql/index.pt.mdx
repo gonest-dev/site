@@ -1,6 +1,6 @@
 ---
 title: GraphQL
-description: Resolvers, geração automática de SDL e Subscriptions via SSE/WebSocket
+description: Resolvers, geração automática de SDL e Subscriptions via protocolos reais graphql-transport-ws/graphql-sse
 ---
 
 `GraphqlResolver` é análogo a `Controller` — registrado via `module.Resolvers(...)`, reaproveitando o
@@ -89,19 +89,40 @@ automaticamente quando o client desconecta. `orderService.Create(...)` continua 
 `emitter.Emit(OrderCreatedEvent{...})` exatamente como já faria para um listener estático via
 `MustOn` — a Subscription não sabe nem se importa quem publica o evento, só o seu tipo.
 
-### Transporte: SSE e WebSocket
+### Transporte: protocolos reais, seguindo especificação
 
-Subscriptions conectam através de dois endpoints, registrados automaticamente assim que pelo menos
-uma `Subscription` existe — `:name` seleciona qual assinar, argumentos chegam via um único parâmetro
-de query `?args=<JSON>` (não há corpo de requisição numa conexão de longa duração):
+Query, Mutation e Subscription despacham todos pelo mesmo path `/graphql`, multiplexados por
+protocolo em vez de por URL — sem formato ad-hoc, sem endpoint separado por Subscription:
 
 ```
-GET /graphql/stream/onOrderCreated?args={"customerId":42}   -- SSE
-GET /graphql/ws/onOrderCreated?args={"customerId":42}       -- WebSocket
+POST /graphql                                          -- GraphQL-over-HTTP simples
+GET  /graphql  (Upgrade: websocket)                     -- graphql-transport-ws
+GET  /graphql  (Accept: text/event-stream, sem token)   -- graphql-sse, Distinct connections mode
+PUT  /graphql -> 201 {token}                            -- graphql-sse, Single connection mode: reserva
+GET  /graphql  (com token)                              -- graphql-sse, Single connection mode: conecta
+POST /graphql  (com token + extensions.operationId)     -- graphql-sse, Single connection mode: executa
+DELETE /graphql?operationId=X  (com token)              -- graphql-sse, Single connection mode: cancela
 ```
 
-Ambos chamam `Subscription.Handler` diretamente — nenhum passa pelo motor de execução do
-`graphql-go/graphql`, que nunca trouxe um motor de streaming de subscription pronto.
+<Callout type="info">
+  Uma IDE GraphQL de verdade (Apollo Sandbox, GraphiQL) conecta direto em `/graphql` — sem URL
+  alternativa pra configurar. Ela negocia `graphql-transport-ws` durante o handshake WebSocket
+  (`Sec-WebSocket-Protocol` é ecoado de volta) e fala o formato padrão de mensagens
+  `ConnectionInit`/`ConnectionAck`, `Subscribe`/`Next`/`Complete`.
+</Callout>
+
+Query/Mutation via WebSocket reusam o MESMO dispatch (motor de execução do `graphql-go/graphql`) que
+`POST /graphql` já usa — só o framing muda. Uma mensagem `Subscribe` resolve pra uma operação de
+resultado único (Query/Mutation, exatamente um `Next` + `Complete`) ou uma de streaming (Subscription,
+um `Next` por `emit(value)`), decidido em runtime pelo campo raiz requisitado. Múltiplas operações
+rodam concorrentemente na mesma conexão WebSocket, isoladas por `id`.
+
+O modo Distinct connections do SSE é o mais simples: uma requisição `GET` com
+`Accept: text/event-stream` por operação, o corpo da resposta É o stream de eventos. O modo Single
+connection existe pro limite estrito de conexões por domínio dos browsers — o client reserva um token
+via `PUT`, abre UMA conexão `GET` carregando esse token, e despacha cada operação seguinte como um
+`POST` separado (ou cancela uma de streaming via `DELETE`), com todo resultado roteado de volta por
+essa única conexão compartilhada.
 
 <Callout type="warn">
   Um panic dentro do `Handler` de uma Subscription é recuperado (não derruba o processo), mas ainda
@@ -168,7 +189,8 @@ em TEMPO DE BUILD do SDL (um erro de configuração, não uma falha por request)
 
 <Callout type="info">
   Veja rodando de ponta a ponta em [`.examples/blog-graphql`](https://github.com/gonest-dev/gonest/tree/main/.examples/blog-graphql)
-  — Query/Mutation/Subscription sobre um repositório de Posts em memória, com uma subscription SSE/WebSocket ao vivo.
+  — Query/Mutation/Subscription sobre um repositório de Posts em memória, demonstrando os 3 transportes
+  reais (WebSocket, SSE Distinct connections, SSE Single connection).
 </Callout>
 
 <Cards>

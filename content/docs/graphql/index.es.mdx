@@ -1,6 +1,6 @@
 ---
 title: GraphQL
-description: Resolvers, generación automática de SDL y Subscriptions vía SSE/WebSocket
+description: Resolvers, generación automática de SDL y Subscriptions vía protocolos reales graphql-transport-ws/graphql-sse
 ---
 
 `GraphqlResolver` es análogo a `Controller` — registrado vía `module.Resolvers(...)`, reutilizando el
@@ -89,19 +89,40 @@ de una conexión), cerrado automáticamente cuando el cliente se desconecta. `or
 sigue llamando `emitter.Emit(OrderCreatedEvent{...})` exactamente como ya lo haría para un listener
 estático vía `MustOn` — la Subscription no sabe ni le importa quién publica el evento, solo su tipo.
 
-### Transporte: SSE y WebSocket
+### Transporte: protocolos reales, siguiendo la especificación
 
-Las Subscriptions se conectan a través de dos endpoints, registrados automáticamente en cuanto existe
-al menos una `Subscription` — `:name` selecciona cuál transmitir, los argumentos llegan vía un único
-parámetro de query `?args=<JSON>` (no hay cuerpo de solicitud en una conexión de larga duración):
+Query, Mutation y Subscription despachan todos por el mismo path `/graphql`, multiplexados por
+protocolo en vez de por URL — sin formato ad-hoc, sin endpoint separado por Subscription:
 
 ```
-GET /graphql/stream/onOrderCreated?args={"customerId":42}   -- SSE
-GET /graphql/ws/onOrderCreated?args={"customerId":42}       -- WebSocket
+POST /graphql                                          -- GraphQL-over-HTTP simple
+GET  /graphql  (Upgrade: websocket)                     -- graphql-transport-ws
+GET  /graphql  (Accept: text/event-stream, sin token)   -- graphql-sse, Distinct connections mode
+PUT  /graphql -> 201 {token}                            -- graphql-sse, Single connection mode: reserva
+GET  /graphql  (con token)                              -- graphql-sse, Single connection mode: conecta
+POST /graphql  (con token + extensions.operationId)     -- graphql-sse, Single connection mode: ejecuta
+DELETE /graphql?operationId=X  (con token)              -- graphql-sse, Single connection mode: cancela
 ```
 
-Ambos llaman a `Subscription.Handler` directamente — ninguno pasa por el motor de ejecución de
-`graphql-go/graphql`, que nunca trajo un motor de streaming de subscription propio.
+<Callout type="info">
+  Un IDE GraphQL real (Apollo Sandbox, GraphiQL) se conecta directo a `/graphql` — sin URL alternativa
+  que configurar. Negocia `graphql-transport-ws` durante el handshake WebSocket
+  (`Sec-WebSocket-Protocol` se devuelve en eco) y habla el formato estándar de mensajes
+  `ConnectionInit`/`ConnectionAck`, `Subscribe`/`Next`/`Complete`.
+</Callout>
+
+Query/Mutation vía WebSocket reusan el MISMO dispatch (motor de ejecución de `graphql-go/graphql`) que
+`POST /graphql` ya usa — solo cambia el framing. Un mensaje `Subscribe` resuelve a una operación de
+resultado único (Query/Mutation, exactamente un `Next` + `Complete`) o una de streaming (Subscription,
+un `Next` por `emit(value)`), decidido en runtime por el campo raíz solicitado. Múltiples operaciones
+corren concurrentemente en la misma conexión WebSocket, aisladas por `id`.
+
+El modo Distinct connections de SSE es el más simple: una solicitud `GET` con
+`Accept: text/event-stream` por operación, el cuerpo de la respuesta ES el stream de eventos. El modo
+Single connection existe por el límite estricto de conexiones por dominio de los navegadores — el
+cliente reserva un token vía `PUT`, abre UNA conexión `GET` cargando ese token, y despacha cada
+operación siguiente como un `POST` separado (o cancela una de streaming vía `DELETE`), con cada
+resultado enrutado de vuelta por esa única conexión compartida.
 
 <Callout type="warn">
   Un panic dentro del `Handler` de una Subscription se recupera (no derriba el proceso), pero todavía
@@ -168,7 +189,8 @@ en TIEMPO DE BUILD del SDL (un error de configuración, no una falla por request
 
 <Callout type="info">
   Míralo funcionando de principio a fin en [`.examples/blog-graphql`](https://github.com/gonest-dev/gonest/tree/main/.examples/blog-graphql)
-  — Query/Mutation/Subscription sobre un repositorio de Posts en memoria, con una subscription SSE/WebSocket en vivo.
+  — Query/Mutation/Subscription sobre un repositorio de Posts en memoria, demostrando los 3 transportes
+  reales (WebSocket, SSE Distinct connections, SSE Single connection).
 </Callout>
 
 <Cards>

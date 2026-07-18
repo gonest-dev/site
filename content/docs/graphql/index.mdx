@@ -1,6 +1,6 @@
 ---
 title: GraphQL
-description: Resolvers, automatic SDL generation, and Subscriptions over SSE/WebSocket
+description: Resolvers, automatic SDL generation, and Subscriptions over real graphql-transport-ws/graphql-sse protocols
 ---
 
 `GraphqlResolver` is analogous to `Controller` — registered via `module.Resolvers(...)`, reusing the
@@ -88,19 +88,39 @@ automatically once the client disconnects. `orderService.Create(...)` keeps call
 `emitter.Emit(OrderCreatedEvent{...})` exactly as it already would for a static `MustOn` listener —
 the Subscription doesn't know or care who publishes the event, only its type.
 
-### Transport: SSE and WebSocket
+### Transport: real, spec-compliant protocols
 
-Subscriptions connect through two endpoints, registered automatically the moment at least one
-`Subscription` exists — `:name` selects which one to stream, arguments arrive via a single
-`?args=<JSON object>` query parameter (there is no request body on a long-lived connection):
+Query, Mutation, and Subscription all dispatch through the same `/graphql` path, multiplexed by
+protocol instead of by URL — no ad-hoc format, no separate per-Subscription endpoint:
 
 ```
-GET /graphql/stream/onOrderCreated?args={"customerId":42}   -- SSE
-GET /graphql/ws/onOrderCreated?args={"customerId":42}       -- WebSocket
+POST /graphql                                          -- plain GraphQL-over-HTTP
+GET  /graphql  (Upgrade: websocket)                     -- graphql-transport-ws
+GET  /graphql  (Accept: text/event-stream, no token)     -- graphql-sse, Distinct connections mode
+PUT  /graphql -> 201 {token}                             -- graphql-sse, Single connection mode: reserve
+GET  /graphql  (with token)                              -- graphql-sse, Single connection mode: connect
+POST /graphql  (with token + extensions.operationId)     -- graphql-sse, Single connection mode: execute
+DELETE /graphql?operationId=X  (with token)              -- graphql-sse, Single connection mode: cancel
 ```
 
-Both call `Subscription.Handler` directly — neither goes through `graphql-go/graphql`'s own execution
-engine, which never shipped a subscription streaming engine of its own.
+<Callout type="info">
+  A real GraphQL IDE (Apollo Sandbox, GraphiQL) connects to `/graphql` directly — no alternate URL to
+  configure. It negotiates `graphql-transport-ws` during the WebSocket handshake
+  (`Sec-WebSocket-Protocol` is echoed back) and speaks the standard `ConnectionInit`/`ConnectionAck`,
+  `Subscribe`/`Next`/`Complete` message shapes.
+</Callout>
+
+Query/Mutation over WebSocket reuse the exact same dispatch (`graphql-go/graphql`'s own execution
+engine) that `POST /graphql` already uses — only the framing differs. A `Subscribe` message resolves
+to either a single-result operation (Query/Mutation, exactly one `Next` + `Complete`) or a streaming
+one (Subscription, one `Next` per `emit(value)`), decided at runtime by which root field the client
+requested. Multiple operations run concurrently on the same WebSocket connection, isolated by `id`.
+
+SSE's Distinct connections mode is the simplest: one `GET` request with `Accept: text/event-stream`
+per operation, response body IS the event stream. Single connection mode exists for browsers'
+strict per-domain connection limit — a client reserves a token via `PUT`, opens ONE `GET` connection
+carrying it, then dispatches every subsequent operation as a separate `POST` (or cancels a streaming
+one via `DELETE`), with every result routed back over that one shared connection.
 
 <Callout type="warn">
   A panic inside a Subscription `Handler` is recovered (it won't crash the process), but there is no
@@ -166,7 +186,8 @@ declaration. `Custom(fn)` without `.GraphqlScalar(name)` on a schema consumed by
 
 <Callout type="info">
   See it running end-to-end in [`.examples/blog-graphql`](https://github.com/gonest-dev/gonest/tree/main/.examples/blog-graphql)
-  — Query/Mutation/Subscription over an in-memory Post store, with a live SSE/WebSocket subscription.
+  — Query/Mutation/Subscription over an in-memory Post store, demonstrating all 3 real transports
+  (WebSocket, SSE Distinct connections, SSE Single connection).
 </Callout>
 
 <Cards>
