@@ -1,4 +1,6 @@
 {
-  "title": "Testes",
-  "pages": ["index"]
+  "title": "Testing",
+  "pages": [
+    "index"
+  ]
 }
