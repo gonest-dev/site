@@ -55,7 +55,7 @@ graph TD
 4. **Validation & Schemas** — Schema Builder Basics, String Family, Numeric & Boolean, Date & Time, Array Builder, Object Builder, Runtime Validation (params/query/body), Custom Validators
 5. **Multipart & File Uploads** — Multipart Form Streaming
 6. **OpenAPI & Swagger** — Generating OpenAPI docs, Swagger UI setup, Route documentation methods
-7. **Event Emitter** — Emitter, Listeners, `MustOn`
+7. **Emitter** — Emitter, Listeners, `MustOn`
 8. **Scheduler** — Cron, Interval, Timeout
 9. **Health Checks** — Terminus-style readiness/liveness pattern
 10. **Testing** — `MustNewTestApp`, `MustOverride`, `MustRequest`, assertions

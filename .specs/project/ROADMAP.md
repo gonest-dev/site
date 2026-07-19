@@ -56,7 +56,7 @@
 **platform-docs** - PLANNED
 
 - OpenAPI/Swagger generation page
-- Event Emitter page
+- Emitter page
 - Scheduler page
 - Health Checks (Terminus-style) page
 - Testing helpers page (`MustNewTestApp`, `MustOverride`, `MustRequest`)

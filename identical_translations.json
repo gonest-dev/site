@@ -1,0 +1,277 @@
+[
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\controller.es.mdx",
+    "type": "title",
+    "value": "Controller & Route"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\controller.pt.mdx",
+    "type": "title",
+    "value": "Controller & Route"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\emitter.es.mdx",
+    "type": "title",
+    "value": "Emitter"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\emitter.pt.mdx",
+    "type": "title",
+    "value": "Emitter"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\exceptions.es.mdx",
+    "type": "title",
+    "value": "Exceptions"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\exceptions.pt.mdx",
+    "type": "title",
+    "value": "Exceptions"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\filter.es.mdx",
+    "type": "title",
+    "value": "Filter"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\filter.pt.mdx",
+    "type": "title",
+    "value": "Filter"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\guard.es.mdx",
+    "type": "title",
+    "value": "Guard"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\guard.pt.mdx",
+    "type": "title",
+    "value": "Guard"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\interceptor.es.mdx",
+    "type": "title",
+    "value": "Interceptor"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\interceptor.pt.mdx",
+    "type": "title",
+    "value": "Interceptor"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\middleware.es.mdx",
+    "type": "title",
+    "value": "Middleware"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\middleware.pt.mdx",
+    "type": "title",
+    "value": "Middleware"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\module.es.mdx",
+    "type": "title",
+    "value": "Module"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\module.pt.mdx",
+    "type": "title",
+    "value": "Module"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\provider.es.mdx",
+    "type": "title",
+    "value": "Provider"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\provider.pt.mdx",
+    "type": "title",
+    "value": "Provider"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\scheduler.es.mdx",
+    "type": "title",
+    "value": "Scheduler"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\scheduler.pt.mdx",
+    "type": "title",
+    "value": "Scheduler"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\schema.es.mdx",
+    "type": "title",
+    "value": "Schema"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\schema.pt.mdx",
+    "type": "title",
+    "value": "Schema"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\config\\index.es.mdx",
+    "type": "title",
+    "value": "Config Loading"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\config\\index.pt.mdx",
+    "type": "title",
+    "value": "Config Loading"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\config\\meta.es.json",
+    "type": "title",
+    "value": "Config Loading"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\config\\meta.pt.json",
+    "type": "title",
+    "value": "Config Loading"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\emitter\\index.es.mdx",
+    "type": "title",
+    "value": "Emitter"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\emitter\\index.pt.mdx",
+    "type": "title",
+    "value": "Emitter"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\emitter\\meta.es.json",
+    "type": "title",
+    "value": "Emitter"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\emitter\\meta.pt.json",
+    "type": "title",
+    "value": "Emitter"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\graphql\\index.es.mdx",
+    "type": "title",
+    "value": "GraphQL"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\graphql\\index.pt.mdx",
+    "type": "title",
+    "value": "GraphQL"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\graphql\\meta.es.json",
+    "type": "title",
+    "value": "GraphQL"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\graphql\\meta.pt.json",
+    "type": "title",
+    "value": "GraphQL"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\lifecycle-hooks\\index.es.mdx",
+    "type": "title",
+    "value": "Lifecycle Hooks"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\lifecycle-hooks\\index.pt.mdx",
+    "type": "title",
+    "value": "Lifecycle Hooks"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\lifecycle-hooks\\meta.es.json",
+    "type": "title",
+    "value": "Lifecycle Hooks"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\lifecycle-hooks\\meta.pt.json",
+    "type": "title",
+    "value": "Lifecycle Hooks"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\openapi\\index.pt.mdx",
+    "type": "title",
+    "value": "OpenAPI & Swagger"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\openapi\\meta.es.json",
+    "type": "title",
+    "value": "OpenAPI & Swagger"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\openapi\\meta.pt.json",
+    "type": "title",
+    "value": "OpenAPI & Swagger"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\filters.es.mdx",
+    "type": "title",
+    "value": "Filters"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\filters.pt.mdx",
+    "type": "title",
+    "value": "Filters"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\guards.es.mdx",
+    "type": "title",
+    "value": "Guards"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\guards.pt.mdx",
+    "type": "title",
+    "value": "Guards"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\interceptors.es.mdx",
+    "type": "title",
+    "value": "Interceptors"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\interceptors.pt.mdx",
+    "type": "title",
+    "value": "Interceptors"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\middleware.es.mdx",
+    "type": "title",
+    "value": "Middleware"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\middleware.pt.mdx",
+    "type": "title",
+    "value": "Middleware"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\scheduler\\index.es.mdx",
+    "type": "title",
+    "value": "Scheduler"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\scheduler\\index.pt.mdx",
+    "type": "title",
+    "value": "Scheduler"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\array-builder.es.mdx",
+    "type": "title",
+    "value": "Array Builder"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\array-builder.pt.mdx",
+    "type": "title",
+    "value": "Array Builder"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\object-builder.es.mdx",
+    "type": "title",
+    "value": "Object Builder"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\object-builder.pt.mdx",
+    "type": "title",
+    "value": "Object Builder"
+  }
+]

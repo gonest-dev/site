@@ -133,7 +133,7 @@ T42, T46, T50 → T51 → T52 → T53
 - Skill: NONE
 
 **Done when**:
-- [ ] All 11 sections (Getting Started, Core Concepts, Request Pipeline, Validation & Schemas, Multipart, OpenAPI/Swagger, Event Emitter, Scheduler, Health Checks, Testing, API Reference) exist as folders with `meta.json` ordering
+- [ ] All 11 sections (Getting Started, Core Concepts, Request Pipeline, Validation & Schemas, Multipart, OpenAPI/Swagger, Emitter, Scheduler, Health Checks, Testing, API Reference) exist as folders with `meta.json` ordering
 - [ ] Placeholder `index.mdx` in each section builds without error
 - [ ] Gate check passes: `npm run build`
 
@@ -846,12 +846,12 @@ T42, T46, T50 → T51 → T52 → T53
 
 ---
 
-### T34: Event Emitter page [P]
+### T34: Emitter[P]
 
 **What**: Write `content/docs/emitter/index.mdx` documenting `gonest.Emitter` (framework singleton, always injectable), `NewListener`/`MustOn[EventType]` (free function, not method), `Emitter.Emit` fire-and-forget/goroutine-per-listener/panic-recovery semantics, no wildcard events.
 **Where**: `content/docs/emitter/index.mdx`
 **Depends on**: T32
-**Reuses**: Content map Event Emitter example (`UserCreatedEvent`)
+**Reuses**: Content map Emitterle (`UserCreatedEvent`)
 
 **Tools**:
 - MCP: NONE
@@ -1316,73 +1316,73 @@ Phase 10 (Sequential):       { T42, T46, T49 } → T50 → T51 → T52 → T53
 
 ## Task Granularity Check
 
-| Task | Scope | Status |
-|---|---|---|
-| T1-T9 | 1 config/component each | ✅ Granular |
-| T11-T38 | 1-2 related MDX pages each (cohesive, same section) | ✅ Granular (2-page tasks are same topic, same file type) |
-| T42 | 13 reference pages, same template, same review pass | ⚠️ Marked [P] as one batch task — acceptable since it's mechanical restatement of already-researched content, not new design work; could be split into 13 sub-tasks if a sub-agent-per-file parallelization is desired during Execute |
-| T43-T50 | 1 component/pipeline step each | ✅ Granular |
-| T51-T53 | 1 verification pass each | ✅ Granular |
+| Task    | Scope                                               | Status                                                                                                                                                                                                                               |
+| ------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| T1-T9   | 1 config/component each                             | ✅ Granular                                                                                                                                                                                                                           |
+| T11-T38 | 1-2 related MDX pages each (cohesive, same section) | ✅ Granular (2-page tasks are same topic, same file type)                                                                                                                                                                             |
+| T42     | 13 reference pages, same template, same review pass | ⚠️ Marked [P] as one batch task — acceptable since it's mechanical restatement of already-researched content, not new design work; could be split into 13 sub-tasks if a sub-agent-per-file parallelization is desired during Execute |
+| T43-T50 | 1 component/pipeline step each                      | ✅ Granular                                                                                                                                                                                                                           |
+| T51-T53 | 1 verification pass each                            | ✅ Granular                                                                                                                                                                                                                           |
 
 ---
 
 ## Diagram-Definition Cross-Check
 
-| Task | Depends On (task body) | Diagram Shows | Status |
-|---|---|---|---|
-| T1 | None | None | ✅ Match |
-| T2 | T1 | T1→T2 | ✅ Match |
-| T3 | T1 | T1→...→T3 (sequential chain) | ✅ Match |
-| T4 | T3 | T3→T4 | ✅ Match |
-| T5 | T4 | T4→T5 | ✅ Match |
-| T6,T7,T8,T9 | T5 (each) | T5→{T6,T7,T8,T9} | ✅ Match |
-| T10 | T6,T7,T8,T9 | {T6,T7,T8,T9}→T10 | ✅ Match |
-| T11,T12 | T10 | T10→{T11,T12,...} | ✅ Match |
-| T13,T14,T15,T16 | T10 | T10→{...,T13,T14,T15,T16} | ✅ Match |
-| T17 | T13,T14,T15,T16 | {T13-T16}→T17 | ✅ Match |
-| T18-T22 | T17 | T17→{T18..T22} | ✅ Match |
-| T23 | T18,T19,T20,T21,T22 | {T18-T22}→T23 | ✅ Match |
-| T24-T31 | T23 | T23→{T24..T31} | ✅ Match |
-| T32 | T24..T31 | {T24-T31}→T32 | ✅ Match |
-| T33-T38 | T32 | T32→{T33..T38} | ✅ Match |
-| T39 | T33-T38 | {T33-T38}→T39 | ✅ Match |
-| T40 | T17,T23,T32,T39 | shown as gate after all content phases | ✅ Match |
-| T41 | T40 | T40→T41 | ✅ Match |
-| T42 | T41 | T41→T42[P] | ✅ Match |
-| T43 | T31 | T31→T43 | ✅ Match |
-| T44 | T43 | T43→T44 | ✅ Match |
-| T45 | T44 | T44→T45 | ✅ Match |
-| T46 | T45 | T45→T46 | ✅ Match |
-| T47 | T22 | T22→T47 | ✅ Match |
-| T48 | T47 | T47→T48 | ✅ Match |
-| T49 | T48 | T48→T49 | ✅ Match |
-| T50 | T46,T49 | {T46,T49}→T50 | ✅ Match |
-| T51 | T42,T46,T50 | {T42,T46,T50}→T51 (T49 folded into T50's dep chain) | ✅ Match |
-| T52 | T51 | T51→T52 | ✅ Match |
-| T53 | T51,T52 | {T51,T52}→T53 | ✅ Match |
+| Task            | Depends On (task body) | Diagram Shows                                       | Status  |
+| --------------- | ---------------------- | --------------------------------------------------- | ------- |
+| T1              | None                   | None                                                | ✅ Match |
+| T2              | T1                     | T1→T2                                               | ✅ Match |
+| T3              | T1                     | T1→...→T3 (sequential chain)                        | ✅ Match |
+| T4              | T3                     | T3→T4                                               | ✅ Match |
+| T5              | T4                     | T4→T5                                               | ✅ Match |
+| T6,T7,T8,T9     | T5 (each)              | T5→{T6,T7,T8,T9}                                    | ✅ Match |
+| T10             | T6,T7,T8,T9            | {T6,T7,T8,T9}→T10                                   | ✅ Match |
+| T11,T12         | T10                    | T10→{T11,T12,...}                                   | ✅ Match |
+| T13,T14,T15,T16 | T10                    | T10→{...,T13,T14,T15,T16}                           | ✅ Match |
+| T17             | T13,T14,T15,T16        | {T13-T16}→T17                                       | ✅ Match |
+| T18-T22         | T17                    | T17→{T18..T22}                                      | ✅ Match |
+| T23             | T18,T19,T20,T21,T22    | {T18-T22}→T23                                       | ✅ Match |
+| T24-T31         | T23                    | T23→{T24..T31}                                      | ✅ Match |
+| T32             | T24..T31               | {T24-T31}→T32                                       | ✅ Match |
+| T33-T38         | T32                    | T32→{T33..T38}                                      | ✅ Match |
+| T39             | T33-T38                | {T33-T38}→T39                                       | ✅ Match |
+| T40             | T17,T23,T32,T39        | shown as gate after all content phases              | ✅ Match |
+| T41             | T40                    | T40→T41                                             | ✅ Match |
+| T42             | T41                    | T41→T42[P]                                          | ✅ Match |
+| T43             | T31                    | T31→T43                                             | ✅ Match |
+| T44             | T43                    | T43→T44                                             | ✅ Match |
+| T45             | T44                    | T44→T45                                             | ✅ Match |
+| T46             | T45                    | T45→T46                                             | ✅ Match |
+| T47             | T22                    | T22→T47                                             | ✅ Match |
+| T48             | T47                    | T47→T48                                             | ✅ Match |
+| T49             | T48                    | T48→T49                                             | ✅ Match |
+| T50             | T46,T49                | {T46,T49}→T50                                       | ✅ Match |
+| T51             | T42,T46,T50            | {T42,T46,T50}→T51 (T49 folded into T50's dep chain) | ✅ Match |
+| T52             | T51                    | T51→T52                                             | ✅ Match |
+| T53             | T51,T52                | {T51,T52}→T53                                       | ✅ Match |
 
 ---
 
 ## Test Co-location Validation
 
-| Task | Code Layer Created/Modified | Matrix Requires | Task Says | Status |
-|---|---|---|---|---|
-| T1-T5 | Fumadocs config/theme/MDX registration | build + lint | none/quick (build+typecheck) | ✅ OK |
-| T6-T10 | Layout/theme/search/hero shell | build + lint | full/e2e (T9 search) | ✅ OK |
-| T11-T39 | MDX content pages | none (manual review) | none | ✅ OK |
-| T40 | Content audit (no new code) | none | none | ✅ OK |
-| T41-T42 | MDX content pages | none | none | ✅ OK |
-| T43 | Go/WASM entrypoint | go-unit | unit (go-unit) | ✅ OK |
-| T44 | Build pipeline config | build + lint | none/full | ✅ OK |
-| T45 | WasmPlayground component | e2e | e2e | ✅ OK |
-| T46 | MDX embeds (wiring only) | none (covered by T45's e2e) | none | ✅ OK |
-| T47 | Infra/deploy config | none (manual verify) | none/full | ✅ OK |
-| T48 | TryItPanel component | e2e | e2e | ✅ OK |
-| T49 | MDX embeds (wiring only) | none (covered by T48's e2e) | none | ✅ OK |
-| T50 | Resilience verification | e2e | e2e | ✅ OK |
-| T51 | Full-site gate | build + lint | full | ✅ OK |
-| T52 | Search verification | e2e | e2e | ✅ OK |
-| T53 | Review/STATE.md update | none | none | ✅ OK |
+| Task    | Code Layer Created/Modified            | Matrix Requires             | Task Says                    | Status |
+| ------- | -------------------------------------- | --------------------------- | ---------------------------- | ------ |
+| T1-T5   | Fumadocs config/theme/MDX registration | build + lint                | none/quick (build+typecheck) | ✅ OK   |
+| T6-T10  | Layout/theme/search/hero shell         | build + lint                | full/e2e (T9 search)         | ✅ OK   |
+| T11-T39 | MDX content pages                      | none (manual review)        | none                         | ✅ OK   |
+| T40     | Content audit (no new code)            | none                        | none                         | ✅ OK   |
+| T41-T42 | MDX content pages                      | none                        | none                         | ✅ OK   |
+| T43     | Go/WASM entrypoint                     | go-unit                     | unit (go-unit)               | ✅ OK   |
+| T44     | Build pipeline config                  | build + lint                | none/full                    | ✅ OK   |
+| T45     | WasmPlayground component               | e2e                         | e2e                          | ✅ OK   |
+| T46     | MDX embeds (wiring only)               | none (covered by T45's e2e) | none                         | ✅ OK   |
+| T47     | Infra/deploy config                    | none (manual verify)        | none/full                    | ✅ OK   |
+| T48     | TryItPanel component                   | e2e                         | e2e                          | ✅ OK   |
+| T49     | MDX embeds (wiring only)               | none (covered by T48's e2e) | none                         | ✅ OK   |
+| T50     | Resilience verification                | e2e                         | e2e                          | ✅ OK   |
+| T51     | Full-site gate                         | build + lint                | full                         | ✅ OK   |
+| T52     | Search verification                    | e2e                         | e2e                          | ✅ OK   |
+| T53     | Review/STATE.md update                 | none                        | none                         | ✅ OK   |
 
 All tasks pass both cross-checks. No restructuring needed.
 

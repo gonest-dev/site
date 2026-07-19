@@ -1,0 +1,872 @@
+[
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\controller.es.mdx",
+    "title": "Controller & Route",
+    "description": "Referencia de gonest.NewController y gonest.Route"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\controller.mdx",
+    "title": "Controller & Route",
+    "description": "gonest.NewController and gonest.Route reference"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\controller.pt.mdx",
+    "title": "Controller & Route",
+    "description": "Referência de gonest.NewController e gonest.Route"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\emitter.es.mdx",
+    "title": "Emitter",
+    "description": "Referencia de gonest.Emitter y Listener"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\emitter.mdx",
+    "title": "Emitter",
+    "description": "gonest.Emitter and Listener reference"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\emitter.pt.mdx",
+    "title": "Emitter",
+    "description": "Referência de gonest.Emitter e Listener"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\exceptions.es.mdx",
+    "title": "Exceptions",
+    "description": "Referencia de HttpException y excepciones integradas"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\exceptions.mdx",
+    "title": "Exceptions",
+    "description": "HttpException and built-in exception reference"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\exceptions.pt.mdx",
+    "title": "Exceptions",
+    "description": "Referência de HttpException e exceções embutidas"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\filter.es.mdx",
+    "title": "Filter",
+    "description": "Referencia de gonest.NewFilter"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\filter.mdx",
+    "title": "Filter",
+    "description": "gonest.NewFilter reference"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\filter.pt.mdx",
+    "title": "Filter",
+    "description": "Referência de gonest.NewFilter"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\guard.es.mdx",
+    "title": "Guard",
+    "description": "Referencia de gonest.NewGuard"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\guard.mdx",
+    "title": "Guard",
+    "description": "gonest.NewGuard reference"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\guard.pt.mdx",
+    "title": "Guard",
+    "description": "Referência de gonest.NewGuard"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\index.es.mdx",
+    "title": "Referencia de la API",
+    "description": "Páginas de referencia para cada símbolo exportado de gonest"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\index.mdx",
+    "title": "API Reference",
+    "description": "Reference pages for every exported gonest symbol"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\index.pt.mdx",
+    "title": "Referência da API",
+    "description": "Páginas de referência para cada símbolo exportado do gonest"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\interceptor.es.mdx",
+    "title": "Interceptor",
+    "description": "Referencia de gonest.NewInterceptor"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\interceptor.mdx",
+    "title": "Interceptor",
+    "description": "gonest.NewInterceptor reference"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\interceptor.pt.mdx",
+    "title": "Interceptor",
+    "description": "Referência de gonest.NewInterceptor"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\meta.es.json",
+    "title": "Referencia de la API"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\meta.json",
+    "title": "API Reference"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\meta.pt.json",
+    "title": "Referência da API"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\middleware.es.mdx",
+    "title": "Middleware",
+    "description": "Referencia de gonest.NewMiddleware"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\middleware.mdx",
+    "title": "Middleware",
+    "description": "gonest.NewMiddleware reference"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\middleware.pt.mdx",
+    "title": "Middleware",
+    "description": "Referência de gonest.NewMiddleware"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\module.es.mdx",
+    "title": "Module",
+    "description": "Referencia de gonest.NewModule"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\module.mdx",
+    "title": "Module",
+    "description": "gonest.NewModule reference"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\module.pt.mdx",
+    "title": "Module",
+    "description": "Referência de gonest.NewModule"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\provider.es.mdx",
+    "title": "Provider",
+    "description": "Referencia de gonest.NewProvider"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\provider.mdx",
+    "title": "Provider",
+    "description": "gonest.NewProvider reference"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\provider.pt.mdx",
+    "title": "Provider",
+    "description": "Referência de gonest.NewProvider"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\scheduler.es.mdx",
+    "title": "Scheduler",
+    "description": "Referencia de gonest.NewScheduler"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\scheduler.mdx",
+    "title": "Scheduler",
+    "description": "gonest.NewScheduler reference"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\scheduler.pt.mdx",
+    "title": "Scheduler",
+    "description": "Referência de gonest.NewScheduler"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\schema.es.mdx",
+    "title": "Schema",
+    "description": "Referencia de gonest.NewSchema y de las ramas de PropertyBuilder"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\schema.mdx",
+    "title": "Schema",
+    "description": "gonest.NewSchema and PropertyBuilder branch reference"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\schema.pt.mdx",
+    "title": "Schema",
+    "description": "Referência de gonest.NewSchema e das ramificações do PropertyBuilder"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\testing.es.mdx",
+    "title": "Testing",
+    "description": "Referencia de MustNewTestApp y TestResponse"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\testing.mdx",
+    "title": "Testing",
+    "description": "MustNewTestApp and TestResponse reference"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\api-reference\\testing.pt.mdx",
+    "title": "Testes",
+    "description": "Referência de MustNewTestApp e TestResponse"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\config\\index.es.mdx",
+    "title": "Config Loading",
+    "description": "Carga archivos .env con paridad completa con dotenvx, luego enlaza y valida structs de config tipadas a partir de variables de entorno, reutilizando el mismo Schema/Parse[T] que REST ya usa"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\config\\index.mdx",
+    "title": "Config Loading",
+    "description": "Load .env files with full dotenvx parity, then bind and validate typed config structs from env vars, reusing the same Schema/Parse[T] REST already uses"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\config\\index.pt.mdx",
+    "title": "Config Loading",
+    "description": "Carregue arquivos .env com paridade completa com o dotenvx, depois faça bind e validação de structs de config tipadas a partir de variáveis de ambiente, reaproveitando o mesmo Schema/Parse[T] que o REST já usa"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\config\\meta.es.json",
+    "title": "Config Loading"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\config\\meta.json",
+    "title": "Config Loading"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\config\\meta.pt.json",
+    "title": "Config Loading"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\controllers.es.mdx",
+    "title": "Controllers y Rutas",
+    "description": "Agrupando rutas bajo un prefijo de ruta"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\controllers.mdx",
+    "title": "Controllers & Routes",
+    "description": "Grouping routes under a path prefix"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\controllers.pt.mdx",
+    "title": "Controllers e Rotas",
+    "description": "Agrupando rotas sob um prefixo de caminho"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\dependency-injection.es.mdx",
+    "title": "Inyección de Dependencias",
+    "description": "MustInject, MustInjectAll y multi-binding"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\dependency-injection.mdx",
+    "title": "Dependency Injection",
+    "description": "MustInject, MustInjectAll, and multi-binding"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\dependency-injection.pt.mdx",
+    "title": "Injeção de Dependência",
+    "description": "MustInject, MustInjectAll e multi-binding"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\index.es.mdx",
+    "title": "Conceptos Fundamentales",
+    "description": "Modules, Providers, Controllers e Inyección de Dependencias"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\index.mdx",
+    "title": "Core Concepts",
+    "description": "Modules, Providers, Controllers and Dependency Injection"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\index.pt.mdx",
+    "title": "Conceitos Fundamentais",
+    "description": "Modules, Providers, Controllers e Injeção de Dependências"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\meta.es.json",
+    "title": "Conceptos Básicos"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\meta.json",
+    "title": "Core Concepts"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\meta.pt.json",
+    "title": "Conceitos Básicos"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\modules.es.mdx",
+    "title": "Módulos",
+    "description": "Conectando providers, controllers y etapas del pipeline"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\modules.mdx",
+    "title": "Modules",
+    "description": "Wiring providers, controllers, and pipeline stages together"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\modules.pt.mdx",
+    "title": "Módulos",
+    "description": "Conectando providers, controllers e estágios do pipeline"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\providers.es.mdx",
+    "title": "Providers y Alcances de DI",
+    "description": "Cómo gonest construye y define el alcance de las instancias de dependencias"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\providers.mdx",
+    "title": "Providers & DI Scopes",
+    "description": "How gonest builds and scopes dependency instances"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\core-concepts\\providers.pt.mdx",
+    "title": "Providers e Escopos de DI",
+    "description": "Como o gonest constrói e define o escopo das instâncias de dependência"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\emitter\\index.es.mdx",
+    "title": "Emitter",
+    "description": "Eventos tipados, fire-and-forget entre proveedores"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\emitter\\index.mdx",
+    "title": "Emitter",
+    "description": "Typed, fire-and-forget events between providers"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\emitter\\index.pt.mdx",
+    "title": "Emitter",
+    "description": "Eventos tipados, fire-and-forget entre provedores"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\emitter\\meta.es.json",
+    "title": "Emitter"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\emitter\\meta.json",
+    "title": "Emitter"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\emitter\\meta.pt.json",
+    "title": "Emitter"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\bootstrap.es.mdx",
+    "title": "Estructura del Proyecto & Bootstrap",
+    "description": "Cómo MustNewApp conecta todo"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\bootstrap.mdx",
+    "title": "Project Structure & Bootstrap",
+    "description": "How MustNewApp wires everything together"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\bootstrap.pt.mdx",
+    "title": "Estrutura do Projeto & Bootstrap",
+    "description": "Como o MustNewApp conecta tudo"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\examples.es.mdx",
+    "title": "Ejemplos",
+    "description": "Aplicaciones de ejemplo ejecutables incluidas con gonest"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\examples.mdx",
+    "title": "Examples",
+    "description": "Runnable example applications shipped with gonest"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\examples.pt.mdx",
+    "title": "Exemplos",
+    "description": "Aplicações de exemplo executáveis incluídas com o gonest"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\index.es.mdx",
+    "title": "Introducción",
+    "description": "Qué es gonest y por qué existe"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\index.mdx",
+    "title": "Introduction",
+    "description": "What gonest is and why it exists"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\index.pt.mdx",
+    "title": "Introdução",
+    "description": "O que é o gonest e por que ele existe"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\installation.es.mdx",
+    "title": "Instalación",
+    "description": "Agregar gonest a un módulo Go"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\installation.mdx",
+    "title": "Installation",
+    "description": "Add gonest to a Go module"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\installation.pt.mdx",
+    "title": "Instalação",
+    "description": "Adicionar o gonest a um módulo Go"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\meta.es.json",
+    "title": "Primeros Pasos"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\meta.json",
+    "title": "Getting Started"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\meta.pt.json",
+    "title": "Primeiros Passos"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\quickstart.es.mdx",
+    "title": "Inicio Rápido",
+    "description": "Construye tu primer módulo gonest en pocos pasos"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\quickstart.mdx",
+    "title": "Quickstart",
+    "description": "Build your first gonest module in a few steps"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\getting-started\\quickstart.pt.mdx",
+    "title": "Início Rápido",
+    "description": "Crie seu primeiro módulo gonest em poucos passos"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\graphql\\index.es.mdx",
+    "title": "GraphQL",
+    "description": "Resolvers, generación automática de SDL y Subscriptions vía protocolos reales graphql-transport-ws/graphql-sse"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\graphql\\index.mdx",
+    "title": "GraphQL",
+    "description": "Resolvers, automatic SDL generation, and Subscriptions over real graphql-transport-ws/graphql-sse protocols"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\graphql\\index.pt.mdx",
+    "title": "GraphQL",
+    "description": "Resolvers, geração automática de SDL e Subscriptions via protocolos reais graphql-transport-ws/graphql-sse"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\graphql\\meta.es.json",
+    "title": "GraphQL"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\graphql\\meta.json",
+    "title": "GraphQL"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\graphql\\meta.pt.json",
+    "title": "GraphQL"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\health-checks\\index.es.mdx",
+    "title": "Comprobaciones de Salud",
+    "description": "Rutas de readiness y liveness al estilo Terminus"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\health-checks\\index.mdx",
+    "title": "Health Checks",
+    "description": "Terminus-style readiness and liveness routes"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\health-checks\\index.pt.mdx",
+    "title": "Verificações de Saúde",
+    "description": "Rotas de readiness e liveness no estilo Terminus"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\health-checks\\meta.es.json",
+    "title": "Verificaciones de Salud"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\health-checks\\meta.json",
+    "title": "Health Checks"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\health-checks\\meta.pt.json",
+    "title": "Verificações de Saúde"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\index.es.mdx",
+    "title": "Documentación",
+    "description": "gonest — un framework de inyección de dependencias y HTTP para Go inspirado en NestJS"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\index.mdx",
+    "title": "Documentation",
+    "description": "gonest — a NestJS-inspired dependency-injection and HTTP framework for Go"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\index.pt.mdx",
+    "title": "Documentação",
+    "description": "gonest — um framework de injeção de dependência e HTTP para Go inspirado no NestJS"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\lifecycle-hooks\\index.es.mdx",
+    "title": "Lifecycle Hooks",
+    "description": "Ejecuta código en momentos bien definidos — OnModuleInit, OnApplicationBootstrap, OnModuleDestroy, BeforeApplicationShutdown, OnApplicationShutdown — igual al hook set real de NestJS"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\lifecycle-hooks\\index.mdx",
+    "title": "Lifecycle Hooks",
+    "description": "Run code at well-defined moments — OnModuleInit, OnApplicationBootstrap, OnModuleDestroy, BeforeApplicationShutdown, OnApplicationShutdown — matching NestJS's real hook set"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\lifecycle-hooks\\index.pt.mdx",
+    "title": "Lifecycle Hooks",
+    "description": "Rode código em momentos bem definidos — OnModuleInit, OnApplicationBootstrap, OnModuleDestroy, BeforeApplicationShutdown, OnApplicationShutdown — igual ao hook set real do NestJS"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\lifecycle-hooks\\meta.es.json",
+    "title": "Lifecycle Hooks"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\lifecycle-hooks\\meta.json",
+    "title": "Lifecycle Hooks"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\lifecycle-hooks\\meta.pt.json",
+    "title": "Lifecycle Hooks"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\meta.es.json",
+    "title": "Documentación"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\meta.json",
+    "title": "Docs"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\meta.pt.json",
+    "title": "Documentação"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\multipart\\index.es.mdx",
+    "title": "Streaming de Formularios Multipart",
+    "description": "Carga de archivos con streaming real, sin buffering"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\multipart\\index.mdx",
+    "title": "Multipart Form Streaming",
+    "description": "True streaming file uploads, no buffering"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\multipart\\index.pt.mdx",
+    "title": "Streaming de Formulários Multipart",
+    "description": "Upload de arquivos com streaming de verdade, sem buffering"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\multipart\\meta.es.json",
+    "title": "Multipart & Carga de Archivos"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\multipart\\meta.json",
+    "title": "Multipart & File Uploads"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\multipart\\meta.pt.json",
+    "title": "Multipart & Upload de Arquivos"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\openapi\\index.es.mdx",
+    "title": "OpenAPI y Swagger",
+    "description": "Generando documentación OpenAPI a partir de los mismos schemas que validan"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\openapi\\index.mdx",
+    "title": "OpenAPI & Swagger",
+    "description": "Generating OpenAPI docs from the same schemas that validate"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\openapi\\index.pt.mdx",
+    "title": "OpenAPI & Swagger",
+    "description": "Gerando documentação OpenAPI a partir dos mesmos schemas que validam"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\openapi\\meta.es.json",
+    "title": "OpenAPI & Swagger"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\openapi\\meta.json",
+    "title": "OpenAPI & Swagger"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\openapi\\meta.pt.json",
+    "title": "OpenAPI & Swagger"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\exceptions.es.mdx",
+    "title": "Exceptions y Recuperación de Panic",
+    "description": "HttpException, exceptions integradas y el contrato de recuperación de panic"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\exceptions.mdx",
+    "title": "Exceptions & Panic Recovery",
+    "description": "HttpException, built-in exceptions, and the panic-recovery contract"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\exceptions.pt.mdx",
+    "title": "Exceptions & Recuperação de Panic",
+    "description": "HttpException, exceptions internas e o contrato de recuperação de panic"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\filters.es.mdx",
+    "title": "Filters",
+    "description": "Capturando tipos específicos de exception y sobrescribiendo su respuesta"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\filters.mdx",
+    "title": "Filters",
+    "description": "Catching specific exception types and overriding their response"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\filters.pt.mdx",
+    "title": "Filters",
+    "description": "Capturando tipos específicos de exception e sobrescrevendo sua resposta"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\guards.es.mdx",
+    "title": "Guards",
+    "description": "Control de acceso booleano antes de que se ejecute el handler"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\guards.mdx",
+    "title": "Guards",
+    "description": "Boolean access control before the handler runs"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\guards.pt.mdx",
+    "title": "Guards",
+    "description": "Controle de acesso booleano antes da execução do handler"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\index.es.mdx",
+    "title": "Visión General y Orden de Ejecución",
+    "description": "Cómo se componen Middleware, Guard, Interceptor y Filter"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\index.mdx",
+    "title": "Overview & Execution Order",
+    "description": "How Middleware, Guard, Interceptor and Filter compose"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\index.pt.mdx",
+    "title": "Visão Geral & Ordem de Execução",
+    "description": "Como Middleware, Guard, Interceptor e Filter se compõem"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\interceptors.es.mdx",
+    "title": "Interceptors",
+    "description": "Envoltura antes/después del handler al estilo AOP"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\interceptors.mdx",
+    "title": "Interceptors",
+    "description": "AOP-style before/after wrapping around the handler"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\interceptors.pt.mdx",
+    "title": "Interceptors",
+    "description": "Envolvimento antes/depois do handler no estilo AOP"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\meta.es.json",
+    "title": "Pipeline de Solicitud"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\meta.json",
+    "title": "Request Pipeline"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\meta.pt.json",
+    "title": "Pipeline de Requisição"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\middleware.es.mdx",
+    "title": "Middleware",
+    "description": "Middleware de solicitudes al estilo Express"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\middleware.mdx",
+    "title": "Middleware",
+    "description": "Express-style request middleware"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\request-pipeline\\middleware.pt.mdx",
+    "title": "Middleware",
+    "description": "Middleware de requisição no estilo Express"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\scheduler\\index.es.mdx",
+    "title": "Scheduler",
+    "description": "Trabajos de cron, interval y timeout"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\scheduler\\index.mdx",
+    "title": "Scheduler",
+    "description": "Cron, interval and timeout jobs"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\scheduler\\index.pt.mdx",
+    "title": "Scheduler",
+    "description": "Jobs de cron, interval e timeout"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\scheduler\\meta.es.json",
+    "title": "Programador"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\scheduler\\meta.json",
+    "title": "Scheduler"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\scheduler\\meta.pt.json",
+    "title": "Agendador"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\testing\\index.es.mdx",
+    "title": "Testing",
+    "description": "Bootstrap en memoria, sobrescritura de proveedores y assertions"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\testing\\index.mdx",
+    "title": "Testing",
+    "description": "In-memory bootstrap, provider overrides, and assertions"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\testing\\index.pt.mdx",
+    "title": "Testes",
+    "description": "Bootstrap em memória, sobrescrita de provedores e assertions"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\testing\\meta.es.json",
+    "title": "Testing"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\testing\\meta.json",
+    "title": "Testing"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\testing\\meta.pt.json",
+    "title": "Testes"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\array-builder.es.mdx",
+    "title": "Array Builder",
+    "description": "El patrón de doble estado container/item"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\array-builder.mdx",
+    "title": "Array Builder",
+    "description": "The dual-state container/item pattern"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\array-builder.pt.mdx",
+    "title": "Array Builder",
+    "description": "O padrão de duplo estado container/item"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\custom-validators.es.mdx",
+    "title": "Validadores Personalizados",
+    "description": "La válvula de escape Custom(fn)"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\custom-validators.mdx",
+    "title": "Custom Validators",
+    "description": "The Custom(fn) escape hatch"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\custom-validators.pt.mdx",
+    "title": "Validadores Customizados",
+    "description": "A válvula de escape Custom(fn)"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\index.es.mdx",
+    "title": "Fundamentos del Schema Builder",
+    "description": "NewSchema, campos identificados por puntero y las restricciones base"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\index.mdx",
+    "title": "Schema Builder Basics",
+    "description": "NewSchema, pointer-identified fields, and the base constraints"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\index.pt.mdx",
+    "title": "Fundamentos do Schema Builder",
+    "description": "NewSchema, campos identificados por ponteiro e as restrições base"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\meta.es.json",
+    "title": "Validación & Schemas"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\meta.json",
+    "title": "Validation & Schemas"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\meta.pt.json",
+    "title": "Validação & Schemas"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\numeric-boolean-datetime.es.mdx",
+    "title": "Numérico, Booleano & Fecha/Hora",
+    "description": "Ramas Integer, Float, Boolean, Date y DateTime"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\numeric-boolean-datetime.mdx",
+    "title": "Numeric, Boolean & Date/Time",
+    "description": "Integer, Float, Boolean, Date and DateTime branches"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\numeric-boolean-datetime.pt.mdx",
+    "title": "Numérico, Booleano & Data/Hora",
+    "description": "Ramificações Integer, Float, Boolean, Date e DateTime"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\object-builder.es.mdx",
+    "title": "Object Builder",
+    "description": "Campos de objeto anidado de estado único"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\object-builder.mdx",
+    "title": "Object Builder",
+    "description": "Single-state nested object fields"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\object-builder.pt.mdx",
+    "title": "Object Builder",
+    "description": "Campos de objeto aninhado de estado único"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\runtime-validation.es.mdx",
+    "title": "Validación en Tiempo de Ejecución",
+    "description": "Validando parámetros de ruta, query string y cuerpo JSON"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\runtime-validation.mdx",
+    "title": "Runtime Validation",
+    "description": "Validating path params, query string, and JSON body"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\runtime-validation.pt.mdx",
+    "title": "Validação em Tempo de Execução",
+    "description": "Validando parâmetros de rota, query string e corpo JSON"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\string-family.es.mdx",
+    "title": "Familia de Strings",
+    "description": "10 ramas de string que comparten Min/Max/Pattern"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\string-family.mdx",
+    "title": "String Family",
+    "description": "10 string branches sharing Min/Max/Pattern"
+  },
+  {
+    "file": "c:\\dev\\gonest-dev\\site\\content\\docs\\validation\\string-family.pt.mdx",
+    "title": "Família de Strings",
+    "description": "10 ramificações de string compartilhando Min/Max/Pattern"
+  }
+]

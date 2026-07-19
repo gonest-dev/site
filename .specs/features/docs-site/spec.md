@@ -48,7 +48,7 @@ gonest is a complete, NestJS-inspired Go framework (all v1 milestones + Mileston
 
 **Acceptance Criteria**:
 
-1. WHEN a user opens any docs page THEN the system SHALL show a persistent left sidebar grouped into sections: Getting Started, Core Concepts, Request Pipeline, Validation & Schemas, Multipart, OpenAPI/Swagger, Event Emitter, Scheduler, Health Checks, Testing, API Reference.
+1. WHEN a user opens any docs page THEN the system SHALL show a persistent left sidebar grouped into sections: Getting Started, Core Concepts, Request Pipeline, Validation & Schemas, Multipart, OpenAPI/Swagger, Emitter, Scheduler, Health Checks, Testing, API Reference.
 2. WHEN a user presses the search shortcut (Cmd/Ctrl+K) or clicks the search box THEN the system SHALL open an instant fuzzy-search modal indexing all page titles/headings/content.
 3. WHEN a user types a query (e.g. "MustInject", "guard", "schema") THEN the system SHALL return ranked matching pages/sections within ~100ms perceived latency (client-side index).
 4. WHEN a user is on a docs page THEN the system SHALL show an on-page table-of-contents (right rail) linking to that page's headings.

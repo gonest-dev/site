@@ -24,7 +24,7 @@
 
 **v1 includes:**
 
-- Full docs IA: Getting Started, Core Concepts (Modules/Providers/Controllers/DI scopes), Request Pipeline (Middleware/Guard/Interceptor/Filter), Validation & Schema Builders (String/Numeric/Boolean/DateTime/Array/Object families), Multipart Form Streaming, OpenAPI/Swagger, Event Emitter, Scheduler, Health Checks (Terminus-style), Testing.
+- Full docs IA: Getting Started, Core Concepts (Modules/Providers/Controllers/DI scopes), Request Pipeline (Middleware/Guard/Interceptor/Filter), Validation & Schema Builders (String/Numeric/Boolean/DateTime/Array/Object families), Multipart Form Streaming, OpenAPI/Swagger, Emitter, Scheduler, Health Checks (Terminus-style), Testing.
 - Custom MDX components: Callout, Steps, Tabs, Cards (Fumadocs ships Tabs/Cards/Callout natively — confirm and extend as needed).
 - Instant/fuzzy search (Fumadocs built-in search, Orama-based).
 - Dark theme as the polished default, light theme supported.
