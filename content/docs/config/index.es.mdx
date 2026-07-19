@@ -1,0 +1,113 @@
+---
+title: Config Loading
+description: Carga archivos .env con paridad completa con dotenvx, luego enlaza y valida structs de config tipadas a partir de variables de entorno, reutilizando el mismo Schema/Parse[T] que REST ya usa
+---
+
+`gonest.Dotenv()` es un singleton — sin DI, invocable desde `main()` antes de que exista ningún
+`Module`/`Provider`/`NewApp`. Cumple dos roles: cargar un archivo `.env` en el proceso y (una vez
+cargado) actuar como fuente `Parseable` para `gonest.MustParse[T]`, igual que cualquier fuente REST.
+
+```go
+package main
+
+import "gonest.dev/gonest"
+
+func main() {
+  gonest.Dotenv().MustLoad("./.env")
+
+  app, err := gonest.NewApp[gonest.FiberApp](AppModule)
+  if err != nil {
+    panic(err)
+  }
+
+  err = app.Listen(":3000")
+  if err != nil {
+    panic(err)
+  }
+}
+```
+
+<Callout type="info">
+  `Load(paths ...string)`/`MustLoad(paths ...string)` aceptan múltiples paths — **el primer path
+  gana**: una variable ya seteada por un path anterior (o ya presente en el entorno del proceso antes
+  de que corra `Load`) nunca es sobrescrita por un path posterior, reflejando la misma precedencia de
+  `dotenvx run -f`.
+</Callout>
+
+## Sintaxis `.env` — paridad completa con `dotenvx`
+
+El parser reproduce el comportamiento real de [`dotenvx`](https://dotenvx.com/docs/env-file), no un
+subconjunto mínimo:
+
+```bash
+# comentario de línea completa
+DB_HOST=db.internal          # comentario inline
+DB_NAME='literal $VAR'       # comillas simples: sin interpolación, sin escapes
+DB_URL="postgres://${DB_HOST}/app"   # comillas dobles: interpolación + escapes
+
+# 4 operadores de default/alternate, iguales al parameter expansion de POSIX shell
+DB_PORT=${PORT:-5432}        # usa default si PORT no está seteada O está vacía
+DB_USER=${USER-admin}        # usa default solo si USER no está seteada
+DB_LABEL=${FLAG:+enabled}    # usa alternate si FLAG está seteada Y no vacía
+DB_FLAG=${FLAG+yes}          # usa alternate solo si FLAG está seteada
+
+PRIVATE_KEY=`-----BEGIN KEY-----
+multi
+line
+-----END KEY-----`
+```
+
+Los escapes (`\n`/`\r`/`\t`/`\\`) aplican solo dentro de comillas dobles, igual que `dotenvx`.
+
+## Env → Schema Binding
+
+`*Dotenv` satisface `execution.Parseable` vía `ParseInto` — `gonest.MustParse[T](gonest.Dotenv(), schema)`
+funciona idéntico a cualquier llamada `Parse[T]` de REST, reutilizando el mismo pipeline de validación
+(`resolveSchema`, `coerceParamString`, `validateValue`, `populate`) sin cambios:
+
+```go
+type DatabaseConfig struct {
+  Host string `json:"host" env:"DB_HOST"`
+  Port int64  `json:"port" env:"DB_PORT"`
+  Url  string `json:"url"  env:"DB_URL"`
+}
+
+var databaseConfigSchema = gonest.NewSchema(func(t *DatabaseConfig, s *gonest.Schema) {
+  s.Property(&t.Host).String().Required()
+  s.Property(&t.Port).Integer().Default(int64(5432))
+  s.Property(&t.Url).String().Required()
+})
+
+var DatabaseConfigProvider = gonest.NewProvider(func(provider *gonest.Provider) {
+  provider.Constructor(func() *DatabaseConfig {
+    config := gonest.MustParse[DatabaseConfig](gonest.Dotenv(), databaseConfigSchema)
+    return &config
+  })
+})
+```
+
+<Callout type="info">
+  `env:"NOMBRE"` mapea un campo a su variable de entorno, el mismo patrón de las tags `param`/`query`.
+  `PropertyBuilder.Default(value)` provee un fallback cuando la fuente (hoy solo `env`) no tiene valor
+  para ese campo — el campo deja de disparar `Required` en ese caso.
+</Callout>
+
+<Callout type="warn">
+  `Schema.Validate(instance)` (validar una struct ya construida) **no existe** y fue rechazado
+  deliberadamente — abriría un segundo camino de validación paralelo en `Schema`. `Parse[T]` siempre
+  valida contra una fuente cruda, nunca una instancia ya poblada.
+</Callout>
+
+## Próximos pasos
+
+<Callout type="info">
+  Míralo funcionando de principio a fin en [`.examples/config-dotenv`](https://github.com/gonest-dev/gonest/tree/main/.examples/config-dotenv)
+  — `DB_HOST` viene directo del `.env`, `DB_PORT` está ausente y resuelve vía `Default(5432)`, y
+  `DB_URL` prueba que la interpolación `${DB_HOST}` funcionó.
+</Callout>
+
+<Cards>
+  <Card title="Validación" href="/docs/validation" />
+  <Card title="Conceptos Centrales" href="/docs/core-concepts" />
+  <Card title="Ejemplos" href="/docs/getting-started/examples" />
+</Cards>

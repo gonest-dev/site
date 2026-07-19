@@ -9,6 +9,7 @@
     "multipart",
     "openapi",
     "graphql",
+    "config",
     "emitter",
     "scheduler",
     "health-checks",

@@ -1,0 +1,112 @@
+---
+title: Config Loading
+description: Load .env files with full dotenvx parity, then bind and validate typed config structs from env vars, reusing the same Schema/Parse[T] REST already uses
+---
+
+`gonest.Dotenv()` is a singleton — no DI, callable from `main()` before any `Module`/`Provider`/`NewApp`
+exists. It plays two roles: loading a `.env` file into the process, and (once loaded) acting as a
+`Parseable` source for `gonest.MustParse[T]`, exactly like any REST source.
+
+```go
+package main
+
+import "gonest.dev/gonest"
+
+func main() {
+  gonest.Dotenv().MustLoad("./.env")
+
+  app, err := gonest.NewApp[gonest.FiberApp](AppModule)
+  if err != nil {
+    panic(err)
+  }
+
+  err = app.Listen(":3000")
+  if err != nil {
+    panic(err)
+  }
+}
+```
+
+<Callout type="info">
+  `Load(paths ...string)`/`MustLoad(paths ...string)` accept multiple paths — **first path wins**: a
+  variable already set by an earlier path (or already present in the process environment before
+  `Load` runs) is never overwritten by a later one, mirroring `dotenvx run -f`'s own precedence.
+</Callout>
+
+## `.env` syntax — full `dotenvx` parity
+
+The parser matches [`dotenvx`](https://dotenvx.com/docs/env-file)'s real behavior, not a minimal
+subset:
+
+```bash
+# full-line comment
+DB_HOST=db.internal          # inline comment
+DB_NAME='literal $VAR'       # single quotes: no interpolation, no escapes
+DB_URL="postgres://${DB_HOST}/app"   # double quotes: interpolation + escapes
+
+# 4 default/alternate operators, same as POSIX shell parameter expansion
+DB_PORT=${PORT:-5432}        # use default if PORT unset OR empty
+DB_USER=${USER-admin}        # use default only if USER unset
+DB_LABEL=${FLAG:+enabled}    # use alternate if FLAG set AND non-empty
+DB_FLAG=${FLAG+yes}          # use alternate only if FLAG is set
+
+PRIVATE_KEY=`-----BEGIN KEY-----
+multi
+line
+-----END KEY-----`
+```
+
+Escapes (`\n`/`\r`/`\t`/`\\`) apply inside double quotes only, matching `dotenvx` exactly.
+
+## Env → Schema Binding
+
+`*Dotenv` satisfies `execution.Parseable` via `ParseInto` — `gonest.MustParse[T](gonest.Dotenv(), schema)`
+works identically to any REST `Parse[T]` call, reusing the same validation pipeline (`resolveSchema`,
+`coerceParamString`, `validateValue`, `populate`) unchanged:
+
+```go
+type DatabaseConfig struct {
+  Host string `json:"host" env:"DB_HOST"`
+  Port int64  `json:"port" env:"DB_PORT"`
+  Url  string `json:"url"  env:"DB_URL"`
+}
+
+var databaseConfigSchema = gonest.NewSchema(func(t *DatabaseConfig, s *gonest.Schema) {
+  s.Property(&t.Host).String().Required()
+  s.Property(&t.Port).Integer().Default(int64(5432))
+  s.Property(&t.Url).String().Required()
+})
+
+var DatabaseConfigProvider = gonest.NewProvider(func(provider *gonest.Provider) {
+  provider.Constructor(func() *DatabaseConfig {
+    config := gonest.MustParse[DatabaseConfig](gonest.Dotenv(), databaseConfigSchema)
+    return &config
+  })
+})
+```
+
+<Callout type="info">
+  `env:"NAME"` maps a field to its env var name, the same pattern as `param`/`query` tags.
+  `PropertyBuilder.Default(value)` supplies a fallback when the source (currently `env` only) has no
+  value for that field — the field no longer triggers `Required` in that case.
+</Callout>
+
+<Callout type="warn">
+  `Schema.Validate(instance)` (validating an already-built struct) does **not** exist and was
+  deliberately rejected — it would open a second, parallel validation path in `Schema`. `Parse[T]`
+  always validates against a raw source, never a populated instance.
+</Callout>
+
+## Next steps
+
+<Callout type="info">
+  See it running end-to-end in [`.examples/config-dotenv`](https://github.com/gonest-dev/gonest/tree/main/.examples/config-dotenv)
+  — `DB_HOST` comes straight from `.env`, `DB_PORT` is absent and resolves via `Default(5432)`, and
+  `DB_URL` proves `${DB_HOST}` interpolation ran.
+</Callout>
+
+<Cards>
+  <Card title="Validation" href="/docs/validation" />
+  <Card title="Core Concepts" href="/docs/core-concepts" />
+  <Card title="Examples" href="/docs/getting-started/examples" />
+</Cards>

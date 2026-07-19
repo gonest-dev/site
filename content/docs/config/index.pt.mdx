@@ -1,0 +1,114 @@
+---
+title: Config Loading
+description: Carregue arquivos .env com paridade completa com o dotenvx, depois faça bind e validação de structs de config tipadas a partir de variáveis de ambiente, reaproveitando o mesmo Schema/Parse[T] que o REST já usa
+---
+
+`gonest.Dotenv()` é um singleton — sem DI, chamável de `main()` antes de qualquer `Module`/`Provider`/
+`NewApp` existir. Ele acumula dois papéis: carregar um arquivo `.env` no processo e (uma vez
+carregado) atuar como fonte `Parseable` para `gonest.MustParse[T]`, exatamente como qualquer fonte
+REST.
+
+```go
+package main
+
+import "gonest.dev/gonest"
+
+func main() {
+  gonest.Dotenv().MustLoad("./.env")
+
+  app, err := gonest.NewApp[gonest.FiberApp](AppModule)
+  if err != nil {
+    panic(err)
+  }
+
+  err = app.Listen(":3000")
+  if err != nil {
+    panic(err)
+  }
+}
+```
+
+<Callout type="info">
+  `Load(paths ...string)`/`MustLoad(paths ...string)` aceitam múltiplos paths — **o primeiro path
+  vence**: uma variável já setada por um path anterior (ou já presente no ambiente do processo antes
+  de `Load` rodar) nunca é sobrescrita por um path seguinte, espelhando a precedência do próprio
+  `dotenvx run -f`.
+</Callout>
+
+## Sintaxe `.env` — paridade completa com o `dotenvx`
+
+O parser reproduz o comportamento real do [`dotenvx`](https://dotenvx.com/docs/env-file), não um
+subconjunto mínimo:
+
+```bash
+# comentário de linha inteira
+DB_HOST=db.internal          # comentário inline
+DB_NAME='literal $VAR'       # aspas simples: sem interpolação, sem escapes
+DB_URL="postgres://${DB_HOST}/app"   # aspas duplas: interpolação + escapes
+
+# 4 operadores de default/alternate, iguais ao parameter expansion do POSIX shell
+DB_PORT=${PORT:-5432}        # usa default se PORT não setada OU vazia
+DB_USER=${USER-admin}        # usa default só se USER não setada
+DB_LABEL=${FLAG:+enabled}    # usa alternate se FLAG setada E não-vazia
+DB_FLAG=${FLAG+yes}          # usa alternate só se FLAG estiver setada
+
+PRIVATE_KEY=`-----BEGIN KEY-----
+multi
+line
+-----END KEY-----`
+```
+
+Escapes (`\n`/`\r`/`\t`/`\\`) valem só dentro de aspas duplas, igual ao `dotenvx`.
+
+## Env → Schema Binding
+
+`*Dotenv` satisfaz `execution.Parseable` via `ParseInto` — `gonest.MustParse[T](gonest.Dotenv(), schema)`
+funciona identicamente a qualquer chamada `Parse[T]` de REST, reaproveitando o mesmo pipeline de
+validação (`resolveSchema`, `coerceParamString`, `validateValue`, `populate`) sem mudança:
+
+```go
+type DatabaseConfig struct {
+  Host string `json:"host" env:"DB_HOST"`
+  Port int64  `json:"port" env:"DB_PORT"`
+  Url  string `json:"url"  env:"DB_URL"`
+}
+
+var databaseConfigSchema = gonest.NewSchema(func(t *DatabaseConfig, s *gonest.Schema) {
+  s.Property(&t.Host).String().Required()
+  s.Property(&t.Port).Integer().Default(int64(5432))
+  s.Property(&t.Url).String().Required()
+})
+
+var DatabaseConfigProvider = gonest.NewProvider(func(provider *gonest.Provider) {
+  provider.Constructor(func() *DatabaseConfig {
+    config := gonest.MustParse[DatabaseConfig](gonest.Dotenv(), databaseConfigSchema)
+    return &config
+  })
+})
+```
+
+<Callout type="info">
+  `env:"NOME"` mapeia um campo pro nome da sua env var, mesmo padrão das tags `param`/`query`.
+  `PropertyBuilder.Default(value)` fornece um fallback quando a fonte (hoje só `env`) não tem valor
+  pro campo — o campo deixa de disparar `Required` nesse caso.
+</Callout>
+
+<Callout type="warn">
+  `Schema.Validate(instance)` (validar uma struct já construída) **não existe** e foi deliberadamente
+  rejeitado — criaria um segundo caminho de validação paralelo em `Schema`. `Parse[T]` sempre valida
+  contra uma fonte crua, nunca uma instância já populada.
+</Callout>
+
+## Próximos passos
+
+<Callout type="info">
+  Veja rodando de ponta a ponta em [`.examples/config-dotenv`](https://github.com/gonest-dev/gonest/tree/main/.examples/config-dotenv)
+  — `DB_HOST` vem direto do `.env`, `DB_PORT` está ausente e resolve via `Default(5432)`, e `DB_URL`
+  prova que a interpolação `${DB_HOST}` rodou.
+</Callout>
+
+<Cards>
+  <Card title="Validação" href="/docs/validation" />
+  <Card title="Conceitos Centrais" href="/docs/core-concepts" />
+  <Card title="Exemplos" href="/docs/getting-started/examples" />
+</Cards>
