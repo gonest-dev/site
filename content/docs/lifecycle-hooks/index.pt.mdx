@@ -1,0 +1,105 @@
+---
+title: Lifecycle Hooks
+description: Rode código em momentos bem definidos — OnModuleInit, OnApplicationBootstrap, OnModuleDestroy, BeforeApplicationShutdown, OnApplicationShutdown — igual ao hook set real do NestJS
+---
+
+`Provider` ganha 5 lifecycle hooks, iguais ao hook set real do NestJS 1:1 (confirmado contra
+[docs.nestjs.com](https://docs.nestjs.com), não chutado). Cada hook recebe a instância já resolvida
+do provider — o mesmo valor que `Constructor` construiu — pra poder configurar ou desmontar estado
+nela:
+
+```go
+package ex
+
+import "gonest.dev/gonest"
+
+type DbService struct{}
+
+func (s *DbService) Connect() error { /* ... */ return nil }
+func (s *DbService) Ping() error    { /* ... */ return nil }
+func (s *DbService) Close() error   { /* ... */ return nil }
+
+var DbServiceProvider = gonest.NewProvider(func(provider *gonest.Provider) {
+  provider.Constructor(func() *DbService { return &DbService{} })
+
+  provider.OnModuleInit(func(s *DbService) error { return s.Connect() })
+  provider.OnApplicationBootstrap(func(s *DbService) error { return s.Ping() })
+  provider.OnModuleDestroy(func(s *DbService) error { return s.Close() })
+})
+```
+
+<Callout type="info">
+  Hooks só disparam pra providers com scope `Singleton` — Request e Transient ficam de fora,
+  espelhando a exclusão real e documentada do NestJS pra classes request-scoped ("não presas ao
+  ciclo de vida da aplicação").
+</Callout>
+
+## Bootstrap: OnModuleInit e OnApplicationBootstrap
+
+Ambos rodam automaticamente durante `NewApp`, antes dele retornar — sem precisar fiar nada. Rodam
+**sequencial**, em ordem de módulo leaf-first (providers do módulo importado mais profundo primeiro,
+os do módulo raiz por último), cada hook aguardado antes do próximo começar:
+
+```
+OnModuleInit    — assim que as dependências DESSE provider estão prontas
+OnApplicationBootstrap — depois que TODO provider do app terminou OnModuleInit
+```
+
+Um hook retornando `error` não-nil faz `NewApp` retornar esse erro (`MustNewApp` panica com ele) —
+exatamente o mesmo contrato que um `Constructor` falhando já tem hoje.
+
+## Shutdown: OnModuleDestroy, BeforeApplicationShutdown, OnApplicationShutdown
+
+Hooks de shutdown são **opt-in**, exatamente como o `app.enableShutdownHooks()` do Nest — chame
+`App.EnableShutdownHooks()` antes de `Listen`:
+
+```go
+app := gonest.MustNewApp[gonest.FiberApp](AppModule)
+app.EnableShutdownHooks()
+app.MustListen(":3000")
+```
+
+Uma vez habilitado, um sinal OS de terminação (`SIGINT` em qualquer plataforma; `SIGTERM` fora do
+Windows — o próprio Windows não entrega `SIGTERM`, mesma ressalva de plataforma que o Nest documenta)
+ou um `app.Close(ctx)` manual dispara os 3 hooks de destroy em sequência estrita, root-first (reverso
+da ordem de bootstrap):
+
+```
+OnModuleDestroy → BeforeApplicationShutdown → OnApplicationShutdown
+```
+
+`BeforeApplicationShutdown` e `OnApplicationShutdown` recebem o signal que disparou como string
+(`"SIGINT"`, `"SIGTERM"`, ou `""` pra um `Close` manual):
+
+```go
+provider.OnApplicationShutdown(func(s *DbService, signal string) error {
+  fmt.Printf("desligando, signal=%q\n", signal)
+  return s.Close()
+})
+```
+
+<Callout type="warn">
+  Sem `EnableShutdownHooks()`, `Close(ctx)` ainda drena o servidor HTTP (desbloqueia `Listen`) — só
+  não roda os 3 hooks de destroy. Igual ao Nest: `app.close()` sempre funciona; os hooks é que ficam
+  atrás do opt-in.
+</Callout>
+
+<Callout type="info">
+  Um hook retornando erro aborta os hooks RESTANTES da sequência — incluindo fases seguintes, não só
+  a atual — espelhando a mesma cadeia sequencial de await do Nest em vez de inventar um comportamento
+  mais brando de "coletar todo erro".
+</Callout>
+
+## Próximos passos
+
+<Callout type="info">
+  Veja rodando de ponta a ponta em [`.examples/lifecycle-hooks`](https://github.com/gonest-dev/gonest/tree/main/.examples/lifecycle-hooks)
+  — `curl /status/` prova que `OnApplicationBootstrap` já rodou antes do primeiro request, e
+  Ctrl+C imprime os 3 hooks de destroy disparando em ordem antes do processo encerrar.
+</Callout>
+
+<Cards>
+  <Card title="Config Loading" href="/docs/config" />
+  <Card title="Conceitos Centrais" href="/docs/core-concepts" />
+  <Card title="Exemplos" href="/docs/getting-started/examples" />
+</Cards>

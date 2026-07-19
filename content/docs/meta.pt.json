@@ -10,6 +10,7 @@
     "openapi",
     "graphql",
     "config",
+    "lifecycle-hooks",
     "emitter",
     "scheduler",
     "health-checks",

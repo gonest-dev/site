@@ -1,0 +1,104 @@
+---
+title: Lifecycle Hooks
+description: Run code at well-defined moments — OnModuleInit, OnApplicationBootstrap, OnModuleDestroy, BeforeApplicationShutdown, OnApplicationShutdown — matching NestJS's real hook set
+---
+
+`Provider` gains 5 lifecycle hooks, matching NestJS's real hook set 1:1 (confirmed against
+[docs.nestjs.com](https://docs.nestjs.com), not guessed). Each hook receives the provider's own
+resolved instance — the same value `Constructor` built — so it can set up or tear down state on it:
+
+```go
+package ex
+
+import "gonest.dev/gonest"
+
+type DbService struct{}
+
+func (s *DbService) Connect() error { /* ... */ return nil }
+func (s *DbService) Ping() error    { /* ... */ return nil }
+func (s *DbService) Close() error   { /* ... */ return nil }
+
+var DbServiceProvider = gonest.NewProvider(func(provider *gonest.Provider) {
+  provider.Constructor(func() *DbService { return &DbService{} })
+
+  provider.OnModuleInit(func(s *DbService) error { return s.Connect() })
+  provider.OnApplicationBootstrap(func(s *DbService) error { return s.Ping() })
+  provider.OnModuleDestroy(func(s *DbService) error { return s.Close() })
+})
+```
+
+<Callout type="info">
+  Hooks only fire for `Singleton`-scope providers — Request and Transient are excluded, mirroring
+  NestJS's own documented exclusion for request-scoped classes ("not tied to the application
+  lifecycle").
+</Callout>
+
+## Bootstrap-time: OnModuleInit and OnApplicationBootstrap
+
+Both run automatically during `NewApp`, before it returns — no wiring required. They run
+**sequentially**, in leaf-first module order (the deepest imported module's providers first, the root
+module's last), each hook awaited before the next starts:
+
+```
+OnModuleInit    — once this provider's own dependencies are ready
+OnApplicationBootstrap — once EVERY provider in the whole app has finished OnModuleInit
+```
+
+A hook returning a non-nil `error` makes `NewApp` return that error (`MustNewApp` panics on it) — the
+exact same contract a failing `Constructor` already has.
+
+## Shutdown: OnModuleDestroy, BeforeApplicationShutdown, OnApplicationShutdown
+
+Shutdown hooks are **opt-in**, exactly like Nest's `app.enableShutdownHooks()` — call
+`App.EnableShutdownHooks()` before `Listen`:
+
+```go
+app := gonest.MustNewApp[gonest.FiberApp](AppModule)
+app.EnableShutdownHooks()
+app.MustListen(":3000")
+```
+
+Once enabled, an OS termination signal (`SIGINT` everywhere; `SIGTERM` on non-Windows — Windows itself
+doesn't deliver `SIGTERM`, matching Nest's own documented platform caveat) or a manual
+`app.Close(ctx)` runs the 3 destroy-phase hooks in strict sequence, root-first (the reverse of
+bootstrap order):
+
+```
+OnModuleDestroy → BeforeApplicationShutdown → OnApplicationShutdown
+```
+
+`BeforeApplicationShutdown` and `OnApplicationShutdown` both receive the triggering signal as a
+string (`"SIGINT"`, `"SIGTERM"`, or `""` for a manual `Close`):
+
+```go
+provider.OnApplicationShutdown(func(s *DbService, signal string) error {
+  fmt.Printf("shutting down, signal=%q\n", signal)
+  return s.Close()
+})
+```
+
+<Callout type="warn">
+  Without `EnableShutdownHooks()`, `Close(ctx)` still drains the HTTP server (unblocking `Listen`) —
+  it just never runs the 3 destroy-phase hooks. Same as Nest: `app.close()` always works; the hooks
+  are what's gated behind the opt-in.
+</Callout>
+
+<Callout type="info">
+  A hook returning an error aborts the REMAINING hooks in the sequence — including later phases, not
+  just the current one — matching Nest's own single sequential await chain rather than inventing a
+  softer "collect every error" behavior.
+</Callout>
+
+## Next steps
+
+<Callout type="info">
+  See it running end-to-end in [`.examples/lifecycle-hooks`](https://github.com/gonest-dev/gonest/tree/main/.examples/lifecycle-hooks)
+  — `curl /status/` proves `OnApplicationBootstrap` already ran before the first request, and
+  Ctrl+C prints the 3 destroy-phase hooks firing in order before the process exits.
+</Callout>
+
+<Cards>
+  <Card title="Config Loading" href="/docs/config" />
+  <Card title="Core Concepts" href="/docs/core-concepts" />
+  <Card title="Examples" href="/docs/getting-started/examples" />
+</Cards>

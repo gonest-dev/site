@@ -1,0 +1,105 @@
+---
+title: Lifecycle Hooks
+description: Ejecuta código en momentos bien definidos — OnModuleInit, OnApplicationBootstrap, OnModuleDestroy, BeforeApplicationShutdown, OnApplicationShutdown — igual al hook set real de NestJS
+---
+
+`Provider` gana 5 lifecycle hooks, idénticos al hook set real de NestJS 1:1 (confirmado contra
+[docs.nestjs.com](https://docs.nestjs.com), no adivinado). Cada hook recibe la instancia ya resuelta
+del provider — el mismo valor que `Constructor` construyó — para poder configurar o desmontar estado
+en ella:
+
+```go
+package ex
+
+import "gonest.dev/gonest"
+
+type DbService struct{}
+
+func (s *DbService) Connect() error { /* ... */ return nil }
+func (s *DbService) Ping() error    { /* ... */ return nil }
+func (s *DbService) Close() error   { /* ... */ return nil }
+
+var DbServiceProvider = gonest.NewProvider(func(provider *gonest.Provider) {
+  provider.Constructor(func() *DbService { return &DbService{} })
+
+  provider.OnModuleInit(func(s *DbService) error { return s.Connect() })
+  provider.OnApplicationBootstrap(func(s *DbService) error { return s.Ping() })
+  provider.OnModuleDestroy(func(s *DbService) error { return s.Close() })
+})
+```
+
+<Callout type="info">
+  Los hooks solo se disparan para providers con scope `Singleton` — Request y Transient quedan
+  excluidos, reflejando la exclusión real y documentada de NestJS para clases request-scoped ("no
+  atadas al ciclo de vida de la aplicación").
+</Callout>
+
+## Bootstrap: OnModuleInit y OnApplicationBootstrap
+
+Ambos corren automáticamente durante `NewApp`, antes de que retorne — sin necesidad de conectar nada.
+Corren **secuencial**, en orden de módulo leaf-first (providers del módulo importado más profundo
+primero, los del módulo raíz al final), cada hook esperado antes de que empiece el siguiente:
+
+```
+OnModuleInit    — apenas las dependencias de ESTE provider están listas
+OnApplicationBootstrap — después de que TODO provider de la app terminó OnModuleInit
+```
+
+Un hook que retorna un `error` no nulo hace que `NewApp` retorne ese error (`MustNewApp` entra en
+panic con él) — exactamente el mismo contrato que ya tiene hoy un `Constructor` que falla.
+
+## Shutdown: OnModuleDestroy, BeforeApplicationShutdown, OnApplicationShutdown
+
+Los hooks de shutdown son **opt-in**, igual que el `app.enableShutdownHooks()` de Nest — llama a
+`App.EnableShutdownHooks()` antes de `Listen`:
+
+```go
+app := gonest.MustNewApp[gonest.FiberApp](AppModule)
+app.EnableShutdownHooks()
+app.MustListen(":3000")
+```
+
+Una vez habilitado, una señal OS de terminación (`SIGINT` en cualquier plataforma; `SIGTERM` fuera de
+Windows — el propio Windows no entrega `SIGTERM`, la misma salvedad de plataforma que documenta Nest)
+o un `app.Close(ctx)` manual dispara los 3 hooks de destroy en secuencia estricta, root-first
+(reverso del orden de bootstrap):
+
+```
+OnModuleDestroy → BeforeApplicationShutdown → OnApplicationShutdown
+```
+
+`BeforeApplicationShutdown` y `OnApplicationShutdown` reciben la señal que disparó como string
+(`"SIGINT"`, `"SIGTERM"`, o `""` para un `Close` manual):
+
+```go
+provider.OnApplicationShutdown(func(s *DbService, signal string) error {
+  fmt.Printf("apagando, signal=%q\n", signal)
+  return s.Close()
+})
+```
+
+<Callout type="warn">
+  Sin `EnableShutdownHooks()`, `Close(ctx)` igual drena el servidor HTTP (desbloquea `Listen`) — solo
+  que nunca corre los 3 hooks de destroy. Igual que Nest: `app.close()` siempre funciona; los hooks
+  son lo que queda detrás del opt-in.
+</Callout>
+
+<Callout type="info">
+  Un hook que retorna error aborta los hooks RESTANTES de la secuencia — incluyendo fases
+  posteriores, no solo la actual — reflejando la misma cadena secuencial de await de Nest en vez de
+  inventar un comportamiento más suave de "recolectar todo error".
+</Callout>
+
+## Próximos pasos
+
+<Callout type="info">
+  Míralo funcionando de principio a fin en [`.examples/lifecycle-hooks`](https://github.com/gonest-dev/gonest/tree/main/.examples/lifecycle-hooks)
+  — `curl /status/` prueba que `OnApplicationBootstrap` ya corrió antes del primer request, y
+  Ctrl+C imprime los 3 hooks de destroy disparando en orden antes de que el proceso termine.
+</Callout>
+
+<Cards>
+  <Card title="Config Loading" href="/docs/config" />
+  <Card title="Conceptos Centrales" href="/docs/core-concepts" />
+  <Card title="Ejemplos" href="/docs/getting-started/examples" />
+</Cards>
