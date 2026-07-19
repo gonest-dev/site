@@ -82,10 +82,10 @@ resolver.Subscription("orderCreated", func(subscription *gonest.GraphqlSubscript
 })
 ```
 
-`gonest.Subscribe[T](emitter, done)` is `Emitter`'s dynamic counterpart to `MustOn`/`Emit` — a channel
+`gonest.Subscribe[T](emitter, done)` is `Emitter`'s dynamic counterpart to `NewListener`/`Emit` — a channel
 that lives only as long as `done` stays open (typically one connection's lifetime), closed
 automatically once the client disconnects. `orderService.Create(...)` keeps calling
-`emitter.Emit(OrderCreatedEvent{...})` exactly as it already would for a static `MustOn` listener —
+`emitter.Emit(OrderCreatedEvent{...})` exactly as it already would for a static `NewListener` listener —
 the Subscription doesn't know or care who publishes the event, only its type.
 
 ### Transport: real, spec-compliant protocols

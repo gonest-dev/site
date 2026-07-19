@@ -9,10 +9,10 @@ O `gonest.Emitter` é um **singleton do framework** — sempre resolvível via
 ```go
 type UserCreatedEvent struct{ UserID int64 }
 
-var UserCreatedListener = gonest.NewListener(func(listener *gonest.Listener) {
-  gonest.MustOn[UserCreatedEvent](listener, func(ctx context.Context, event UserCreatedEvent) {
+var UserCreatedListener = gonest.NewListener(func(listener *gonest.Listener) func(context.Context, UserCreatedEvent) {
+  return func(ctx context.Context, event UserCreatedEvent) {
     // handle the event
-  })
+  }
 })
 
 var UserModule = gonest.NewModule(func(module *gonest.Module) {
@@ -26,8 +26,11 @@ var UserProvider = gonest.NewProvider(func(provider *gonest.Provider) {
 ```
 
 <Callout type="info">
-  `MustOn[EventType](listener, handler)` é uma **função** livre, não um
-  método — o Go não permite parâmetros de tipo (type parameters) em métodos.
+  O `EventType` de `NewListener[EventType]` é inferido a partir do segundo parâmetro do handler
+  retornado — sem argumento de tipo explícito no call site. A função builder recebe o próprio
+  `*Listener` (pra `MustInject`/`MustInjectAll`) e retorna o handler de fato por evento: qualquer
+  dependência é resolvida UMA VEZ, em tempo de bootstrap, e capturada no closure pra todo evento
+  futuro.
 </Callout>
 
 ## Semântica do Emit
@@ -42,8 +45,8 @@ struct do Go.
 
 ## Subscriptions dinâmicas (`Subscribe[T]`)
 
-`MustOn` registra um handler estático, com a vida toda do app. `gonest.Subscribe[T](emitter, done)` é
-seu par dinâmico — um canal que vive só enquanto `done` continua aberto (tipicamente a vida de uma
+`NewListener` registra um handler estático, com a vida toda do app. `gonest.Subscribe[T](emitter, done)`
+é seu par dinâmico — um canal que vive só enquanto `done` continua aberto (tipicamente a vida de uma
 conexão), fechado automaticamente assim que dispara. É sobre isso que as Subscriptions de GraphQL
 são construídas (ver [GraphQL](/docs/graphql)):
 

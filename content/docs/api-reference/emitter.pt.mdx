@@ -7,8 +7,7 @@ description: Referência de gonest.Emitter e Listener
 
 | Símbolo | Descrição |
 |---|---|
-| `NewListener(func(listener *gonest.Listener) {...})` | Constrói um Listener. |
-| `MustOn[EventType](listener, handler)` | Função livre (não um método) que registra um Handler tipado. |
+| `NewListener[EventType](func(listener *gonest.Listener) func(context.Context, EventType) {...})` | Constrói um Listener preso a `EventType`; o builder resolve dependências uma vez e retorna o handler de fato por evento. |
 | `Emitter.Emit(event)` | Dispara e esquece (fire-and-forget); uma goroutine por Listener; panics/erros são recuperados internamente. |
 
 Sem eventos por padrão de string (wildcard/string-pattern) — os eventos são tipados por struct Go.
