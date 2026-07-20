@@ -10,7 +10,7 @@ description: Eventos tipados, fire-and-forget entre proveedores
 type UserCreatedEvent struct{ UserID int64 }
 
 var UserCreatedListener = gonest.NewListener(func(listener *gonest.Listener[UserCreatedEvent]) {
-  listener.On(func(ctx context.Context, event UserCreatedEvent) {
+  listener.MustOn(func(ctx context.Context, event UserCreatedEvent) {
     // handle the event
   })
 })
@@ -28,9 +28,18 @@ var UserProvider = gonest.NewProvider(func(provider *gonest.Provider) {
 <Callout type="info">
   `Listener[EventType]` es un tipo genérico real — el argumento de tipo de `NewListener` se infiere
   del propio parámetro de la función builder. El builder recibe el `*Listener[EventType]` (para
-  `MustInject`/`MustInjectAll`) y debe llamar a `listener.On(handler)` exactamente una vez: cualquier
+  `MustInject`/`MustInjectAll`) y debe llamar a `On` o `MustOn` exactamente una vez: cualquier
   dependencia se resuelve UNA VEZ, en tiempo de bootstrap, y queda capturada en el closure para cada
   evento futuro.
+</Callout>
+
+<Callout type="info">
+  `On(func(ctx, event) error)` y `MustOn(func(ctx, event))` se diferencian solo en si el handler
+  reporta fallo — el error retornado por `On` recibe el MISMO tratamiento que `Emit` ya le da a un
+  panic recuperado (se registra en el log, nunca se propaga); `MustOn` envuelve un handler que nunca
+  falla, para no tener que escribir `return nil`. A pesar del nombre, `MustOn` NO entra en panic con
+  nada — excepción deliberada a la convención habitual de este framework de que el prefijo `Must`
+  significa "entra en panic", elegida para leerse natural junto a `On`.
 </Callout>
 
 ## Semántica de Emit
@@ -45,7 +54,7 @@ struct de Go.
 
 ## Subscriptions dinámicas (`Subscribe[T]`)
 
-`NewListener`+`On` registra un handler estático, de por vida de la app. `gonest.Subscribe[T](emitter, done)`
+`NewListener`+`On`/`MustOn` registra un handler estático, de por vida de la app. `gonest.Subscribe[T](emitter, done)`
 es su contraparte dinámica — un canal que vive solo mientras `done` permanezca abierto (típicamente la
 duración de una conexión), cerrado automáticamente en cuanto se dispara. Sobre esto se construyen las
 Subscriptions de GraphQL (ver [GraphQL](/docs/graphql)):

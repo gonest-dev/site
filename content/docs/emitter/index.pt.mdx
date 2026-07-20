@@ -10,7 +10,7 @@ O `gonest.Emitter` é um **singleton do framework** — sempre resolvível via
 type UserCreatedEvent struct{ UserID int64 }
 
 var UserCreatedListener = gonest.NewListener(func(listener *gonest.Listener[UserCreatedEvent]) {
-  listener.On(func(ctx context.Context, event UserCreatedEvent) {
+  listener.MustOn(func(ctx context.Context, event UserCreatedEvent) {
     // handle the event
   })
 })
@@ -28,9 +28,17 @@ var UserProvider = gonest.NewProvider(func(provider *gonest.Provider) {
 <Callout type="info">
   `Listener[EventType]` é um tipo genérico de verdade — o argumento de tipo de `NewListener` é
   inferido a partir do próprio parâmetro da função builder. O builder recebe o `*Listener[EventType]`
-  (pra `MustInject`/`MustInjectAll`) e deve chamar `listener.On(handler)` exatamente uma vez: qualquer
+  (pra `MustInject`/`MustInjectAll`) e deve chamar `On` ou `MustOn` exatamente uma vez: qualquer
   dependência é resolvida UMA VEZ, em tempo de bootstrap, e capturada no closure pra todo evento
   futuro.
+</Callout>
+
+<Callout type="info">
+  `On(func(ctx, event) error)` e `MustOn(func(ctx, event))` diferem só em se o handler reporta falha
+  — o erro retornado por `On` recebe o MESMO tratamento que `Emit` já dá a um panic recuperado
+  (logado, nunca propagado); `MustOn` embrulha um handler que nunca falha, pra não precisar escrever
+  `return nil`. Apesar do nome, `MustOn` NÃO panica em nada — exceção deliberada à convenção usual
+  deste framework de que prefixo `Must` significa "panica", escolhida pra ler natural ao lado de `On`.
 </Callout>
 
 ## Semântica do Emit
@@ -45,7 +53,7 @@ struct do Go.
 
 ## Subscriptions dinâmicas (`Subscribe[T]`)
 
-`NewListener`+`On` registra um handler estático, com a vida toda do app. `gonest.Subscribe[T](emitter, done)`
+`NewListener`+`On`/`MustOn` registra um handler estático, com a vida toda do app. `gonest.Subscribe[T](emitter, done)`
 é seu par dinâmico — um canal que vive só enquanto `done` continua aberto (tipicamente a vida de uma
 conexão), fechado automaticamente assim que dispara. É sobre isso que as Subscriptions de GraphQL
 são construídas (ver [GraphQL](/docs/graphql)):

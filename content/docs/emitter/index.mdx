@@ -10,7 +10,7 @@ description: Typed, fire-and-forget events between providers
 type UserCreatedEvent struct{ UserID int64 }
 
 var UserCreatedListener = gonest.NewListener(func(listener *gonest.Listener[UserCreatedEvent]) {
-  listener.On(func(ctx context.Context, event UserCreatedEvent) {
+  listener.MustOn(func(ctx context.Context, event UserCreatedEvent) {
     // handle the event
   })
 })
@@ -28,8 +28,17 @@ var UserProvider = gonest.NewProvider(func(provider *gonest.Provider) {
 <Callout type="info">
   `Listener[EventType]` is a real generic type — `NewListener`'s type argument is inferred from the
   builder function's own parameter. The builder receives the `*Listener[EventType]` itself (for
-  `MustInject`/`MustInjectAll`) and is expected to call `listener.On(handler)` exactly once: any
-  dependency is resolved ONCE, at bootstrap time, then closed over for every future event.
+  `MustInject`/`MustInjectAll`) and is expected to call `On` or `MustOn` exactly once: any dependency
+  is resolved ONCE, at bootstrap time, then closed over for every future event.
+</Callout>
+
+<Callout type="info">
+  `On(func(ctx, event) error)` and `MustOn(func(ctx, event))` differ only in whether the handler
+  reports failure — `On`'s returned error gets the same treatment `Emit` already gives a recovered
+  panic (logged, never propagated); `MustOn` wraps a handler that never fails so it doesn't have to
+  write `return nil`. Despite the name, `MustOn` does **not** panic on anything — a deliberate
+  exception to this framework's usual `Must`-prefix-means-panics convention, chosen to read naturally
+  alongside `On`.
 </Callout>
 
 ## Emit semantics
@@ -44,8 +53,8 @@ Go struct.
 
 ## Dynamic subscriptions (`Subscribe[T]`)
 
-`NewListener`+`On` registers a static, app-lifetime handler. `gonest.Subscribe[T](emitter, done)` is
-its dynamic counterpart — a channel that lives only as long as `done` stays open (typically one
+`NewListener`+`On`/`MustOn` registers a static, app-lifetime handler. `gonest.Subscribe[T](emitter, done)`
+is its dynamic counterpart — a channel that lives only as long as `done` stays open (typically one
 connection's lifetime), closed automatically once it fires. This is what GraphQL Subscriptions
 (see [GraphQL](/docs/graphql)) are built on:
 

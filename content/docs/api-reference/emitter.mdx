@@ -7,8 +7,9 @@ description: gonest.Emitter and Listener reference
 
 | Symbol | Description |
 |---|---|
-| `NewListener[EventType](func(listener *gonest.Listener[EventType]) {...})` | Build a listener bound to `EventType`; the builder resolves dependencies once, then calls `listener.On(handler)`. |
-| `(*Listener[EventType]).On(func(ctx context.Context, event EventType))` | Register the per-event handler on a `Listener[EventType]`. |
+| `NewListener[EventType](func(listener *gonest.Listener[EventType]) {...})` | Build a listener bound to `EventType`; the builder resolves dependencies once, then calls `On` or `MustOn`. |
+| `(*Listener[EventType]).On(func(ctx context.Context, event EventType) error)` | Register the per-event handler; a returned error is logged like a recovered panic. |
+| `(*Listener[EventType]).MustOn(func(ctx context.Context, event EventType))` | Register a handler that never fails (no `error` return needed). Does NOT panic despite the name. |
 | `Emitter.Emit(event)` | Fire-and-forget; one goroutine per listener; panics/errors recovered internally. |
 
 No wildcard/string-pattern events — events are typed by Go struct.

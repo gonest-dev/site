@@ -7,8 +7,9 @@ description: Referencia de gonest.Emitter y Listener
 
 | Símbolo | Descripción |
 |---|---|
-| `NewListener[EventType](func(listener *gonest.Listener[EventType]) {...})` | Construye un Listener atado a `EventType`; el builder resuelve dependencias una vez, luego llama a `listener.On(handler)`. |
-| `(*Listener[EventType]).On(func(ctx context.Context, event EventType))` | Registra el handler por evento en un `Listener[EventType]`. |
+| `NewListener[EventType](func(listener *gonest.Listener[EventType]) {...})` | Construye un Listener atado a `EventType`; el builder resuelve dependencias una vez, luego llama a `On` o `MustOn`. |
+| `(*Listener[EventType]).On(func(ctx context.Context, event EventType) error)` | Registra el handler por evento; un error retornado se registra igual que un panic recuperado. |
+| `(*Listener[EventType]).MustOn(func(ctx context.Context, event EventType))` | Registra un handler que nunca falla (sin retorno `error`). NO entra en panic pese al nombre. |
 | `Emitter.Emit(event)` | Dispara y olvida (fire-and-forget); una goroutine por Listener; los panics/errores se recuperan internamente. |
 
 No hay eventos por patrón de cadena (wildcard/string-pattern) — los eventos están tipados por struct de Go.
