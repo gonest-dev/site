@@ -43,6 +43,52 @@ var AppModule = gonest.NewModule(func(module *gonest.Module) {
 })
 ```
 
+## Dynamic modules
+
+NestJS needs a special `DynamicModule` return type and `forRoot()`/`register()` convention because
+`@Module()` is a **decorator** — its metadata is fixed at class-definition time, so injecting runtime
+config into it needs an escape hatch. gonest has no such constraint: `Module` is already a plain Go
+value built by a builder function, so a "dynamic module" is just a regular function that closes over
+options and returns a `*gonest.Module` — no special type, no framework support needed:
+
+```go
+type DatabaseOptions struct {
+  DSN string
+}
+
+func DatabaseModuleForRoot(opts DatabaseOptions) *gonest.Module {
+  connProvider := gonest.NewProvider(func(provider *gonest.Provider) {
+    provider.Constructor(func() *Connection { return connect(opts.DSN) })
+  })
+  return gonest.NewModule(func(module *gonest.Module) {
+    module.Providers(connProvider)
+    module.Exports(connProvider)
+  })
+}
+```
+
+<Callout type="warn">
+  Build the dynamic module ONCE into a package-level `var`, the same convention every static module in
+  gonest already uses — `Module.Imports` deduplicates by Go pointer identity, so two SEPARATE calls to
+  `DatabaseModuleForRoot(sameOpts)` produce two DIFFERENT `*Module` values (two real connections, not
+  one shared). Import the same variable everywhere you need it:
+
+  ```go
+  var DatabaseModule = DatabaseModuleForRoot(DatabaseOptions{DSN: os.Getenv("DATABASE_URL")})
+
+  var AppModule = gonest.NewModule(func(module *gonest.Module) {
+    module.Imports(DatabaseModule) // same *Module wherever it's imported
+  })
+  ```
+</Callout>
+
+There is no equivalent to Nest's `forRootAsync` (config resolved from an injected service) — a
+`Module`'s builder function has no `MustInject` capability of its own (module assembly runs before any
+`Provider` is resolved). That case doesn't need one, though: the Provider that needs the config
+resolves it via `MustInject` inside its own `Constructor`, the same Provider-to-Provider dependency
+pattern gonest already supports everywhere — see [Config Loading](/docs/config) for a real example of
+a Provider building itself from a `Constructor`-time dependency.
+
 ## Next steps
 
 <Cards>

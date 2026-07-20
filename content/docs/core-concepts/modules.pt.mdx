@@ -42,6 +42,54 @@ var AppModule = gonest.NewModule(func(module *gonest.Module) {
 })
 ```
 
+## Dynamic Modules
+
+O NestJS precisa de um tipo especial `DynamicModule` e da convenção `forRoot()`/`register()` porque
+`@Module()` é um **decorator** — sua metadata fica fixa em tempo de definição da classe, então injetar
+config de runtime nela precisa de um escape hatch. gonest não tem essa limitação: `Module` já é um
+valor Go comum construído por uma função builder, então um "dynamic module" é só uma função normal que
+fecha sobre `options` e retorna um `*gonest.Module` — sem tipo especial, sem suporte de framework
+nenhum:
+
+```go
+type DatabaseOptions struct {
+  DSN string
+}
+
+func DatabaseModuleForRoot(opts DatabaseOptions) *gonest.Module {
+  connProvider := gonest.NewProvider(func(provider *gonest.Provider) {
+    provider.Constructor(func() *Connection { return connect(opts.DSN) })
+  })
+  return gonest.NewModule(func(module *gonest.Module) {
+    module.Providers(connProvider)
+    module.Exports(connProvider)
+  })
+}
+```
+
+<Callout type="warn">
+  Construa o dynamic module UMA VEZ numa `var` de pacote, mesma convenção que todo módulo estático do
+  gonest já usa — `Module.Imports` deduplica por identidade de ponteiro Go, então duas chamadas
+  SEPARADAS de `DatabaseModuleForRoot(mesmasOpts)` produzem dois valores `*Module` DIFERENTES (duas
+  conexões reais, não uma compartilhada). Importe a MESMA variável em todo lugar que precisar:
+
+  ```go
+  var DatabaseModule = DatabaseModuleForRoot(DatabaseOptions{DSN: os.Getenv("DATABASE_URL")})
+
+  var AppModule = gonest.NewModule(func(module *gonest.Module) {
+    module.Imports(DatabaseModule) // mesmo *Module onde quer que seja importado
+  })
+  ```
+</Callout>
+
+Não existe equivalente ao `forRootAsync` do Nest (config resolvida a partir de um serviço injetado) —
+a função builder de um `Module` não tem capacidade de `MustInject` própria (a montagem de módulos roda
+ANTES de qualquer `Provider` ser resolvido). Esse caso nem precisa de um, na verdade: o Provider que
+precisa da config resolve ela via `MustInject` dentro do próprio `Constructor`, o mesmo padrão de
+dependência Provider-a-Provider que o gonest já suporta em todo lugar — veja [Config
+Loading](/docs/config) pra um exemplo real de um Provider se construindo a partir de uma dependência
+em tempo de `Constructor`.
+
 ## Próximos passos
 
 <Cards>
