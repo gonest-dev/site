@@ -79,8 +79,7 @@ var databaseConfigSchema = gonest.NewSchema(func(t *DatabaseConfig, s *gonest.Sc
 
 var DatabaseConfigProvider = gonest.NewProvider(func(provider *gonest.Provider) {
   provider.Constructor(func() *DatabaseConfig {
-    config := gonest.MustParse[DatabaseConfig](gonest.Dotenv(), databaseConfigSchema)
-    return &config
+    return gonest.MustParse[*DatabaseConfig](gonest.Dotenv(), databaseConfigSchema)
   })
 })
 ```
@@ -89,6 +88,12 @@ var DatabaseConfigProvider = gonest.NewProvider(func(provider *gonest.Provider) 
   `env:"NAME"` maps a field to its env var name, the same pattern as `param`/`query` tags.
   `PropertyBuilder.Default(value)` supplies a fallback when the source (currently `env` only) has no
   value for that field — the field no longer triggers `Required` in that case.
+</Callout>
+
+<Callout type="info">
+  `T` in `MustParse[T]`/`Parse[T]` can be the struct itself or a pointer to it. `MustParse[*DatabaseConfig]`
+  allocates the struct and hands back the populated pointer directly — exactly what a `Provider.Constructor`
+  returning `*DatabaseConfig` needs, no manual `config := MustParse[DatabaseConfig](...); return &config`.
 </Callout>
 
 <Callout type="warn">
