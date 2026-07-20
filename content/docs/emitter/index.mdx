@@ -9,10 +9,10 @@ description: Typed, fire-and-forget events between providers
 ```go
 type UserCreatedEvent struct{ UserID int64 }
 
-var UserCreatedListener = gonest.NewListener(func(listener *gonest.Listener) func(context.Context, UserCreatedEvent) {
-  return func(ctx context.Context, event UserCreatedEvent) {
+var UserCreatedListener = gonest.NewListener(func(listener *gonest.Listener[UserCreatedEvent]) {
+  listener.On(func(ctx context.Context, event UserCreatedEvent) {
     // handle the event
-  }
+  })
 })
 
 var UserModule = gonest.NewModule(func(module *gonest.Module) {
@@ -26,10 +26,10 @@ var UserProvider = gonest.NewProvider(func(provider *gonest.Provider) {
 ```
 
 <Callout type="info">
-  `NewListener[EventType]`'s `EventType` is inferred from the returned handler's second parameter — no
-  explicit type argument needed at the call site. The builder function receives the `*Listener` itself
-  (for `MustInject`/`MustInjectAll`) and returns the actual per-event handler: any dependency is
-  resolved ONCE, at bootstrap time, then closed over for every future event.
+  `Listener[EventType]` is a real generic type — `NewListener`'s type argument is inferred from the
+  builder function's own parameter. The builder receives the `*Listener[EventType]` itself (for
+  `MustInject`/`MustInjectAll`) and is expected to call `listener.On(handler)` exactly once: any
+  dependency is resolved ONCE, at bootstrap time, then closed over for every future event.
 </Callout>
 
 ## Emit semantics
@@ -44,8 +44,8 @@ Go struct.
 
 ## Dynamic subscriptions (`Subscribe[T]`)
 
-`NewListener` registers a static, app-lifetime handler. `gonest.Subscribe[T](emitter, done)` is its
-dynamic counterpart — a channel that lives only as long as `done` stays open (typically one
+`NewListener`+`On` registers a static, app-lifetime handler. `gonest.Subscribe[T](emitter, done)` is
+its dynamic counterpart — a channel that lives only as long as `done` stays open (typically one
 connection's lifetime), closed automatically once it fires. This is what GraphQL Subscriptions
 (see [GraphQL](/docs/graphql)) are built on:
 
