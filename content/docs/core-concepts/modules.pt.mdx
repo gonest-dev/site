@@ -90,6 +90,30 @@ dependência Provider-a-Provider que o gonest já suporta em todo lugar — veja
 Loading](/docs/config) pra um exemplo real de um Provider se construindo a partir de uma dependência
 em tempo de `Constructor`.
 
+## Lazy loading não tem equivalente em gonest — de propósito, não esquecimento
+
+O `LazyModuleLoader` do NestJS adia o trabalho real de um módulo pro primeiro uso via `import()`
+dinâmico do JavaScript — código que ainda não foi baixado/parseado é carregado sob demanda, o que
+importa pra ambientes sensíveis a cold-start (serverless, webworkers) que querem pular caminhos de
+código que uma invocação específica nunca toca.
+
+<Callout type="warn">
+  **Isso não tem equivalente idiomático em Go, e não é uma lacuna que o gonest pretende preencher.**
+  Um binário Go é compilado antecipadamente — o código de TODO pacote importado já está DENTRO do
+  binário, sempre, não importa se uma chamada `Module.Imports` específica roda ou não. Não existe
+  estado "ainda não baixado" pra código Go adiar (a stdlib tem o pacote `plugin`, mas é notoriamente
+  frágil, só Linux/macOS, e não é usado em lugar nenhum deste projeto nem do ecossistema Go em geral).
+  O problema que o `LazyModuleLoader` resolve simplesmente não existe pra um binário compilado — o
+  custo que o Nest adia pro tempo do primeiro request, o Go já pagou inteiro em tempo de `go build`.
+</Callout>
+
+O paralelo REAL mais próximo — adiar o `Constructor` caro de um Provider até o primeiro uso de
+verdade, em vez de eager durante `NewApp` (todo Provider `Singleton` registrado resolve concorrente no
+bootstrap hoje, use alguém ou não) — é uma ideia DIFERENTE, não implementada, não é "lazy loading" no
+sentido de carregamento de módulo. Veja `INSIGHT-LAZY.md` na raiz do repo pro raciocínio completo,
+incluindo um cenário concreto (um binário único estilo Lambda atendendo múltiplos tipos de evento,
+onde só a árvore de Provider de UM tipo é realmente necessária por invocação).
+
 ## Próximos passos
 
 <Cards>

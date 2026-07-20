@@ -91,6 +91,31 @@ mismo patrón de dependencia Provider-a-Provider que gonest ya soporta en todos 
 Loading](/docs/config) para un ejemplo real de un Provider construyéndose a partir de una dependencia
 en tiempo de `Constructor`.
 
+## Lazy loading no tiene equivalente en gonest — a propósito, no por olvido
+
+`LazyModuleLoader` de NestJS difiere el trabajo real de un módulo hasta el primer uso vía `import()`
+dinámico de JavaScript — código que aún no fue descargado/parseado se carga bajo demanda, lo cual
+importa para entornos sensibles a cold-start (serverless, webworkers) que quieren saltarse rutas de
+código que una invocación específica nunca toca.
+
+<Callout type="warn">
+  **Esto no tiene equivalente idiomático en Go, y no es una carencia que gonest planee llenar.** Un
+  binario Go se compila por adelantado — el código de TODO paquete importado ya está DENTRO del
+  binario, siempre, sin importar si una llamada `Module.Imports` específica corre o no. No existe un
+  estado "aún no descargado" para que el código Go difiera (la stdlib tiene el paquete `plugin`, pero
+  es notoriamente frágil, solo Linux/macOS, y no se usa en ningún lugar de este proyecto ni del
+  ecosistema Go en general). El problema que `LazyModuleLoader` resuelve simplemente no existe para
+  un binario compilado — el costo que Nest difiere hasta el primer request, Go ya lo pagó entero en
+  tiempo de `go build`.
+</Callout>
+
+El paralelo REAL más cercano — diferir el `Constructor` caro de un Provider hasta el primer uso real,
+en vez de eager durante `NewApp` (todo Provider `Singleton` registrado se resuelve concurrente en el
+bootstrap hoy, lo use alguien o no) — es una idea DIFERENTE, no implementada, no es "lazy loading" en
+el sentido de carga de módulo. Mira `INSIGHT-LAZY.md` en la raíz del repo para el razonamiento
+completo, incluyendo un escenario concreto (un binario único estilo Lambda atendiendo múltiples tipos
+de evento, donde solo el árbol de Provider de UN tipo es realmente necesario por invocación).
+
 ## Próximos pasos
 
 <Cards>
