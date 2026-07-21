@@ -21,6 +21,7 @@ var UserModule = gonest.NewModule(func(module *gonest.Module) {
 | `Controllers(...)` | Register controllers owned by this module. |
 | `Imports(...)` | Import other modules, gaining access to their exported providers. |
 | `Exports(...)` | Expose providers to modules that import this one. |
+| `ExportModules(...)` | Re-export a whole imported `*Module` — see below. |
 | `Use(...)` | Register global middleware. **Root module only.** |
 | `Filters(...)` | Register global exception filters. **Root module only.** |
 | `Listeners(...)` | Register event listeners for the [Emitter](/docs/emitter). |
@@ -42,6 +43,43 @@ var AppModule = gonest.NewModule(func(module *gonest.Module) {
   module.Filters(FooFilter)
 })
 ```
+
+## Re-exporting a whole module
+
+`Exports` only takes individual providers. To make an ENTIRE imported
+module's own exports visible transitively — NestJS's `exports: [CommonModule]`
+pattern — import it and pass it to `ExportModules` instead:
+
+```go
+var DatabaseModule = gonest.NewModule(func(module *gonest.Module) {
+  module.Providers(daoProviders...) // 20+ DAO providers
+  module.Exports(daoProviders...)
+})
+
+var InfraModule = gonest.NewModule(func(module *gonest.Module) {
+  module.Imports(DatabaseModule)
+  module.ExportModules(DatabaseModule) // re-export, not Exports(DatabaseModule)
+})
+
+var AppModule = gonest.NewModule(func(module *gonest.Module) {
+  module.Imports(InfraModule) // never imports DatabaseModule directly
+  module.Controllers(SomeController) // can still MustInject any DAO
+})
+```
+
+This chains to any depth (a module can re-export a module that itself
+re-exports another), only propagates what the re-exported module ALREADY
+exports (never bypasses its own encapsulation), and a re-exported module
+must also be passed to `Imports` on the same module — `Exports`ing/
+`ExportModules`ing something you didn't import is a Stage 1 assembly error,
+not a silent no-op.
+
+<Callout type="warn">
+  `Exports(mod)` (passing a `*Module` where a provider is expected) does not
+  compile — `*Module` does not satisfy `ProviderRef`. Use `ExportModules`
+  for a module, `Exports` for individual providers; they are 2 separate
+  calls, not one overloaded method (Go has no union parameter types).
+</Callout>
 
 ## Dynamic modules
 
