@@ -47,7 +47,16 @@ each with a matching getter (`TitleText()`, `ContactInfo()`, `HasBearerAuth()`, 
 `OpenapiGenerate` walks the full module tree (root + imported,
 recursively), dedups repeated `*Schema` references **by pointer identity**
 (emitting `$ref` reuse in `components.schemas`), and covers every branch
-family (String/Numeric/Boolean/DateTime/Array/Object).
+family (String/Numeric/Boolean/DateTime/Array/Object) — a field with
+`.Enum(...)` set emits `enum: [...]`, omitted entirely when unset.
+
+<Callout type="warn">
+  `components.schemas` is keyed by each `*Schema`'s own `Title(...)`, not by
+  Go type — 2 different types sharing the same title silently overwrite each
+  other's entry. Give every schema a unique title, especially generic
+  helpers reused across entities (derive the title from the caller's own,
+  e.g. `parentTitle + "Where"`, rather than a fixed string).
+</Callout>
 
 <Callout type="warn">
   [`Custom(fn)`](/docs/validation/custom-validators) fields appear in

@@ -6,11 +6,15 @@ description: Integer, Float, Boolean, Date and DateTime branches
 ## Numeric
 
 `Integer()` (format `int64`), `Int32()`, `Float()`, `Double()` share
-`Min(int)`/`Max(int)`:
+`Min(int)`/`Max(int)` and `Enum(items ...int64)`:
 
 ```go
 m.Property(&t.Age).Integer().Required().Min(0).Max(150)
+m.Property(&t.Priority).Integer().Required().Enum(1, 2, 3)
 ```
+
+Like the string family's own `Enum`, this rejects any value outside the
+list at request time and emits `enum: [...]` in generated OpenAPI docs.
 
 ## Boolean, Date & DateTime — wrapper-less branches
 

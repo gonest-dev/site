@@ -3,8 +3,8 @@ title: String Family
 description: 10 string branches sharing Min/Max/Pattern
 ---
 
-All string-family branches share `Min(n)`, `Max(n)`, and `Pattern(regex)`, and
-each sets an OpenAPI `format` value.
+All string-family branches share `Min(n)`, `Max(n)`, `Pattern(regex)`, and
+`Enum(items ...string)`, and each sets an OpenAPI `format` value.
 
 | Branch | OpenAPI `format` |
 |---|---|
@@ -23,7 +23,12 @@ each sets an OpenAPI `format` value.
 m.Property(&t.Name).String().Required().Min(1).Max(50)
 m.Property(&t.Email).Email().Required()
 m.Property(&t.Id).Uuid().Required()
+m.Property(&t.Status).String().Required().Enum("active", "inactive")
 ```
+
+`Enum` rejects any value outside the given list at request time (collected
+alongside any other violation, never short-circuits) and emits `enum: [...]`
+in generated OpenAPI docs.
 
 ## Next steps
 

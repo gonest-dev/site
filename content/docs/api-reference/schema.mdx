@@ -12,7 +12,20 @@ description: gonest.NewSchema and PropertyBuilder branch reference
 
 ## Base constraints (every branch)
 
-`Required()`, `Nullable()`, `Description("...")`, `Examples(...)`
+`Required()`, `Nullable()`, `Description(word, words...)`, `Examples(...)`
+
+`Description` (and `Route.Summary`/`Route.Description`,
+`RouteResponse.Description`, `OpenAPI.Description`) takes at least one
+string, plus any number more — the extra ones are joined with a single
+space, letting a long description split across several Go string literals
+without manual `"..." + "..."` concatenation:
+
+```go
+m.Property(&t.Bio).String().Description(
+  "Short author bio shown on the public profile page —",
+  "plain text, no markdown, max 500 characters.",
+)
+```
 
 ## Branches
 
@@ -48,6 +61,25 @@ var cpfSchema = gonest.NewValue[string](func(m *gonest.Value) {
 
 cpf := gonest.MustParse[string](req.Body().Json(), cpfSchema)
 ```
+
+## Looking up a schema declared elsewhere
+
+`gonest.SchemaFor[T]() *Schema` returns the `*Schema` an earlier
+`NewSchema[T]` call already registered — a reflection-based lookup against
+the same internal registry `NewSchema[T]` populates, so a `Provider`/
+`Controller` in a different file/package can reach an entity's schema
+without needing an explicit exported `var` threaded through an import:
+
+```go
+// entity.go
+var Schema = gonest.NewSchema(func(t *User, s *gonest.Schema) { ... })
+
+// somewhere else, no import of the var above needed
+s := gonest.SchemaFor[User]()
+```
+
+Panics if `T` was never registered via `NewSchema[T]` — same fail-loud
+stance as `MustInject`.
 
 ## Parsing functions
 
