@@ -13,7 +13,7 @@ doc := gonest.NewOpenAPI("3.1.0", func(b *gonest.OpenAPI) {
   b.BearerAuth()
 })
 
-gonest.GenerateOpenApiSchema(app, doc) // recorre todo el árbol de módulos
+gonest.OpenapiGenerate(app, doc) // recorre todo el árbol de módulos
 
 gonest.SetupSwagger(app, "/docs", doc, gonest.SwaggerOptions{
   JsonDocumentUrl: "/openapi.json",
@@ -44,7 +44,7 @@ cada uno con un getter correspondiente (`TitleText()`, `ContactInfo()`, `HasBear
 
 ## Generación de Schema
 
-`GenerateOpenApiSchema` recorre todo el árbol de módulos (raíz + importados,
+`OpenapiGenerate` recorre todo el árbol de módulos (raíz + importados,
 recursivamente), deduplica las referencias repetidas de `*Schema` **por identidad de puntero**
 (emitiendo reutilización de `$ref` en `components.schemas`), y cubre cada familia de ramas
 (String/Numeric/Boolean/DateTime/Array/Object).
