@@ -20,8 +20,7 @@ var UserModule = gonest.NewModule(func(module *gonest.Module) {
 | `Providers(...)` | Register providers owned by this module. |
 | `Controllers(...)` | Register controllers owned by this module. |
 | `Imports(...)` | Import other modules, gaining access to their exported providers. |
-| `Exports(...)` | Expose providers to modules that import this one. |
-| `ExportModules(...)` | Re-export a whole imported `*Module` — see below. |
+| `Exports(...)` | Expose providers, or re-export a whole imported `*Module`, to modules that import this one — see below. |
 | `Use(...)` | Register global middleware. **Root module only.** |
 | `Filters(...)` | Register global exception filters. **Root module only.** |
 | `Listeners(...)` | Register event listeners for the [Emitter](/docs/emitter). |
@@ -46,9 +45,12 @@ var AppModule = gonest.NewModule(func(module *gonest.Module) {
 
 ## Re-exporting a whole module
 
-`Exports` only takes individual providers. To make an ENTIRE imported
-module's own exports visible transitively — NestJS's `exports: [CommonModule]`
-pattern — import it and pass it to `ExportModules` instead:
+`Exports` takes both individual providers and whole imported `*Module`
+values in the same call — mirrors NestJS's `exports: [SomeProvider,
+CommonModule]`, which accepts providers and modules in one array. Passing a
+`*Module` re-exports it: to make an ENTIRE imported module's own exports
+visible transitively, import it and pass it to `Exports` alongside (or
+instead of) individual providers:
 
 ```go
 var DatabaseModule = gonest.NewModule(func(module *gonest.Module) {
@@ -58,7 +60,7 @@ var DatabaseModule = gonest.NewModule(func(module *gonest.Module) {
 
 var InfraModule = gonest.NewModule(func(module *gonest.Module) {
   module.Imports(DatabaseModule)
-  module.ExportModules(DatabaseModule) // re-export, not Exports(DatabaseModule)
+  module.Exports(DatabaseModule) // re-export: a *Module, not a provider
 })
 
 var AppModule = gonest.NewModule(func(module *gonest.Module) {
@@ -70,15 +72,14 @@ var AppModule = gonest.NewModule(func(module *gonest.Module) {
 This chains to any depth (a module can re-export a module that itself
 re-exports another), only propagates what the re-exported module ALREADY
 exports (never bypasses its own encapsulation), and a re-exported module
-must also be passed to `Imports` on the same module — `Exports`ing/
-`ExportModules`ing something you didn't import is a Stage 1 assembly error,
-not a silent no-op.
+must also be passed to `Imports` on the same module — `Exports`ing
+something you didn't import is a Stage 1 assembly error, not a silent
+no-op.
 
-<Callout type="warn">
-  `Exports(mod)` (passing a `*Module` where a provider is expected) does not
-  compile — `*Module` does not satisfy `ProviderRef`. Use `ExportModules`
-  for a module, `Exports` for individual providers; they are 2 separate
-  calls, not one overloaded method (Go has no union parameter types).
+<Callout type="info">
+  `Exports` accepts anything implementing `gonest.ExportableRef` — a
+  `ProviderRef` (individual provider) or a `*Module` (whole re-export), in
+  any mix, in one call.
 </Callout>
 
 ## Dynamic modules
