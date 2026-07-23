@@ -82,6 +82,12 @@ no-op.
   any mix, in one call.
 </Callout>
 
+A provider exported by its **concrete** type is only injectable by that
+concrete type. To let an importing module `MustInject` a provider by an
+**interface** it implements, wrap it with `gonest.ProviderAs[T](ref)` before
+passing it to `Providers`/`Exports` — see [Exporting a provider as an
+interface](/docs/core-concepts/providers#exporting-a-provider-as-an-interface).
+
 ## Dynamic modules
 
 NestJS needs a special `DynamicModule` return type and `forRoot()`/`register()` convention because

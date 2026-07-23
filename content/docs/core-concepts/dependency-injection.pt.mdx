@@ -11,8 +11,10 @@ Resolve exatamente uma instância de `T`. Dá panic se zero ou mais de uma corre
 encontrada.
 
 - **Tipos de ponteiro** (`*UserService`) exigem uma correspondência exata de tipo.
-- **Tipos de interface** correspondem a um registro exato, ou utilizam
-  `reflect.Type.Implements()` como alternativa se exatamente um Provider satisfizer a interface.
+- **Tipos de interface** também exigem uma correspondência exata — não existe mais uma alternativa
+  estrutural. Um Provider só se torna resolvível por uma interface `T` se ele foi explicitamente
+  embrulhado (wrapped) pra `T` via `gonest.ProviderAs[T](ref)`; veja
+  [Exportando um Provider como uma interface](/docs/core-concepts/providers#exportando-um-provider-como-uma-interface).
 
 ```go
 userService := gonest.MustInject[*UserService](controller)
@@ -30,7 +32,7 @@ type Pingable interface {
   Ping(ctx context.Context) error
 }
 
-var HealthController = gonest.NewController(func(controller *gonest.Controller) {
+var HealthController_ = gonest.NewController(func(controller *gonest.Controller) {
   controller.Path("/health")
   pingables := gonest.MustInjectAll[Pingable](controller)
   _ = pingables

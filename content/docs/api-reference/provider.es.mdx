@@ -16,5 +16,6 @@ description: Referencia de gonest.NewProvider
 |---|---|
 | `MustInject[T](owner)` | Resuelve exactamente una coincidencia; da panic si hay 0 o N. |
 | `MustInjectAll[T](owner)` | Resuelve cada coincidencia; nunca da panic. |
+| `ProviderAs[T any](ref ProviderRef) ProviderRef` | Envuelve `ref`, registrándolo como la interfaz `T` — la única forma en que `T` se vuelve resoluble por `MustInject`/`MustInjectAll`. El registro concreto del propio `ref` también debe pasarse a `Providers(...)`. Da panic inmediatamente si `T` no es una interfaz, o si `ref` es el resultado de otra llamada a `ProviderAs` (encadenamiento). |
 
 Consulta: [Providers & DI Scopes](/docs/core-concepts/providers), [Dependency Injection](/docs/core-concepts/dependency-injection)

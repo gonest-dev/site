@@ -11,8 +11,10 @@ Resolves exactly one instance of `T`. Panics if zero or more than one match is
 found.
 
 - **Pointer types** (`*UserService`) require an exact type match.
-- **Interface types** match an exact registration, or fall back to
-  `reflect.Type.Implements()` if exactly one provider satisfies the interface.
+- **Interface types** also require an exact match — there is no structural
+  fallback. A provider becomes resolvable by an interface `T` only if it was
+  explicitly wrapped for `T` via `gonest.ProviderAs[T](ref)`; see
+  [Exporting a provider as an interface](/docs/core-concepts/providers#exporting-a-provider-as-an-interface).
 
 ```go
 userService := gonest.MustInject[*UserService](controller)
@@ -30,7 +32,7 @@ type Pingable interface {
   Ping(ctx context.Context) error
 }
 
-var HealthController = gonest.NewController(func(controller *gonest.Controller) {
+var HealthController_ = gonest.NewController(func(controller *gonest.Controller) {
   controller.Path("/health")
   pingables := gonest.MustInjectAll[Pingable](controller)
   _ = pingables

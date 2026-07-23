@@ -33,6 +33,11 @@ var UserModule = gonest.NewModule(func(module *gonest.Module) {
   (consulta [Request Pipeline](/docs/request-pipeline)) y se combinan con los globales.
 </Callout>
 
+Un Provider exportado por su tipo **concreto** solo es inyectable por ese tipo concreto. Para permitir
+que un Module que importa este otro haga `MustInject` de un Provider por una **interfaz** que
+implementa, envuélvelo con `gonest.ProviderAs[T](ref)` antes de pasarlo a `Providers`/`Exports` —
+consulta [Exportando un Provider como una interfaz](/docs/core-concepts/providers#exportando-un-provider-como-una-interfaz).
+
 ## Aplicando Middleware y Filters globales
 
 ```go
