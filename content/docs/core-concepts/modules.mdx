@@ -21,6 +21,7 @@ var UserModule = gonest.NewModule(func(module *gonest.Module) {
 | `Controllers(...)` | Register controllers owned by this module. |
 | `Imports(...)` | Import other modules, gaining access to their exported providers. |
 | `Exports(...)` | Expose providers, or re-export a whole imported `*Module`, to modules that import this one — see below. |
+| `Lazy(func(l *gonest.LazyModule) {...})` | Decide which module(s) to `Imports`/`Exports` from a config value resolved inside the DI graph — see [Deciding an import from inside the DI graph](#deciding-an-import-from-inside-the-di-graph-modulelazy) below. |
 | `Use(...)` | Register global middleware. **Root module only.** |
 | `Filters(...)` | Register global exception filters. **Root module only.** |
 | `Listeners(...)` | Register event listeners for the [Emitter](/docs/emitter). |
@@ -127,14 +128,61 @@ func DatabaseModuleForRoot(opts DatabaseOptions) *gonest.Module {
   ```
 </Callout>
 
-There is no equivalent to Nest's `forRootAsync` (config resolved from an injected service) — a
-`Module`'s builder function has no `MustInject` capability of its own (module assembly runs before any
-`Provider` is resolved). That case doesn't need one, though: the Provider that needs the config
-resolves it via `MustInject` inside its own `Constructor`, the same Provider-to-Provider dependency
-pattern gonest already supports everywhere — see [Config Loading](/docs/config) for a real example of
-a Provider building itself from a `Constructor`-time dependency.
+### Deciding an import from inside the DI graph: `Module.Lazy`
+
+`DatabaseModuleForRoot` above covers options the CALLER supplies explicitly. The other case Nest's
+`forRootAsync` covers — a module picking which sibling module(s) to import/export based on a config
+value resolved from an INJECTED service, not from an argument passed in from outside — has a real
+gonest equivalent: `Module.Lazy(func(l *gonest.LazyModule) {...})`. Inside that callback,
+`gonest.MustInject[T](l)` eagerly and synchronously constructs a provider already registered via this
+SAME module's own `Providers(...)`, and `l.Imports(...)`/`l.Exports(...)` behave exactly like
+`Module.Imports`/`Module.Exports`:
+
+```go
+var Config_ = gonest.NewProvider(func(p *gonest.Provider) {
+  p.Constructor(func() *Config {
+    return gonest.MustParse[Config](gonest.Dotenv(), configSchema) // env:"NOTIFICATION_DRIVER"
+  })
+})
+
+var Module_ = gonest.NewModule(func(m *gonest.Module) {
+  m.Providers(Config_)
+  m.Exports(Config_)
+  m.Lazy(func(l *gonest.LazyModule) {
+    config := gonest.MustInject[*Config](l)
+    switch config.Driver {
+    case "sms":
+      l.Imports(sms.Module_)
+      l.Exports(sms.Module_)
+    default:
+      l.Imports(email.Module_)
+      l.Exports(email.Module_)
+    }
+  })
+})
+```
+
+This is the real, working `.examples/notification-driver` — `NOTIFICATION_DRIVER` picks `email.Module_`
+or `sms.Module_` at bootstrap, decided from inside the DI graph instead of a free function called from
+`main()`.
+
+<Callout type="warn">
+  `Module.Lazy`'s `MustInject[T](l)` is intentionally narrow — it only sees providers registered via
+  THIS module's own `Providers(...)`, earlier in the same builder function (not an imported module's
+  providers, since `Imports` isn't finalized yet — that's what `Lazy` is deciding). The targeted
+  provider must also be **self-contained**: its `Constructor` cannot itself call `MustInject` (no
+  nested dependencies), and it must be `ScopeSingleton` (the default). Both panic at bootstrap
+  otherwise — `Lazy` is for a `Config`-shaped provider reading `.env`/flags, not a general synchronous
+  sub-graph resolver.
+</Callout>
 
 ## Lazy loading has no gonest equivalent — by design, not oversight
+
+<Callout type="info">
+  Not to be confused with `Module.Lazy` above — that picks WHICH module to import, synchronously, at
+  bootstrap. This section is about something else entirely: NestJS's `LazyModuleLoader`, which defers
+  loading a module's CODE until first use.
+</Callout>
 
 NestJS's `LazyModuleLoader` defers a module's real work to first use via JavaScript's dynamic
 `import()` — code that hasn't been downloaded/parsed yet gets loaded on demand, which matters for

@@ -21,6 +21,7 @@ var UserModule = gonest.NewModule(func(module *gonest.Module) {
 | `Controllers(...)` | Registra Controllers propiedad de este Module. |
 | `Imports(...)` | Importa otros Modules, obteniendo acceso a sus Providers exportados. |
 | `Exports(...)` | Expone Providers a Modules que importan este. |
+| `Lazy(func(l *gonest.LazyModule) {...})` | Decide qué Module(s) `Imports`/`Exports` a partir de un valor de config resuelto desde dentro del grafo de DI — mira [Decidiendo un import desde dentro del grafo de DI](#decidiendo-un-import-desde-dentro-del-grafo-de-di-modulelazy) abajo. |
 | `Use(...)` | Registra Middleware global. **Solo en el Module raíz.** |
 | `Filters(...)` | Registra Filters de excepción globales. **Solo en el Module raíz.** |
 | `Listeners(...)` | Registra escuchas de eventos para el [Emitter](/docs/emitter). |
@@ -88,15 +89,61 @@ func DatabaseModuleForRoot(opts DatabaseOptions) *gonest.Module {
   ```
 </Callout>
 
-No existe un equivalente al `forRootAsync` de Nest (config resuelta desde un servicio inyectado) — la
-función builder de un `Module` no tiene capacidad de `MustInject` propia (el ensamblaje de módulos
-corre ANTES de que cualquier `Provider` sea resuelto). Ese caso ni siquiera lo necesita, en realidad:
-el Provider que necesita la config la resuelve vía `MustInject` dentro de su propio `Constructor`, el
-mismo patrón de dependencia Provider-a-Provider que gonest ya soporta en todos lados — mira [Config
-Loading](/docs/config) para un ejemplo real de un Provider construyéndose a partir de una dependencia
-en tiempo de `Constructor`.
+### Decidiendo un import desde DENTRO del grafo de DI: `Module.Lazy`
+
+`DatabaseModuleForRoot` arriba cubre options que el LLAMADOR pasa explícitamente. El otro caso que
+cubre el `forRootAsync` de Nest — un Module eligiendo qué Module(s) hermano(s) importar/exportar a
+partir de un valor de config resuelto desde un servicio INYECTADO, no desde un argumento pasado desde
+afuera — tiene un equivalente real en gonest: `Module.Lazy(func(l *gonest.LazyModule) {...})`. Dentro
+de ese callback, `gonest.MustInject[T](l)` construye de forma eager y síncrona un Provider ya
+registrado en los propios `Providers(...)` de ESTE Module, y `l.Imports(...)`/`l.Exports(...)` se
+comportan exactamente como `Module.Imports`/`Module.Exports`:
+
+```go
+var Config_ = gonest.NewProvider(func(p *gonest.Provider) {
+  p.Constructor(func() *Config {
+    return gonest.MustParse[Config](gonest.Dotenv(), configSchema) // env:"NOTIFICATION_DRIVER"
+  })
+})
+
+var Module_ = gonest.NewModule(func(m *gonest.Module) {
+  m.Providers(Config_)
+  m.Exports(Config_)
+  m.Lazy(func(l *gonest.LazyModule) {
+    config := gonest.MustInject[*Config](l)
+    switch config.Driver {
+    case "sms":
+      l.Imports(sms.Module_)
+      l.Exports(sms.Module_)
+    default:
+      l.Imports(email.Module_)
+      l.Exports(email.Module_)
+    }
+  })
+})
+```
+
+Este es el `.examples/notification-driver` real, funcionando — `NOTIFICATION_DRIVER` elige
+`email.Module_` o `sms.Module_` en el bootstrap, decidido desde dentro del grafo de DI en vez de una
+función libre llamada desde `main()`.
+
+<Callout type="warn">
+  El `MustInject[T](l)` de `Module.Lazy` es intencionalmente restringido — solo ve Providers
+  registrados en los propios `Providers(...)` de ESTE Module, antes en la misma función builder (no
+  los Providers de un Module importado, ya que `Imports` todavía no está finalizado — eso es
+  justamente lo que `Lazy` está decidiendo). El Provider objetivo también debe ser **autocontenido**:
+  su `Constructor` no puede llamar `MustInject` (sin dependencias anidadas), y debe ser
+  `ScopeSingleton` (el valor por defecto). Ambos causan panic en el bootstrap si no — `Lazy` es para un
+  Provider con forma de `Config` leyendo `.env`/flags, no un resolvedor síncrono de subgrafo genérico.
+</Callout>
 
 ## Lazy loading no tiene equivalente en gonest — a propósito, no por olvido
+
+<Callout type="info">
+  No confundir con `Module.Lazy` arriba — ese elige QUÉ Module importar, de forma síncrona, en el
+  bootstrap. Esta sección trata de otra cosa: el `LazyModuleLoader` de NestJS, que difiere la carga del
+  CÓDIGO de un módulo hasta el primer uso.
+</Callout>
 
 `LazyModuleLoader` de NestJS difiere el trabajo real de un módulo hasta el primer uso vía `import()`
 dinámico de JavaScript — código que aún no fue descargado/parseado se carga bajo demanda, lo cual

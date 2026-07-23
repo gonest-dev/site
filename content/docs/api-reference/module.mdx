@@ -11,6 +11,7 @@ description: gonest.NewModule reference
 | `Controllers(...)` | Register controllers owned by this module. |
 | `Imports(...)` | Import other modules, gaining access to their exported providers. |
 | `Exports(...)` | Expose providers, or re-export a whole imported `*Module` (its own exports become visible transitively), to modules that import this one — accepts either in the same call via `ExportableRef`. |
+| `Lazy(func(l *gonest.LazyModule) {...})` | Decide, synchronously and from inside the DI graph, which module(s) to `Imports`/`Exports` — based on a config value read via `gonest.MustInject[T](l)` from this same module's own `Providers(...)`. gonest's equivalent to NestJS's `DynamicModule.forRootAsync`. |
 | `Use(...)` | Register global middleware. Root module only. |
 | `Filters(...)` | Register global exception filters. Root module only. |
 | `Listeners(...)` | Register event listeners. |
