@@ -18,4 +18,74 @@ description: Referência de gonest.NewProvider
 | `MustInjectAll[T](owner)` | Resolve todas as correspondências; nunca dá panic. |
 | `ProviderAs[T any](ref ProviderRef) ProviderRef` | Embrulha (wrap) `ref`, registrando-o como a interface `T` — o único jeito de `T` se tornar resolvível por `MustInject`/`MustInjectAll`. O registro concreto do próprio `ref` também precisa ser passado pra `Providers(...)`. Dá panic imediatamente se `T` não for uma interface, ou se `ref` for o resultado de outra chamada de `ProviderAs` (encadeamento). |
 
+## Exemplos de uso
+
+### Exemplo básico de Provider
+
+```go
+package user
+
+import "github.com/gonest/gonest"
+
+type UserService struct{}
+
+func NewUserService() *UserService {
+	return &UserService{}
+}
+
+var UserServiceProvider = gonest.NewProvider(func(p *gonest.Provider) {
+	p.Scope(gonest.ScopeSingleton)
+	p.Constructor(NewUserService)
+})
+```
+
+### Registrando Construtor para Interface com `ProviderAs`
+
+No GoNest, para injetar uma interface em vez de um tipo concreto (similar ao padrão do NestJS `{ provide: 'IUserRepository', useClass: PgUserRepository }`), utilize `gonest.ProviderAs[T]`:
+
+```go
+package user
+
+import "github.com/gonest/gonest"
+
+type UserRepository interface {
+	FindByID(id string) (*User, error)
+}
+
+type PgUserRepository struct{}
+
+func NewPgUserRepository() *PgUserRepository {
+	return &PgUserRepository{}
+}
+
+func (r *PgUserRepository) FindByID(id string) (*User, error) {
+	return &User{ID: id}, nil
+}
+
+// 1. Define o provider da implementação concreta
+var PgRepoRef = gonest.NewProvider(func(p *gonest.Provider) {
+	p.Constructor(NewPgUserRepository)
+})
+
+// 2. Associa a implementação concreta à interface UserRepository
+var UserRepoRef = gonest.ProviderAs[UserRepository](PgRepoRef)
+
+// 3. Registra ambos no Módulo (o provider concreto e o alias da interface)
+var UserModule = gonest.NewModule(func(m *gonest.Module) {
+	m.Providers(PgRepoRef, UserRepoRef)
+})
+```
+
+### Resolvendo Instâncias com `MustInject` e `MustInjectAll`
+
+Uma vez que a interface esteja registrada com `ProviderAs`, você pode resolvê-la usando a interface como parâmetro de tipo:
+
+```go
+// Resolve a única implementação da interface UserRepository (dá panic se houver 0 ou mais de 1)
+userRepo := gonest.MustInject[UserRepository](owner)
+
+// Resolve todas as implementações registradas para a interface UserRepository
+allRepos := gonest.MustInjectAll[UserRepository](owner)
+```
+
 Veja: [Providers & DI Scopes](/docs/core-concepts/providers), [Dependency Injection](/docs/core-concepts/dependency-injection)

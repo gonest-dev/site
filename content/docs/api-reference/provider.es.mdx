@@ -7,15 +7,85 @@ description: Referencia de gonest.NewProvider
 
 | Método | Descripción |
 |---|---|
-| `Scope(gonest.ScopeSingleton \| ScopeTransient \| ScopeRequest)` | Establece el tiempo de vida (lifetime) de la instancia. |
+| `Scope(gonest.ScopeSingleton \| ScopeTransient \| ScopeRequest)` | Define el tiempo de vida (lifetime) de la instancia. |
 | `Constructor(fn)` | `fn` es uno de `func() T`, `func() (T, error)`, `func(ctx) T`, `func(ctx) (T, error)`. |
 
 ## Funciones de resolución
 
 | Función | Comportamiento |
 |---|---|
-| `MustInject[T](owner)` | Resuelve exactamente una coincidencia; da panic si hay 0 o N. |
-| `MustInjectAll[T](owner)` | Resuelve cada coincidencia; nunca da panic. |
-| `ProviderAs[T any](ref ProviderRef) ProviderRef` | Envuelve `ref`, registrándolo como la interfaz `T` — la única forma en que `T` se vuelve resoluble por `MustInject`/`MustInjectAll`. El registro concreto del propio `ref` también debe pasarse a `Providers(...)`. Da panic inmediatamente si `T` no es una interfaz, o si `ref` es el resultado de otra llamada a `ProviderAs` (encadenamiento). |
+| `MustInject[T](owner)` | Resuelve exactamente una coincidencia; lanza panic si hay 0 o N. |
+| `MustInjectAll[T](owner)` | Resuelve todas las coincidencias; nunca lanza panic. |
+| `ProviderAs[T any](ref ProviderRef) ProviderRef` | Envuelve (wrap) `ref`, registrándolo como la interfaz `T` — la única forma en que `T` sea resolbible por `MustInject`/`MustInjectAll`. El registro concreto del propio `ref` también debe pasarse a `Providers(...)`. Lanza panic inmediatamente si `T` no es una interfaz, o si `ref` es el resultado de otra llamada a `ProviderAs` (encadenamiento). |
 
-Consulta: [Providers & DI Scopes](/docs/core-concepts/providers), [Dependency Injection](/docs/core-concepts/dependency-injection)
+## Ejemplos de uso
+
+### Ejemplo básico de Provider
+
+```go
+package user
+
+import "github.com/gonest/gonest"
+
+type UserService struct{}
+
+func NewUserService() *UserService {
+	return &UserService{}
+}
+
+var UserServiceProvider = gonest.NewProvider(func(p *gonest.Provider) {
+	p.Scope(gonest.ScopeSingleton)
+	p.Constructor(NewUserService)
+})
+```
+
+### Registrando Constructor para Interfaz con `ProviderAs`
+
+En GoNest, para inyectar una interfaz en lugar de un tipo concreto (similar al patrón de NestJS `{ provide: 'IUserRepository', useClass: PgUserRepository }`), utiliza `gonest.ProviderAs[T]`:
+
+```go
+package user
+
+import "github.com/gonest/gonest"
+
+type UserRepository interface {
+	FindByID(id string) (*User, error)
+}
+
+type PgUserRepository struct{}
+
+func NewPgUserRepository() *PgUserRepository {
+	return &PgUserRepository{}
+}
+
+func (r *PgUserRepository) FindByID(id string) (*User, error) {
+	return &User{ID: id}, nil
+}
+
+// 1. Define el provider de la implementación concreta
+var PgRepoRef = gonest.NewProvider(func(p *gonest.Provider) {
+	p.Constructor(NewPgUserRepository)
+})
+
+// 2. Asocia la implementación concreta a la interfaz UserRepository
+var UserRepoRef = gonest.ProviderAs[UserRepository](PgRepoRef)
+
+// 3. Registra ambos en el Módulo (el provider concreto y el alias de la interfaz)
+var UserModule = gonest.NewModule(func(m *gonest.Module) {
+	m.Providers(PgRepoRef, UserRepoRef)
+})
+```
+
+### Resolviendo Instancias con `MustInject` y `MustInjectAll`
+
+Una vez que la interfaz esté registrada con `ProviderAs`, puedes resolverla usando la interfaz como parámetro de tipo:
+
+```go
+// Resuelve la única implementación de la interfaz UserRepository (lanza panic si hay 0 o más de 1)
+userRepo := gonest.MustInject[UserRepository](owner)
+
+// Resuelve todas las implementaciones registradas para la interfaz UserRepository
+allRepos := gonest.MustInjectAll[UserRepository](owner)
+```
+
+Vea: [Providers & DI Scopes](/docs/core-concepts/providers), [Dependency Injection](/docs/core-concepts/dependency-injection)

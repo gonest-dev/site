@@ -6,6 +6,7 @@
 - Locale codes are short (`en`/`pt`/`es`), not region-qualified — matches Fumadocs' own convention; register (Brazilian Portuguese, neutral Spanish) is a content decision, not a routing one.
 - The default (English) locale needs **no filename suffix** — only `pt`/`es` overrides get `.pt.mdx`/`.es.mdx` siblings. This corrected an earlier (external, GEMINI.md-sourced) assumption that all ~43 existing pages would need renaming.
 - The static search index (`/api/search`) is a **single shared route**, not one per locale — `createFromSource(source, {localeMap}).staticGET()` already produces one combined `{type:'i18n', data:{en,pt,es}}` file once the source loader is i18n-aware. This corrected the original `.specs/features/i18n/design.md` assumption (per-locale routes under `app/[lang]/api/search`), found by inspecting the installed `fumadocs-core` types directly rather than trusting a docs snippet at face value.
+- Mandatory code examples policy: All documentation pages (especially API Reference & Core Concepts) must contain explicit, practical, and copy-pasteable Go code examples (even minimal ones) for every symbol and function (e.g. `ProviderAs`, `MustInject`, `MustInjectAll`). The core premise of GoNest is bringing NestJS/TypeScript developers to Go without steep Go syntax friction. See `.specs/codebase/CONVENTIONS.md`.
 
 ## Completed (i18n feature, ROADMAP.md M5)
 

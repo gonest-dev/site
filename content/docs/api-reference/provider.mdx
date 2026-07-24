@@ -18,4 +18,74 @@ description: gonest.NewProvider reference
 | `MustInjectAll[T](owner)` | Resolves every match; never panics. |
 | `ProviderAs[T any](ref ProviderRef) ProviderRef` | Wraps `ref`, registering it as interface `T` — the only way `T` becomes resolvable by `MustInject`/`MustInjectAll`. `ref`'s own concrete registration must also be passed to `Providers(...)`. Panics immediately if `T` isn't an interface, or if `ref` is itself the result of another `ProviderAs` call (chaining). |
 
+## Code Examples
+
+### Basic Provider Usage
+
+```go
+package user
+
+import "github.com/gonest/gonest"
+
+type UserService struct{}
+
+func NewUserService() *UserService {
+	return &UserService{}
+}
+
+var UserServiceProvider = gonest.NewProvider(func(p *gonest.Provider) {
+	p.Scope(gonest.ScopeSingleton)
+	p.Constructor(NewUserService)
+})
+```
+
+### Registering Interface Bindings with `ProviderAs`
+
+In GoNest, to inject an interface rather than a concrete struct (analogous to NestJS `{ provide: 'IUserRepository', useClass: PgUserRepository }`), use `gonest.ProviderAs[T]`:
+
+```go
+package user
+
+import "github.com/gonest/gonest"
+
+type UserRepository interface {
+	FindByID(id string) (*User, error)
+}
+
+type PgUserRepository struct{}
+
+func NewPgUserRepository() *PgUserRepository {
+	return &PgUserRepository{}
+}
+
+func (r *PgUserRepository) FindByID(id string) (*User, error) {
+	return &User{ID: id}, nil
+}
+
+// 1. Define the concrete implementation provider
+var PgRepoRef = gonest.NewProvider(func(p *gonest.Provider) {
+	p.Constructor(NewPgUserRepository)
+})
+
+// 2. Map the concrete provider to the UserRepository interface
+var UserRepoRef = gonest.ProviderAs[UserRepository](PgRepoRef)
+
+// 3. Register both in your Module (both concrete and interface refs are required)
+var UserModule = gonest.NewModule(func(m *gonest.Module) {
+	m.Providers(PgRepoRef, UserRepoRef)
+})
+```
+
+### Resolving Dependencies with `MustInject` and `MustInjectAll`
+
+Once the interface is registered with `ProviderAs`, resolve instances using the interface type:
+
+```go
+// Resolves the single registered implementation for UserRepository (panics if 0 or >1 matches)
+userRepo := gonest.MustInject[UserRepository](owner)
+
+// Resolves all registered implementations matching UserRepository interface
+allRepos := gonest.MustInjectAll[UserRepository](owner)
+```
+
 See: [Providers & DI Scopes](/docs/core-concepts/providers), [Dependency Injection](/docs/core-concepts/dependency-injection)

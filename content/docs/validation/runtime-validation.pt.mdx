@@ -87,6 +87,10 @@ body.Email.Sync(&entity.Email)
 gonest.SyncAccessorFields(entity, body)
 ```
 
+`gonest.SyncAccessorFields(dst, src)` percorre os campos correspondentes de
+duas structs e chama `Sync` em cada `Accessor[T]` dirty de `src`, então
+você não precisa chamar `Sync` campo a campo manualmente.
+
 ## Próximos passos
 
 <Cards>
