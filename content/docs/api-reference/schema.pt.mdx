@@ -27,8 +27,71 @@ description: Referência de gonest.NewSchema e das ramificações do PropertyBui
 
 ## Funções de parsing
 
-`gonest.MustParse[T](src, schema) T` / `gonest.Parse[T](src, schema) (T, error)`,
-onde `src` é um de `req.Params()`, `req.Query()`, `req.Headers()`,
-`req.Body().Json()`, ou `req.Body().Form(onFile)`.
+`gonest.MustParse[T](src, schema) T` / `gonest.Parse[T](src, schema) (T, error)`, onde `src` é um de `req.Params()`, `req.Query()`, `req.Headers()`, `req.Body().Json()`, ou `req.Body().Form(onFile)`.
+
+Por convenção nos projetos GoNest, referências de schema são declaradas como variáveis de pacote com um underline no final (`_`).
+
+## Exemplos de uso
+
+### Declaração de Schema com Validação de DTO
+
+```go
+package user
+
+import (
+	"time"
+	"github.com/gonest/gonest"
+)
+
+type CreateUserDto struct {
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	Age       int       `json:"age"`
+	IsActive  bool      `json:"isActive"`
+	Tags      []string  `json:"tags"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+// Por convenção no GoNest, a referência de schema termina com um underline (_)
+var CreateUserSchema_ = gonest.NewSchema(func(t *CreateUserDto, s *gonest.Schema) {
+	s.Title("CreateUserDto")
+
+	s.Property(&t.Name).String().Min(2).Max(100).Required().
+		Description("Nome completo do usuário")
+
+	s.Property(&t.Email).Email().Required().
+		Description("Endereço de e-mail válido para contato")
+
+	s.Property(&t.Age).Integer().Min(18).Max(120).Required().
+		Description("Idade do usuário (mínimo 18 anos)")
+
+	s.Property(&t.IsActive).Boolean().Required()
+
+	// Validação de Array: define regras nos itens (.Items) e limites na lista (.Min / .Max)
+	s.Property(&t.Tags).Array().
+		Items(func(m *gonest.StringMetadata) {
+			m.Min(1)
+		}).Min(1).Max(5).Required()
+
+	s.Property(&t.CreatedAt).DateTime().Required()
+})
+```
+
+### Validação em Tempo de Execução com `MustParse`
+
+```go
+// Exemplo de parse síncrono a partir de dados brutos
+rawInput := map[string]any{
+	"name":      "Alice Silva",
+	"email":     "alice@example.com",
+	"age":       28,
+	"isActive":  true,
+	"tags":      []string{"admin", "dev"},
+	"createdAt": "2026-07-24T18:00:00Z",
+}
+
+// Retorna uma struct CreateUserDto fortemente tipada e validada
+userDto := gonest.MustParse[CreateUserDto](rawInput, CreateUserSchema_)
+```
 
 Veja: [Schema Builder Basics](/docs/validation), [Array Builder](/docs/validation/array-builder), [Object Builder](/docs/validation/object-builder), [Runtime Validation](/docs/validation/runtime-validation)

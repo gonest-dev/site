@@ -18,21 +18,80 @@ description: gonest.NewModule reference
 | `Schedulers(...TokenRef)` | Register scheduler jobs. |
 | `Name("...")` | Set a readable name used in error messages. |
 
-Every builder method accepts `...gonest.TokenRef` — the marker interface every
-registrable value (`ProviderRef`, `ControllerRef`, `ResolverRef`,
-`MiddlewareRef`, `FilterRef`, `ListenerRef`, `SchedulerRef`, and `*Module`
-itself) embeds. Passing a value of the wrong kind to a given method (e.g. a
-`ControllerRef` to `Providers`) panics immediately, naming the method and the
-received type. This lets you declare a single typed slice and reuse it across
-multiple builder calls with no manual conversion:
+Every builder method accepts `...gonest.TokenRef` — the marker interface implemented by all DI entities. By convention in GoNest projects, declared reference variables end with a trailing underscore (`_`).
+
+## Code Examples
+
+### Feature Module Declaration (`UserModule_`)
 
 ```go
-var providers = []gonest.TokenRef{
-  UserProvider,
+package user
+
+import "github.com/gonest/gonest"
+
+// By convention in GoNest, module reference variables end with a trailing underscore (_)
+var UserModule_ = gonest.NewModule(func(m *gonest.Module) {
+	m.Name("UserModule")
+
+	// Providers owned by this module
+	m.Providers(
+		PgUserRepository_,
+		UserRepository_,
+		UserServiceProvider_,
+	)
+
+	// Controllers owned by this module
+	m.Controllers(
+		UserController_,
+	)
+
+	// Providers exported for importing modules
+	m.Exports(
+		UserRepository_,
+		UserServiceProvider_,
+	)
+})
+```
+
+### Importing in a Root Module (`AppModule_`)
+
+```go
+package app
+
+import (
+	"github.com/gonest/gonest"
+	"your-project/user"
+)
+
+var AppModule_ = gonest.NewModule(func(m *gonest.Module) {
+	m.Name("AppModule")
+
+	// Import feature modules
+	m.Imports(
+		user.UserModule_,
+	)
+
+	// Global middleware registered at root module level
+	m.Use(
+		LoggerMiddleware_,
+	)
+})
+```
+
+### Reusing `TokenRef` Slices
+
+You can declare a shared slice of tokens and reuse it across methods:
+
+```go
+var commonProviders = []gonest.TokenRef{
+	PgUserRepository_,
+	UserRepository_,
 }
 
-module.Providers(providers...)
-module.Exports(providers...) // same slice, no conversion needed
+var UserModule_ = gonest.NewModule(func(m *gonest.Module) {
+	m.Providers(commonProviders...)
+	m.Exports(commonProviders...) // Reused slice without conversion
+})
 ```
 
 See: [Modules](/docs/core-concepts/modules)

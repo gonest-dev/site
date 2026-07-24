@@ -8,26 +8,13 @@ description: gonest.NewSchema and PropertyBuilder branch reference
 | Method | Description |
 |---|---|
 | `Title("...")` | Name in `components.schemas` (defaults to Go type name). |
-| `Property(&t.X)` | Identify a field by pointer, returns a `*PropertyBuilder`. |
+| `Property(&t.X)` | Identify field by pointer, returns `*PropertyBuilder`. |
 
-## Base constraints (every branch)
+## Base Constraints (All Branches)
 
-`Required()`, `Nullable()`, `Description(word, words...)`, `Examples(...)`
+`Required()`, `Nullable()`, `Description("...")`, `Examples(...)`
 
-`Description` (and `Route.Summary`/`Route.Description`,
-`RouteResponse.Description`, `OpenAPI.Description`) takes at least one
-string, plus any number more — the extra ones are joined with a single
-space, letting a long description split across several Go string literals
-without manual `"..." + "..."` concatenation:
-
-```go
-m.Property(&t.Bio).String().Description(
-  "Short author bio shown on the public profile page —",
-  "plain text, no markdown, max 500 characters.",
-)
-```
-
-## Branches
+## Property Branches
 
 | Branch | Returns | Notes |
 |---|---|---|
@@ -36,55 +23,75 @@ m.Property(&t.Bio).String().Description(
 | `Boolean()`, `Date()`, `DateTime()` | `*PropertyBuilder` | wrapper-less, base constraints only |
 | `Array()` | `*ArrayMetadata` | dual-state (container vs. item), see `.Items(fn)` |
 | `Object(fn)` | `*ObjectMetadata` | single-state, `.Metadata(ref)` / `.AdditionalProperties()` |
-| `Custom(fn func(raw any) (any, error))` | `*PropertyBuilder` | universal escape hatch, replaces built-in checks |
-| `Sanitize(fn func(raw any) any)` | `*PropertyBuilder` | pre-processing, composes with built-in checks (doesn't replace them) |
+| `Custom(fn func(raw any) (any, error))` | `*PropertyBuilder` | universal escape hatch |
 
-## Cross-field checks
+## Parsing Functions
 
-`Schema.Refine(fn func(dst any) (field string, err error)) *Schema` registers a
-check run after every individual field validates and populates — for
-comparisons no single field can know on its own (e.g. password
-confirmation). Multiple `Refine` calls accumulate; all run (collect-all).
-See [Custom Validators](/docs/validation/custom-validators) for the full
-example.
+`gonest.MustParse[T](src, schema) T` / `gonest.Parse[T](src, schema) (T, error)`, where `src` is one of `req.Params()`, `req.Query()`, `req.Headers()`, `req.Body().Json()`, or `req.Body().Form(onFile)`.
 
-## Standalone values (no struct)
+By convention in GoNest projects, schema reference variables end with a trailing underscore (`_`).
 
-`gonest.NewValue[T any](fn func(m *gonest.Value)) *gonest.Schema` builds a
-`*Schema` for a single primitive value — no struct wrapping it. `Value` is
-an alias of `PropertyBuilder`, reusing the same branch methods:
+## Code Examples
+
+### Schema Declaration with DTO Validation Rules
 
 ```go
-var cpfSchema = gonest.NewValue[string](func(m *gonest.Value) {
-  m.String().Min(11).Max(11).Pattern(`^\d{11}$`).Required()
+package user
+
+import (
+	"time"
+	"github.com/gonest/gonest"
+)
+
+type CreateUserDto struct {
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	Age       int       `json:"age"`
+	IsActive  bool      `json:"isActive"`
+	Tags      []string  `json:"tags"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+// By convention in GoNest, schema reference variables end with a trailing underscore (_)
+var CreateUserSchema_ = gonest.NewSchema(func(t *CreateUserDto, s *gonest.Schema) {
+	s.Title("CreateUserDto")
+
+	s.Property(&t.Name).String().Min(2).Max(100).Required().
+		Description("User's full name")
+
+	s.Property(&t.Email).Email().Required().
+		Description("Valid contact email address")
+
+	s.Property(&t.Age).Integer().Min(18).Max(120).Required().
+		Description("User age (minimum 18 years)")
+
+	s.Property(&t.IsActive).Boolean().Required()
+
+	// Array validation: defines item rules inside .Items() and array bounds on parent (.Min / .Max)
+	s.Property(&t.Tags).Array().
+		Items(func(m *gonest.StringMetadata) {
+			m.Min(1)
+		}).Min(1).Max(5).Required()
+
+	s.Property(&t.CreatedAt).DateTime().Required()
 })
-
-cpf := gonest.MustParse[string](req.Body().Json(), cpfSchema)
 ```
 
-## Looking up a schema declared elsewhere
-
-`gonest.SchemaFor[T]() *Schema` returns the `*Schema` an earlier
-`NewSchema[T]` call already registered — a reflection-based lookup against
-the same internal registry `NewSchema[T]` populates, so a `Provider`/
-`Controller` in a different file/package can reach an entity's schema
-without needing an explicit exported `var` threaded through an import:
+### Runtime Validation with `MustParse`
 
 ```go
-// entity.go
-var Schema = gonest.NewSchema(func(t *User, s *gonest.Schema) { ... })
+// Parsing raw payload into a validated DTO struct
+rawInput := map[string]any{
+	"name":      "Alice Smith",
+	"email":     "alice@example.com",
+	"age":       28,
+	"isActive":  true,
+	"tags":      []string{"admin", "dev"},
+	"createdAt": "2026-07-24T18:00:00Z",
+}
 
-// somewhere else, no import of the var above needed
-s := gonest.SchemaFor[User]()
+// Returns a strongly-typed and validated CreateUserDto struct
+userDto := gonest.MustParse[CreateUserDto](rawInput, CreateUserSchema_)
 ```
-
-Panics if `T` was never registered via `NewSchema[T]` — same fail-loud
-stance as `MustInject`.
-
-## Parsing functions
-
-`gonest.MustParse[T](src, schema) T` / `gonest.Parse[T](src, schema) (T, error)`,
-where `src` is one of `req.Params()`, `req.Query()`, `req.Headers()`,
-`req.Body().Json()`, or `req.Body().Form(onFile)`.
 
 See: [Schema Builder Basics](/docs/validation), [Array Builder](/docs/validation/array-builder), [Object Builder](/docs/validation/object-builder), [Runtime Validation](/docs/validation/runtime-validation)

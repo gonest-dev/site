@@ -8,20 +8,94 @@ description: Referencia de gonest.NewController y gonest.Route
 | Método | Descripción |
 |---|---|
 | `Path("/prefix")` | Prefijo de ruta para todas las rutas en este Controller. |
-| `Tags("...")` | Etiquetas de OpenAPI, heredadas por cada ruta a menos que se anulen. |
-| `BearerAuth()` | Marca todas las rutas como si requirieran autenticación bearer, a menos que se anulen. |
-| `Use(...)` | Middleware de ámbito de Controller. |
-| `Guards(...)` | Guards de ámbito de Controller. |
-| `Interceptors(...)` | Interceptors de ámbito de Controller. |
-| `Filters(...)` | Filters de excepción de ámbito de Controller. |
+| `Tags("...")` | Tags de OpenAPI, heredadas por todas las rutas, a menos que se sobrescriban. |
+| `BearerAuth()` | Marca todas las rutas requiriendo autenticación bearer, a menos que se sobrescriban. |
+| `Use(...)` | Middleware en el alcance del Controller. |
+| `Guards(...)` | Guards en el alcance del Controller. |
+| `Interceptors(...)` | Interceptors en el alcance del Controller. |
+| `Filters(...)` | Filters de excepción en el alcance del Controller. |
 | `Route(method, path, fn)` | Declaración genérica de ruta. |
-| `RouteGet(path, fn)` / `RoutePost(path, fn)` / `RoutePut(path, fn)` / `RoutePatch(path, fn)` / `RouteDelete(path, fn)` / `RouteHead(path, fn)` / `RouteOptions(path, fn)` / `RouteTrace(path, fn)` / `RouteConnect(path, fn)` / `RouteQuery(path, fn)` | Atajos por verbo HTTP. |
+| `RouteGet(path, fn)` / `RoutePost(path, fn)` / `RoutePut(path, fn)` / `RoutePatch(path, fn)` / `RouteDelete(path, fn)` / `RouteHead(path, fn)` / `RouteOptions(path, fn)` / `RouteTrace(path, fn)` / `RouteConnect(path, fn)` / `RouteQuery(path, fn)` | Accesos directos por verbo HTTP. |
 
-## Métodos de `Route`
+## Métodos de documentación de `Route` (Swagger / OpenAPI)
 
-`Summary`, `Description`, `OperationId`, `Tags`, `BearerAuth`, `RequestBody(schema)`,
-`Response(status, schema...)`, `PathParams(schema)`, `QueryParams(schema)`,
-`ExcludeFromDocs()`, `Deprecated()`, `Params(schema)`, `FormBody(schema, fieldName)`,
-`Handler(func(req *gonest.Request, res *gonest.Response) {...})`.
+| Método | Descripción |
+|---|---|
+| `Summary(...)` | Resumen corto de la operación para Swagger UI. |
+| `Description(...)` | Descripción detallada de la ruta en Swagger. |
+| `OperationId(...)` | Identificador único de operación en la especificación OpenAPI. |
+| `Tags(...)` | Define o sobrescribe las tags del Controller para esta ruta. |
+| `BearerAuth()` | Marca la ruta individual con soporte de autenticación Bearer. |
+| `RequestBody(schema)` | Asocia el esquema de validación del cuerpo de la petición a Swagger. |
+| `Response(status, schema...)` | Documenta una respuesta HTTP con su código de estado y esquema asociado. |
+| `PathParams(schema)` | Documenta los parámetros de ruta (ej: `:id`). |
+| `QueryParams(schema)` | Documenta los parámetros de consulta (query string). |
+| `ExcludeFromDocs()` | Oculta la ruta de la documentación generada por Swagger. |
+| `Deprecated()` | Marca la ruta como obsoleta (deprecated) en Swagger. |
 
-Consulta: [Controllers & Routes](/docs/core-concepts/controllers), [OpenAPI & Swagger](/docs/openapi)
+Por convención en proyectos GoNest, las variables de referencia terminan con un guion bajo al final (`_`).
+
+## Ejemplos de uso
+
+### Declaración de Controller con metadatos de Swagger / OpenAPI
+
+El siguiente ejemplo demuestra cómo declarar un `UserController_`, definir prefijo de rutas, aplicar Guards y encadenar declaraciones de Swagger para la generación automática de OpenAPI:
+
+```go
+package user
+
+import (
+	"net/http"
+	"github.com/gonest/gonest"
+)
+
+// Por convención en GoNest, la referencia del controller termina con un guion bajo (_)
+var UserController_ = gonest.NewController(func(c *gonest.Controller) {
+	c.Path("/users")
+	c.Tags("Users")
+	c.Guards(AuthGuard_)
+
+	// GET /users/:id - Buscar usuario por ID con documentación Swagger encadenada
+	c.RouteGet("/:id", func(req *gonest.Request, res *gonest.Response) {
+		id := req.Param("id")
+		
+		// Inyección de dependencia desde el contenedor de DI
+		userRepo := gonest.MustInject[UserRepository](req)
+		
+		user, err := userRepo.FindByID(id)
+		if err != nil {
+			res.Status(http.StatusNotFound).JSON(gonest.Map{"error": "Usuario no encontrado"})
+			return
+		}
+		
+		res.Status(http.StatusOK).JSON(user)
+	}).
+	Summary("Buscar usuario por ID").
+	Description("Retorna el perfil completo de un usuario mediante su identificador único.").
+	PathParams(UserIdParamSchema_).
+	Response(http.StatusOK, UserResponseSchema_).
+	Response(http.StatusNotFound, ErrorResponseSchema_)
+
+	// POST /users - Crear nuevo usuario con validación de cuerpo y respuestas Swagger
+	c.RoutePost("", func(req *gonest.Request, res *gonest.Response) {
+		var body CreateUserDto
+		req.MustParseRestJsonBody(&body)
+		
+		userRepo := gonest.MustInject[UserRepository](req)
+		user, err := userRepo.Create(body.Name, body.Email)
+		if err != nil {
+			res.Status(http.StatusBadRequest).JSON(gonest.Map{"error": err.Error()})
+			return
+		}
+		
+		res.Status(http.StatusCreated).JSON(user)
+	}).
+	Summary("Crear nuevo usuario").
+	Description("Registra un nuevo usuario en el sistema con cuerpo JSON validado.").
+	RequestBody(CreateUserSchema_).
+	Response(http.StatusCreated, UserResponseSchema_).
+	Response(http.StatusBadRequest, ErrorResponseSchema_)
+})
+```
+
+Vea: [Controllers & Routes](/docs/core-concepts/controllers), [OpenAPI & Swagger](/docs/openapi)

@@ -10,7 +10,7 @@ description: Referência de gonest.NewModule
 | `Providers(...TokenRef)` | Registra Providers de propriedade deste Module. |
 | `Controllers(...TokenRef)` | Registra Controllers de propriedade deste Module. |
 | `Imports(...TokenRef)` | Importa outros Modules, obtendo acesso aos seus Providers exportados. |
-| `Exports(...TokenRef)` | Expõe Providers para Modules que importam este. |
+| `Exports(...TokenRef)` | Expõe Providers, ou re-exporta um `*Module` importado inteiro (seus próprios exports ficam visíveis transitivamente), para os módulos que importam este — aceita ambos na mesma chamada. |
 | `Lazy(func(l *gonest.LazyModule) {...})` | Decide, de forma síncrona e de DENTRO do grafo de DI, qual(is) Module(s) `Imports`/`Exports` — a partir de um valor de config lido via `gonest.MustInject[T](l)` dos próprios `Providers(...)` deste Module. Equivalente do gonest ao `DynamicModule.forRootAsync` do NestJS. |
 | `Use(...TokenRef)` | Registra Middleware global. Apenas no Module raiz. |
 | `Filters(...TokenRef)` | Registra Filters de exceção globais. Apenas no Module raiz. |
@@ -18,21 +18,80 @@ description: Referência de gonest.NewModule
 | `Schedulers(...TokenRef)` | Registra tarefas (jobs) do Scheduler. |
 | `Name("...")` | Define um nome legível usado em mensagens de erro. |
 
-Todo método builder aceita `...gonest.TokenRef` — o marker interface que
-todos os valores registráveis implementam (`ProviderRef`, `ControllerRef`,
-`ResolverRef`, `MiddlewareRef`, `FilterRef`, `ListenerRef`, `SchedulerRef`, e
-o próprio `*Module`). Passar um valor do tipo errado pra um método dado (ex:
-um `ControllerRef` pra `Providers`) panica imediatamente, nomeando o método e
-o tipo recebido. Isso permite declarar uma única slice tipada e reusá-la em
-várias chamadas de builder sem conversão manual:
+Todo método builder aceita `...gonest.TokenRef` — a interface marker que todos os elementos do sistema DI implementam. Por convenção nos projetos GoNest, referências são declaradas como variáveis de pacote com um underline no final (`_`).
+
+## Exemplos de uso
+
+### Declaração de um Módulo de Funcionalidade (`UserModule_`)
 
 ```go
-var providers = []gonest.TokenRef{
-  UserProvider,
+package user
+
+import "github.com/gonest/gonest"
+
+// Por convenção no GoNest, a referência exportada do módulo termina com um underline (_)
+var UserModule_ = gonest.NewModule(func(m *gonest.Module) {
+	m.Name("UserModule")
+
+	// Providers pertencentes a este módulo
+	m.Providers(
+		PgUserRepository_,
+		UserRepository_,
+		UserServiceProvider_,
+	)
+
+	// Controllers pertencentes a este módulo
+	m.Controllers(
+		UserController_,
+	)
+
+	// Providers exportados para outros módulos que importarem UserModule_
+	m.Exports(
+		UserRepository_,
+		UserServiceProvider_,
+	)
+})
+```
+
+### Importando em um Módulo Raiz (`AppModule_`)
+
+```go
+package app
+
+import (
+	"github.com/gonest/gonest"
+	"your-project/user"
+)
+
+var AppModule_ = gonest.NewModule(func(m *gonest.Module) {
+	m.Name("AppModule")
+
+	// Importa submódulos de funcionalidades
+	m.Imports(
+		user.UserModule_,
+	)
+
+	// Middleware global aplicado à aplicação
+	m.Use(
+		LoggerMiddleware_,
+	)
+})
+```
+
+### Reuso de Slice de `TokenRef`
+
+Caso deseje declarar uma coleção de providers compartilhados:
+
+```go
+var commonProviders = []gonest.TokenRef{
+	PgUserRepository_,
+	UserRepository_,
 }
 
-module.Providers(providers...)
-module.Exports(providers...) // mesma slice, sem conversão
+var UserModule_ = gonest.NewModule(func(m *gonest.Module) {
+	m.Providers(commonProviders...)
+	m.Exports(commonProviders...) // Mesma slice reusada sem conversão
+})
 ```
 
 Veja: [Modules](/docs/core-concepts/modules)

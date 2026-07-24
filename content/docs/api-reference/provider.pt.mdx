@@ -33,7 +33,7 @@ func NewUserService() *UserService {
 	return &UserService{}
 }
 
-var UserServiceProvider = gonest.NewProvider(func(p *gonest.Provider) {
+var UserServiceProvider_ = gonest.NewProvider(func(p *gonest.Provider) {
 	p.Scope(gonest.ScopeSingleton)
 	p.Constructor(NewUserService)
 })
@@ -41,7 +41,7 @@ var UserServiceProvider = gonest.NewProvider(func(p *gonest.Provider) {
 
 ### Registrando Construtor para Interface com `ProviderAs`
 
-No GoNest, para injetar uma interface em vez de um tipo concreto (similar ao padrão do NestJS `{ provide: 'IUserRepository', useClass: PgUserRepository }`), utilize `gonest.ProviderAs[T]`:
+No GoNest, por convenção, referências terminam com um underline (`_`) e para injetar uma interface em vez de um tipo concreto (similar ao padrão do NestJS `{ provide: 'IUserRepository', useClass: PgUserRepository }`), utilize `gonest.ProviderAs[T]`:
 
 ```go
 package user
@@ -62,17 +62,17 @@ func (r *PgUserRepository) FindByID(id string) (*User, error) {
 	return &User{ID: id}, nil
 }
 
-// 1. Define o provider da implementação concreta
-var PgRepoRef = gonest.NewProvider(func(p *gonest.Provider) {
+// 1. Define o provider da implementação concreta (sufixo _)
+var PgUserRepository_ = gonest.NewProvider(func(p *gonest.Provider) {
 	p.Constructor(NewPgUserRepository)
 })
 
-// 2. Associa a implementação concreta à interface UserRepository
-var UserRepoRef = gonest.ProviderAs[UserRepository](PgRepoRef)
+// 2. Associa a implementação concreta à interface UserRepository (sufixo _)
+var UserRepository_ = gonest.ProviderAs[UserRepository](PgUserRepository_)
 
 // 3. Registra ambos no Módulo (o provider concreto e o alias da interface)
-var UserModule = gonest.NewModule(func(m *gonest.Module) {
-	m.Providers(PgRepoRef, UserRepoRef)
+var UserModule_ = gonest.NewModule(func(m *gonest.Module) {
+	m.Providers(PgUserRepository_, UserRepository_)
 })
 ```
 

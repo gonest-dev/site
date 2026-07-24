@@ -33,7 +33,7 @@ func NewUserService() *UserService {
 	return &UserService{}
 }
 
-var UserServiceProvider = gonest.NewProvider(func(p *gonest.Provider) {
+var UserServiceProvider_ = gonest.NewProvider(func(p *gonest.Provider) {
 	p.Scope(gonest.ScopeSingleton)
 	p.Constructor(NewUserService)
 })
@@ -41,7 +41,7 @@ var UserServiceProvider = gonest.NewProvider(func(p *gonest.Provider) {
 
 ### Registering Interface Bindings with `ProviderAs`
 
-In GoNest, to inject an interface rather than a concrete struct (analogous to NestJS `{ provide: 'IUserRepository', useClass: PgUserRepository }`), use `gonest.ProviderAs[T]`:
+In GoNest, reference variables end with a trailing underscore (`_`) by convention. To inject an interface rather than a concrete struct (analogous to NestJS `{ provide: 'IUserRepository', useClass: PgUserRepository }`), use `gonest.ProviderAs[T]`:
 
 ```go
 package user
@@ -62,17 +62,17 @@ func (r *PgUserRepository) FindByID(id string) (*User, error) {
 	return &User{ID: id}, nil
 }
 
-// 1. Define the concrete implementation provider
-var PgRepoRef = gonest.NewProvider(func(p *gonest.Provider) {
+// 1. Define the concrete implementation provider (trailing _)
+var PgUserRepository_ = gonest.NewProvider(func(p *gonest.Provider) {
 	p.Constructor(NewPgUserRepository)
 })
 
-// 2. Map the concrete provider to the UserRepository interface
-var UserRepoRef = gonest.ProviderAs[UserRepository](PgRepoRef)
+// 2. Map the concrete provider to the UserRepository interface (trailing _)
+var UserRepository_ = gonest.ProviderAs[UserRepository](PgUserRepository_)
 
 // 3. Register both in your Module (both concrete and interface refs are required)
-var UserModule = gonest.NewModule(func(m *gonest.Module) {
-	m.Providers(PgRepoRef, UserRepoRef)
+var UserModule_ = gonest.NewModule(func(m *gonest.Module) {
+	m.Providers(PgUserRepository_, UserRepository_)
 })
 ```
 

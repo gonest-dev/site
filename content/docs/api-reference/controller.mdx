@@ -17,11 +17,85 @@ description: gonest.NewController and gonest.Route reference
 | `Route(method, path, fn)` | Generic route declaration. |
 | `RouteGet(path, fn)` / `RoutePost(path, fn)` / `RoutePut(path, fn)` / `RoutePatch(path, fn)` / `RouteDelete(path, fn)` / `RouteHead(path, fn)` / `RouteOptions(path, fn)` / `RouteTrace(path, fn)` / `RouteConnect(path, fn)` / `RouteQuery(path, fn)` | Per-verb shorthands. |
 
-## `Route` methods
+## `Route` Documentation Methods (Swagger / OpenAPI)
 
-`Summary`, `Description`, `OperationId`, `Tags`, `BearerAuth`, `RequestBody(schema)`,
-`Response(status, schema...)`, `PathParams(schema)`, `QueryParams(schema)`,
-`ExcludeFromDocs()`, `Deprecated()`, `Params(schema)`, `FormBody(schema, fieldName)`,
-`Handler(func(req *gonest.Request, res *gonest.Response) {...})`.
+| Method | Description |
+|---|---|
+| `Summary(...)` | Short operation summary for Swagger UI. |
+| `Description(...)` | Detailed operation description in Swagger. |
+| `OperationId(...)` | Unique operation identifier in OpenAPI spec. |
+| `Tags(...)` | Set or override controller tags for this route. |
+| `BearerAuth()` | Mark an individual route as supporting Bearer auth. |
+| `RequestBody(schema)` | Attach request body validation schema to Swagger documentation. |
+| `Response(status, schema...)` | Document an HTTP status response code and its optional response schema. |
+| `PathParams(schema)` | Document path parameters (e.g. `:id`). |
+| `QueryParams(schema)` | Document query string parameters. |
+| `ExcludeFromDocs()` | Hide route from generated Swagger documentation. |
+| `Deprecated()` | Mark route as deprecated in Swagger. |
+
+By convention in GoNest projects, declared reference variables end with a trailing underscore (`_`).
+
+## Code Examples
+
+### Controller Declaration with Swagger / OpenAPI Metadata
+
+The example below demonstrates how to declare a `UserController_`, configure a route prefix, attach guards, and chain Swagger metadata for automatic OpenAPI documentation generation:
+
+```go
+package user
+
+import (
+	"net/http"
+	"github.com/gonest/gonest"
+)
+
+// By convention in GoNest, controller reference variables end with a trailing underscore (_)
+var UserController_ = gonest.NewController(func(c *gonest.Controller) {
+	c.Path("/users")
+	c.Tags("Users")
+	c.Guards(AuthGuard_)
+
+	// GET /users/:id - Get user by ID with chained Swagger metadata
+	c.RouteGet("/:id", func(req *gonest.Request, res *gonest.Response) {
+		id := req.Param("id")
+		
+		// Inject dependency from DI container
+		userRepo := gonest.MustInject[UserRepository](req)
+		
+		user, err := userRepo.FindByID(id)
+		if err != nil {
+			res.Status(http.StatusNotFound).JSON(gonest.Map{"error": "User not found"})
+			return
+		}
+		
+		res.Status(http.StatusOK).JSON(user)
+	}).
+	Summary("Get user by ID").
+	Description("Fetches a user profile given a unique identifier.").
+	PathParams(UserIdParamSchema_).
+	Response(http.StatusOK, UserResponseSchema_).
+	Response(http.StatusNotFound, ErrorResponseSchema_)
+
+	// POST /users - Create new user with request validation and Swagger responses
+	c.RoutePost("", func(req *gonest.Request, res *gonest.Response) {
+		var body CreateUserDto
+		req.MustParseRestJsonBody(&body)
+		
+		userRepo := gonest.MustInject[UserRepository](req)
+		user, err := userRepo.Create(body.Name, body.Email)
+		if err != nil {
+			res.Status(http.StatusBadRequest).JSON(gonest.Map{"error": err.Error()})
+			return
+		}
+		
+		res.Status(http.StatusCreated).JSON(user)
+	}).
+	Summary("Create new user").
+	Description("Registers a new user account with validated JSON input.").
+	RequestBody(CreateUserSchema_).
+	Response(http.StatusCreated, UserResponseSchema_).
+	Response(http.StatusBadRequest, ErrorResponseSchema_)
+})
+```
 
 See: [Controllers & Routes](/docs/core-concepts/controllers), [OpenAPI & Swagger](/docs/openapi)

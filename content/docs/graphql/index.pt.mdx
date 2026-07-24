@@ -3,27 +3,27 @@ title: GraphQL
 description: Resolvers, geração automática de SDL e Subscriptions via protocolos reais graphql-transport-ws/graphql-sse
 ---
 
-`GraphqlResolver` é análogo a `Controller` — registrado via `module.Resolvers(...)`, reaproveitando o
-mesmo `Schema`/`Parse[T]`/`MustInject` que o REST já usa. Sem duplicar validação nem DI entre REST e
-GraphQL.
+`GraphqlResolver` é análogo a `Controller` — registrado via `module.Resolvers(...)`, reaproveitando o mesmo `Schema`/`Parse[T]`/`MustInject` que o REST já usa. Sem duplicar validação nem DI entre REST e GraphQL.
+
+Por convenção no GoNest, a referência do resolver termina com um underline (`_`), ex: `UserResolver_`.
 
 ```go
-package ex
+package user
 
-import "gonest.dev/gonest"
+import "github.com/gonest/gonest"
 
-var UserResolver = gonest.NewGraphqlResolver(func(resolver *gonest.GraphqlResolver) {
-  userService := gonest.MustInject[*UserService](resolver)
+var UserResolver_ = gonest.NewGraphqlResolver(func(resolver *gonest.GraphqlResolver) {
+	userService := gonest.MustInject[UserService](resolver)
 
-  resolver.Query("user", func(query *gonest.GraphqlQuery) {
-    query.Args(userIdParamsSchema)   // mesma Schema já usada na validação REST
-    query.Returns(userEntitySchema)  // mesma Schema também alimenta o SDL gerado
+	resolver.Query("user", func(query *gonest.GraphqlQuery) {
+		query.Args(userIdParamsSchema)   // mesma Schema já usada na validação REST
+		query.Returns(userEntitySchema)  // mesma Schema também alimenta o SDL gerado
 
-    query.Handler(func(ctx *gonest.GraphqlContext) any {
-      args := gonest.MustParse[UserIdParams](ctx.Args(), userIdParamsSchema)
-      return userService.Get(args.UserId) // o valor retornado JÁ É o data
-    })
-  })
+		query.Handler(func(ctx *gonest.GraphqlContext) any {
+			args := gonest.MustParse[UserIdParams](ctx.Args(), userIdParamsSchema)
+			return userService.Get(args.UserId) // o valor retornado JÁ É o data
+		})
+	})
 })
 ```
 
@@ -33,66 +33,74 @@ var UserResolver = gonest.NewGraphqlResolver(func(resolver *gonest.GraphqlResolv
   capacidade de resolução de DI própria.
 </Callout>
 
+## Registrando Resolvers no Módulo
+
+Para registrar resolvers em um módulo GoNest, utilize `m.Resolvers(...)`:
+
+```go
+package user
+
+import "github.com/gonest/gonest"
+
+var UserModule_ = gonest.NewModule(func(m *gonest.Module) {
+	m.Name("UserModule")
+	m.Providers(
+		UserServiceProvider_,
+	)
+	m.Resolvers(
+		UserResolver_,
+	)
+})
+```
+
 ## Query e Mutation
 
-Ambos compartilham exatamente a mesma forma — `.Args(schema)`, `.Returns(schema)`,
-`.Handler(func(ctx *gonest.GraphqlContext) any)`. O valor retornado pelo Handler vira diretamente o
-`data` da resposta GraphQL, igual ao NestJS — não existe um `Response`/write-side separado (GraphQL
-não tem status code nem headers para justificar um):
+Ambose compartilham exatamente a mesma forma — `.Args(schema)`, `.Returns(schema)`, `.Handler(func(ctx *gonest.GraphqlContext) any)`. O valor retornado pelo Handler vira diretamente o `data` da resposta GraphQL, igual ao NestJS:
 
 ```go
 resolver.Mutation("createUser", func(mutation *gonest.GraphqlMutation) {
-  mutation.Args(userEntitySchema)
-  mutation.Returns(userEntitySchema)
+	mutation.Args(userEntitySchema)
+	mutation.Returns(userEntitySchema)
 
-  mutation.Handler(func(ctx *gonest.GraphqlContext) any {
-    input := gonest.MustParse[UserEntity](ctx.Args(), userEntitySchema)
-    return userService.Create(input)
-  })
+	mutation.Handler(func(ctx *gonest.GraphqlContext) any {
+		input := gonest.MustParse[UserEntity](ctx.Args(), userEntitySchema)
+		userService := gonest.MustInject[UserService](resolver)
+		return userService.Create(input)
+	})
 })
 ```
 
-`gonest.GraphqlMutation` é um alias de tipo de `gonest.GraphqlQuery` — o root type GraphQL que um
-campo acaba usando (`Query` vs `Mutation` no SDL gerado) é decidido por qual método o registrou, não
-por um Go type distinto.
+`gonest.GraphqlMutation` é um alias de tipo de `gonest.GraphqlQuery` — o root type GraphQL que um campo acaba usando (`Query` vs `Mutation` no SDL gerado) é decidido por qual método o registrou, não por um Go type distinto.
 
-Ambos dispacham através de UM endpoint HTTP fixo, `POST /graphql`, seguindo o formato padrão
-GraphQL-over-HTTP (`{query, variables, operationName}` → `{data, errors}`).
+Ambos despacham através de UM endpoint HTTP fixo, `POST /graphql`, seguindo o formato padrão GraphQL-over-HTTP (`{query, variables, operationName}` → `{data, errors}`).
 
 ## Subscription
 
-Fundamentalmente diferente de Query/Mutation — um STREAM, não request-response. O resolver fica vivo
-emitindo N valores enquanto o client continua conectado, por isso seu `Handler` tem assinatura
-diferente (`func(ctx, emit)`, não `func(ctx) any`):
+Fundamentalmente diferente de Query/Mutation — um STREAM, não request-response. O resolver fica vivo emitindo N valores enquanto o client continua conectado, por isso seu `Handler` tem assinatura diferente (`func(ctx, emit)`, não `func(ctx) any`):
 
 ```go
 resolver.Subscription("orderCreated", func(subscription *gonest.GraphqlSubscription) {
-  subscription.Args(orderFilterSchema)
-  subscription.Returns(orderEntitySchema)
+	subscription.Args(orderFilterSchema)
+	subscription.Returns(orderEntitySchema)
 
-  subscription.Handler(func(ctx *gonest.GraphqlContext, emit func(any)) {
-    args := gonest.MustParse[OrderFilter](ctx.Args(), orderFilterSchema)
-    emitter := gonest.MustInject[*gonest.Emitter](resolver)
+	subscription.Handler(func(ctx *gonest.GraphqlContext, emit func(any)) {
+		args := gonest.MustParse[OrderFilter](ctx.Args(), orderFilterSchema)
+		emitter := gonest.MustInject[*gonest.Emitter](resolver)
 
-    for event := range gonest.Subscribe[OrderCreatedEvent](emitter, ctx.Done()) {
-      if event.CustomerId == args.CustomerId {
-        emit(event)
-      }
-    }
-  })
+		for event := range gonest.Subscribe[OrderCreatedEvent](emitter, ctx.Done()) {
+			if event.CustomerId == args.CustomerId {
+				emit(event)
+			}
+		}
+	})
 })
 ```
 
-`gonest.Subscribe[T](emitter, done)` é o par dinâmico do `Emitter` complementar a `NewListener`/`Emit` — um
-canal que vive só enquanto `done` continua aberto (tipicamente a vida de uma conexão), fechado
-automaticamente quando o client desconecta. `orderService.Create(...)` continua chamando
-`emitter.Emit(OrderCreatedEvent{...})` exatamente como já faria para um listener estático via
-`NewListener` — a Subscription não sabe nem se importa quem publica o evento, só o seu tipo.
+`gonest.Subscribe[T](emitter, done)` é o par dinâmico do `Emitter` complementar a `NewListener`/`Emit` — um canal que vive só enquanto `done` continua aberto (tipicamente a vida de uma conexão), fechado automaticamente quando o client desconecta. `orderService.Create(...)` continua chamando `emitter.Emit(OrderCreatedEvent{...})` exatamente como já faria para um listener estático via `NewListener` — a Subscription não sabe nem se importa quem publica o evento, só o seu tipo.
 
 ### Transporte: protocolos reais, seguindo especificação
 
-Query, Mutation e Subscription despacham todos pelo mesmo path `/graphql`, multiplexados por
-protocolo em vez de por URL — sem formato ad-hoc, sem endpoint separado por Subscription:
+Query, Mutation e Subscription despacham todos pelo mesmo path `/graphql`, multiplexados por protocolo em vez de por URL — sem formato ad-hoc, sem endpoint separado por Subscription:
 
 ```
 POST /graphql                                          -- GraphQL-over-HTTP simples
@@ -111,18 +119,9 @@ DELETE /graphql?operationId=X  (com token)              -- graphql-sse, Single c
   `ConnectionInit`/`ConnectionAck`, `Subscribe`/`Next`/`Complete`.
 </Callout>
 
-Query/Mutation via WebSocket reusam o MESMO dispatch (motor de execução do `graphql-go/graphql`) que
-`POST /graphql` já usa — só o framing muda. Uma mensagem `Subscribe` resolve pra uma operação de
-resultado único (Query/Mutation, exatamente um `Next` + `Complete`) ou uma de streaming (Subscription,
-um `Next` por `emit(value)`), decidido em runtime pelo campo raiz requisitado. Múltiplas operações
-rodam concorrentemente na mesma conexão WebSocket, isoladas por `id`.
+Query/Mutation via WebSocket reusam o MESMO dispatch (motor de execução do `graphql-go/graphql`) que `POST /graphql` já usa — só o framing muda. Uma mensagem `Subscribe` resolve pra uma operação de resultado único (Query/Mutation, exatamente um `Next` + `Complete`) ou uma de streaming (Subscription, um `Next` por `emit(value)`), decidido em runtime pelo campo raiz requisitado. Múltiplas operações rodam concorrentemente na mesma conexão WebSocket, isoladas por `id`.
 
-O modo Distinct connections do SSE é o mais simples: uma requisição `GET` com
-`Accept: text/event-stream` por operação, o corpo da resposta É o stream de eventos. O modo Single
-connection existe pro limite estrito de conexões por domínio dos browsers — o client reserva um token
-via `PUT`, abre UMA conexão `GET` carregando esse token, e despacha cada operação seguinte como um
-`POST` separado (ou cancela uma de streaming via `DELETE`), com todo resultado roteado de volta por
-essa única conexão compartilhada.
+O modo Distinct connections do SSE é o mais simples: uma requisição `GET` com `Accept: text/event-stream` por operação, o corpo da resposta É o stream de eventos. O modo Single connection existe pro limite estrito de conexões por domínio dos browsers — o client reserva um token via `PUT`, abre UMA conexão `GET` carregando esse token, e despacha cada operação seguinte como um `POST` separado (ou cancela uma de streaming via `DELETE`), com todo resultado roteado de volta por essa única conexão compartilhada.
 
 <Callout type="warn">
   Um panic dentro do `Handler` de uma Subscription é recuperado (não derruba o processo), mas ainda
@@ -132,26 +131,23 @@ essa única conexão compartilhada.
 
 ## Geração automática de SDL
 
-O SDL gerado vem da MESMA `Schema` que o REST já usa — sem uma segunda declaração de tipo paralela
-pra manter sincronizada.
+O SDL gerado vem da MESMA `Schema` que o REST já usa — sem uma segunda declaração de tipo paralela pra manter sincronizada.
 
 ### Branches de formato viram Custom Scalars
 
-Todo branch de formato (`Email`/`Uuid`/`Uri`/`Hostname`/`Ipv4`/`Ipv6`/`Password`/`Byte`/`Binary`/`DateTime`/`Date`)
-mapeia para um Custom Scalar GraphQL — os 5 scalars nativos do GraphQL (`Int`/`Float`/`String`/`Boolean`/`ID`)
-não têm noção nenhuma de "isso é um e-mail":
+Todo branch de formato (`Email`/`Uuid`/`Uri`/`Hostname`/`Ipv4`/`Ipv6`/`Password`/`Byte`/`Binary`/`DateTime`/`Date`) mapeia para um Custom Scalar GraphQL — os 5 scalars nativos do GraphQL (`Int`/`Float`/`String`/`Boolean`/`ID`) não têm noção nenhuma de "isso é um e-mail":
 
 ```go
 type UserEntity struct {
-  Id        int64     `json:"id"`
-  Email     string    `json:"email"`
-  CreatedAt time.Time `json:"createdAt"`
+	Id        int64     `json:"id"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 var userEntitySchema = gonest.NewSchema(func(t *UserEntity, s *gonest.Schema) {
-  s.Property(&t.Id).Integer().Required()
-  s.Property(&t.Email).Email().Required()
-  s.Property(&t.CreatedAt).DateTime().Required()
+	s.Property(&t.Id).Integer().Required()
+	s.Property(&t.Email).Email().Required()
+	s.Property(&t.CreatedAt).DateTime().Required()
 })
 ```
 
@@ -168,22 +164,17 @@ type UserEntity {
 }
 ```
 
-Todo formato distinto usado em qualquer lugar do app deduplica pra UMA declaração `scalar`, nunca
-repetida por campo.
+Todo formato distinto usado em qualquer lugar do app deduplica pra UMA declaração `scalar`, nunca repetida por campo.
 
 ### Tipos verdadeiramente customizados (ex: `primitive.ObjectID` do MongoDB)
 
-Um tipo sem `format` OpenAPI equivalente (já resolvido para REST via `Custom(fn)`) não tem nome de
-scalar óbvio. `Custom(fn)` ganha `.GraphqlScalar(name)`, relevante só quando a `Schema` é consumida
-por um Resolver — REST/OpenAPI ignoram esse valor por completo:
+Um tipo sem `format` OpenAPI equivalente (já resolvido para REST via `Custom(fn)`) não tem nome de scalar óbvio. `Custom(fn)` ganha `.GraphqlScalar(name)`, relevante só quando a `Schema` é consumida por um Resolver — REST/OpenAPI ignoram esse valor por completo:
 
 ```go
 m.Property(&t.Id).Custom(decodeObjectID).GraphqlScalar("ObjectID").Required()
 ```
 
-Dois campos compartilhando o mesmo `.GraphqlScalar("ObjectID")` deduplicam pra uma única declaração
-`scalar ObjectID`. `Custom(fn)` sem `.GraphqlScalar(name)` num schema consumido por um Resolver falha
-em TEMPO DE BUILD do SDL (um erro de configuração, não uma falha por request).
+Dois campos compartilhando o mesmo `.GraphqlScalar("ObjectID")` deduplicam pra uma única declaração `scalar ObjectID`. `Custom(fn)` sem `.GraphqlScalar(name)` num schema consumido por um Resolver falha em TEMPO DE BUILD do SDL (um erro de configuração, não uma falha por request).
 
 ## Próximos passos
 

@@ -1,6 +1,6 @@
 ---
 title: Schema
-description: Referencia de gonest.NewSchema y de las ramas de PropertyBuilder
+description: Referencia de gonest.NewSchema y ramificaciones de PropertyBuilder
 ---
 
 `gonest.NewSchema[T](func(t *T, s *gonest.Schema) {...})`
@@ -8,27 +8,90 @@ description: Referencia de gonest.NewSchema y de las ramas de PropertyBuilder
 | Método | Descripción |
 |---|---|
 | `Title("...")` | Nombre en `components.schemas` (por defecto, el nombre del tipo Go). |
-| `Property(&t.X)` | Identifica un campo por puntero, devuelve un `*PropertyBuilder`. |
+| `Property(&t.X)` | Identifica un campo por puntero, retorna un `*PropertyBuilder`. |
 
-## Restricciones base (todas las ramas)
+## Restricciones base (todos los ramos)
 
 `Required()`, `Nullable()`, `Description("...")`, `Examples(...)`
 
-## Ramas (Branches)
+## Ramos (Branches)
 
-| Rama | Devuelve | Notas |
+| Ramo | Retorna | Notas |
 |---|---|---|
 | `String()`, `Email()`, `Uuid()`, `Uri()`, `Hostname()`, `Ipv4()`, `Ipv6()`, `Password()`, `Byte()`, `Binary()` | `*StringMetadata` | `Min`/`Max`/`Pattern` |
 | `Integer()`, `Int32()`, `Float()`, `Double()` | `*NumericMetadata` | `Min`/`Max` |
-| `Boolean()`, `Date()`, `DateTime()` | `*PropertyBuilder` | sin envoltorio (wrapper-less), solo restricciones base |
-| `Array()` | `*ArrayMetadata` | estado dual (contenedor vs. elemento), consulta `.Items(fn)` |
+| `Boolean()`, `Date()`, `DateTime()` | `*PropertyBuilder` | sin wrapper (wrapper-less), solo restricciones base |
+| `Array()` | `*ArrayMetadata` | estado doble (contenedor vs. ítem), vea `.Items(fn)` |
 | `Object(fn)` | `*ObjectMetadata` | estado único, `.Metadata(ref)` / `.AdditionalProperties()` |
-| `Custom(fn func(raw any) (any, error))` | `*PropertyBuilder` | vía de escape universal (universal escape hatch) |
+| `Custom(fn func(raw any) (any, error))` | `*PropertyBuilder` | salida de escape universal (universal escape hatch) |
 
 ## Funciones de parsing
 
-`gonest.MustParse[T](src, schema) T` / `gonest.Parse[T](src, schema) (T, error)`,
-donde `src` es uno de `req.Params()`, `req.Query()`, `req.Headers()`,
-`req.Body().Json()`, o `req.Body().Form(onFile)`.
+`gonest.MustParse[T](src, schema) T` / `gonest.Parse[T](src, schema) (T, error)`, donde `src` es uno de `req.Params()`, `req.Query()`, `req.Headers()`, `req.Body().Json()`, o `req.Body().Form(onFile)`.
 
-Consulta: [Schema Builder Basics](/docs/validation), [Array Builder](/docs/validation/array-builder), [Object Builder](/docs/validation/object-builder), [Runtime Validation](/docs/validation/runtime-validation)
+Por convención en proyectos GoNest, las referencias de esquema se declaran como variables de paquete con un guion bajo al final (`_`).
+
+## Ejemplos de uso
+
+### Declaración de Schema con Reglas de Validación de DTO
+
+```go
+package user
+
+import (
+	"time"
+	"github.com/gonest/gonest"
+)
+
+type CreateUserDto struct {
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	Age       int       `json:"age"`
+	IsActive  bool      `json:"isActive"`
+	Tags      []string  `json:"tags"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+// Por convención en GoNest, la referencia de esquema termina con un guion bajo (_)
+var CreateUserSchema_ = gonest.NewSchema(func(t *CreateUserDto, s *gonest.Schema) {
+	s.Title("CreateUserDto")
+
+	s.Property(&t.Name).String().Min(2).Max(100).Required().
+		Description("Nombre completo del usuario")
+
+	s.Property(&t.Email).Email().Required().
+		Description("Dirección de correo electrónico válida")
+
+	s.Property(&t.Age).Integer().Min(18).Max(120).Required().
+		Description("Edad del usuario (mínimo 18 años)")
+
+	s.Property(&t.IsActive).Boolean().Required()
+
+	// Validación de Array: define reglas en los ítems (.Items) y límites en la lista (.Min / .Max)
+	s.Property(&t.Tags).Array().
+		Items(func(m *gonest.StringMetadata) {
+			m.Min(1)
+		}).Min(1).Max(5).Required()
+
+	s.Property(&t.CreatedAt).DateTime().Required()
+})
+```
+
+### Validación en Tiempo de Ejecución con `MustParse`
+
+```go
+// Parseo de payload desde datos sin procesar
+rawInput := map[string]any{
+	"name":      "Alice Pérez",
+	"email":     "alice@example.com",
+	"age":       28,
+	"isActive":  true,
+	"tags":      []string{"admin", "dev"},
+	"createdAt": "2026-07-24T18:00:00Z",
+}
+
+// Retorna una estructura CreateUserDto fuertemente tipada y validada
+userDto := gonest.MustParse[CreateUserDto](rawInput, CreateUserSchema_)
+```
+
+Vea: [Schema Builder Basics](/docs/validation), [Array Builder](/docs/validation/array-builder), [Object Builder](/docs/validation/object-builder), [Runtime Validation](/docs/validation/runtime-validation)

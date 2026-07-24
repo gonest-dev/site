@@ -17,11 +17,85 @@ description: Referência de gonest.NewController e gonest.Route
 | `Route(method, path, fn)` | Declaração genérica de rota. |
 | `RouteGet(path, fn)` / `RoutePost(path, fn)` / `RoutePut(path, fn)` / `RoutePatch(path, fn)` / `RouteDelete(path, fn)` / `RouteHead(path, fn)` / `RouteOptions(path, fn)` / `RouteTrace(path, fn)` / `RouteConnect(path, fn)` / `RouteQuery(path, fn)` | Atalhos por verbo HTTP. |
 
-## Métodos do `Route`
+## Métodos de documentação do `Route` (Swagger / OpenAPI)
 
-`Summary`, `Description`, `OperationId`, `Tags`, `BearerAuth`, `RequestBody(schema)`,
-`Response(status, schema...)`, `PathParams(schema)`, `QueryParams(schema)`,
-`ExcludeFromDocs()`, `Deprecated()`, `Params(schema)`, `FormBody(schema, fieldName)`,
-`Handler(func(req *gonest.Request, res *gonest.Response) {...})`.
+| Método | Descrição |
+|---|---|
+| `Summary(...)` | Resumo curto da operação para a UI do Swagger. |
+| `Description(...)` | Descrição detalhada da rota no Swagger. |
+| `OperationId(...)` | ID único da operação no spec do OpenAPI. |
+| `Tags(...)` | Define ou sobrescreve as tags do Controller para esta rota. |
+| `BearerAuth()` | Marca a rota individual com suporte a autenticação Bearer. |
+| `RequestBody(schema)` | Associa o esquema de validação do corpo da requisição ao Swagger. |
+| `Response(status, schema...)` | Documenta uma resposta HTTP com seu código de status e schema associado. |
+| `PathParams(schema)` | Documenta os parâmetros de caminho (ex: `:id`). |
+| `QueryParams(schema)` | Documenta os parâmetros de busca (query string). |
+| `ExcludeFromDocs()` | Oculta a rota da documentação gerada pelo Swagger. |
+| `Deprecated()` | Marca a rota como obsoleta (deprecated) no Swagger. |
+
+Por convenção nos projetos GoNest, referências são declaradas como variáveis de pacote com um underline no final (`_`).
+
+## Exemplos de uso
+
+### Declaração de Controller com Swagger / OpenAPI
+
+O exemplo abaixo demonstra como declarar um `UserController_`, definir prefixo de rotas, aplicar Guards e encadear declarações do Swagger para documentação automática:
+
+```go
+package user
+
+import (
+	"net/http"
+	"github.com/gonest/gonest"
+)
+
+// Por convenção no GoNest, a referência do controller termina com um underline (_)
+var UserController_ = gonest.NewController(func(c *gonest.Controller) {
+	c.Path("/users")
+	c.Tags("Users")
+	c.Guards(AuthGuard_)
+
+	// GET /users/:id - Buscar usuário por ID com documentação Swagger encadeada
+	c.RouteGet("/:id", func(req *gonest.Request, res *gonest.Response) {
+		id := req.Param("id")
+		
+		// Injeção de dependência do serviço ou repositório
+		userRepo := gonest.MustInject[UserRepository](req)
+		
+		user, err := userRepo.FindByID(id)
+		if err != nil {
+			res.Status(http.StatusNotFound).JSON(gonest.Map{"error": "Usuário não encontrado"})
+			return
+		}
+		
+		res.Status(http.StatusOK).JSON(user)
+	}).
+	Summary("Buscar usuário por ID").
+	Description("Retorna o perfil completo de um usuário a partir do seu identificador único.").
+	PathParams(UserIdParamSchema_).
+	Response(http.StatusOK, UserResponseSchema_).
+	Response(http.StatusNotFound, ErrorResponseSchema_)
+
+	// POST /users - Criar novo usuário com validação de corpo e respostas Swagger
+	c.RoutePost("", func(req *gonest.Request, res *gonest.Response) {
+		var body CreateUserDto
+		req.MustParseRestJsonBody(&body)
+		
+		userRepo := gonest.MustInject[UserRepository](req)
+		user, err := userRepo.Create(body.Name, body.Email)
+		if err != nil {
+			res.Status(http.StatusBadRequest).JSON(gonest.Map{"error": err.Error()})
+			return
+		}
+		
+		res.Status(http.StatusCreated).JSON(user)
+	}).
+	Summary("Criar novo usuário").
+	Description("Cadastra um novo usuário no sistema com corpo JSON validado.").
+	RequestBody(CreateUserSchema_).
+	Response(http.StatusCreated, UserResponseSchema_).
+	Response(http.StatusBadRequest, ErrorResponseSchema_)
+})
+```
 
 Veja: [Controllers & Routes](/docs/core-concepts/controllers), [OpenAPI & Swagger](/docs/openapi)

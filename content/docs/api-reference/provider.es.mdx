@@ -33,7 +33,7 @@ func NewUserService() *UserService {
 	return &UserService{}
 }
 
-var UserServiceProvider = gonest.NewProvider(func(p *gonest.Provider) {
+var UserServiceProvider_ = gonest.NewProvider(func(p *gonest.Provider) {
 	p.Scope(gonest.ScopeSingleton)
 	p.Constructor(NewUserService)
 })
@@ -41,7 +41,7 @@ var UserServiceProvider = gonest.NewProvider(func(p *gonest.Provider) {
 
 ### Registrando Constructor para Interfaz con `ProviderAs`
 
-En GoNest, para inyectar una interfaz en lugar de un tipo concreto (similar al patrón de NestJS `{ provide: 'IUserRepository', useClass: PgUserRepository }`), utiliza `gonest.ProviderAs[T]`:
+En GoNest, por convención, las referencias terminan con un guion bajo (`_`) y para inyectar una interfaz en lugar de un tipo concreto (similar al patrón de NestJS `{ provide: 'IUserRepository', useClass: PgUserRepository }`), utiliza `gonest.ProviderAs[T]`:
 
 ```go
 package user
@@ -62,21 +62,21 @@ func (r *PgUserRepository) FindByID(id string) (*User, error) {
 	return &User{ID: id}, nil
 }
 
-// 1. Define el provider de la implementación concreta
-var PgRepoRef = gonest.NewProvider(func(p *gonest.Provider) {
+// 1. Define el provider de la implementación concreta (sufijo _)
+var PgUserRepository_ = gonest.NewProvider(func(p *gonest.Provider) {
 	p.Constructor(NewPgUserRepository)
 })
 
-// 2. Asocia la implementación concreta a la interfaz UserRepository
-var UserRepoRef = gonest.ProviderAs[UserRepository](PgRepoRef)
+// 2. Asocia la implementación concreta a la interfaz UserRepository (sufijo _)
+var UserRepository_ = gonest.ProviderAs[UserRepository](PgUserRepository_)
 
 // 3. Registra ambos en el Módulo (el provider concreto y el alias de la interfaz)
-var UserModule = gonest.NewModule(func(m *gonest.Module) {
-	m.Providers(PgRepoRef, UserRepoRef)
+var UserModule_ = gonest.NewModule(func(m *gonest.Module) {
+	m.Providers(PgUserRepository_, UserRepository_)
 })
 ```
 
-### Resolviendo Instancias con `MustInject` y `MustInjectAll`
+### Resolviendo Instancias con `MustInject` e `MustInjectAll`
 
 Una vez que la interfaz esté registrada con `ProviderAs`, puedes resolverla usando la interfaz como parámetro de tipo:
 
