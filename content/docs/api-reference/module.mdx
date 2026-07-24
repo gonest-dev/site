@@ -7,15 +7,32 @@ description: gonest.NewModule reference
 
 | Method | Description |
 |---|---|
-| `Providers(...)` | Register providers owned by this module. |
-| `Controllers(...)` | Register controllers owned by this module. |
-| `Imports(...)` | Import other modules, gaining access to their exported providers. |
-| `Exports(...)` | Expose providers, or re-export a whole imported `*Module` (its own exports become visible transitively), to modules that import this one — accepts either in the same call via `ExportableRef`. |
+| `Providers(...TokenRef)` | Register providers owned by this module. |
+| `Controllers(...TokenRef)` | Register controllers owned by this module. |
+| `Imports(...TokenRef)` | Import other modules, gaining access to their exported providers. |
+| `Exports(...TokenRef)` | Expose providers, or re-export a whole imported `*Module` (its own exports become visible transitively), to modules that import this one — accepts either in the same call. |
 | `Lazy(func(l *gonest.LazyModule) {...})` | Decide, synchronously and from inside the DI graph, which module(s) to `Imports`/`Exports` — based on a config value read via `gonest.MustInject[T](l)` from this same module's own `Providers(...)`. gonest's equivalent to NestJS's `DynamicModule.forRootAsync`. |
-| `Use(...)` | Register global middleware. Root module only. |
-| `Filters(...)` | Register global exception filters. Root module only. |
-| `Listeners(...)` | Register event listeners. |
-| `Schedulers(...)` | Register scheduler jobs. |
+| `Use(...TokenRef)` | Register global middleware. Root module only. |
+| `Filters(...TokenRef)` | Register global exception filters. Root module only. |
+| `Listeners(...TokenRef)` | Register event listeners. |
+| `Schedulers(...TokenRef)` | Register scheduler jobs. |
 | `Name("...")` | Set a readable name used in error messages. |
+
+Every builder method accepts `...gonest.TokenRef` — the marker interface every
+registrable value (`ProviderRef`, `ControllerRef`, `ResolverRef`,
+`MiddlewareRef`, `FilterRef`, `ListenerRef`, `SchedulerRef`, and `*Module`
+itself) embeds. Passing a value of the wrong kind to a given method (e.g. a
+`ControllerRef` to `Providers`) panics immediately, naming the method and the
+received type. This lets you declare a single typed slice and reuse it across
+multiple builder calls with no manual conversion:
+
+```go
+var providers = []gonest.TokenRef{
+  UserProvider,
+}
+
+module.Providers(providers...)
+module.Exports(providers...) // same slice, no conversion needed
+```
 
 See: [Modules](/docs/core-concepts/modules)

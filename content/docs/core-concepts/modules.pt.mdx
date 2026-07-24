@@ -17,16 +17,36 @@ var UserModule = gonest.NewModule(func(module *gonest.Module) {
 
 | Método | Descrição |
 |---|---|
-| `Providers(...)` | Registra Providers de propriedade deste Module. |
-| `Controllers(...)` | Registra Controllers de propriedade deste Module. |
-| `Imports(...)` | Importa outros Modules, obtendo acesso aos seus Providers exportados. |
-| `Exports(...)` | Expõe Providers para Modules que importam este. |
+| `Providers(...TokenRef)` | Registra Providers de propriedade deste Module. |
+| `Controllers(...TokenRef)` | Registra Controllers de propriedade deste Module. |
+| `Imports(...TokenRef)` | Importa outros Modules, obtendo acesso aos seus Providers exportados. |
+| `Exports(...TokenRef)` | Expõe Providers para Modules que importam este. |
 | `Lazy(func(l *gonest.LazyModule) {...})` | Decide qual(is) Module(s) `Imports`/`Exports` a partir de um valor de config resolvido de dentro do grafo de DI — veja [Decidindo um import de dentro do grafo de DI](#decidindo-um-import-de-dentro-do-grafo-de-di-modulelazy) abaixo. |
-| `Use(...)` | Registra Middleware global. **Apenas no Module raiz.** |
-| `Filters(...)` | Registra Filters de exceção globais. **Apenas no Module raiz.** |
-| `Listeners(...)` | Registra ouvintes de eventos para o [Emitter](/docs/emitter). |
-| `Schedulers(...)` | Registra tarefas do [Scheduler](/docs/scheduler). |
+| `Use(...TokenRef)` | Registra Middleware global. **Apenas no Module raiz.** |
+| `Filters(...TokenRef)` | Registra Filters de exceção globais. **Apenas no Module raiz.** |
+| `Listeners(...TokenRef)` | Registra ouvintes de eventos para o [Emitter](/docs/emitter). |
+| `Schedulers(...TokenRef)` | Registra tarefas do [Scheduler](/docs/scheduler). |
 | `Name("...")` | Define um nome legível usado em mensagens de erro. |
+
+Todo método builder acima aceita `...gonest.TokenRef` — um único marker
+interface que os 7 marker interfaces `XxxRef` embutem (`ProviderRef`,
+`ControllerRef`, `ResolverRef`, `MiddlewareRef`, `FilterRef`, `ListenerRef`,
+`SchedulerRef`), assim como o próprio `*Module`. Isso permite declarar UMA
+slice tipada e reusá-la em várias chamadas de builder sem conversão manual
+elemento a elemento:
+
+```go
+var providers = []gonest.TokenRef{
+  UserProvider,
+}
+
+module.Providers(providers...)
+module.Exports(providers...) // mesma slice, sem conversão
+```
+
+Passar o tipo errado de `TokenRef` pra um método dado (ex: um
+`ControllerRef` pra `Providers`) panica imediatamente, nomeando o método e o
+tipo recebido — a mesma postura fail-fast que `MustInject`.
 
 <Callout type="warn">
   `Use` e `Filters` são apenas para a raiz quando aplicados no nível do Module — eles

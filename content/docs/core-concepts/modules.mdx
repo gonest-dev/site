@@ -17,16 +17,36 @@ var UserModule = gonest.NewModule(func(module *gonest.Module) {
 
 | Method | Description |
 |---|---|
-| `Providers(...)` | Register providers owned by this module. |
-| `Controllers(...)` | Register controllers owned by this module. |
-| `Imports(...)` | Import other modules, gaining access to their exported providers. |
-| `Exports(...)` | Expose providers, or re-export a whole imported `*Module`, to modules that import this one — see below. |
+| `Providers(...TokenRef)` | Register providers owned by this module. |
+| `Controllers(...TokenRef)` | Register controllers owned by this module. |
+| `Imports(...TokenRef)` | Import other modules, gaining access to their exported providers. |
+| `Exports(...TokenRef)` | Expose providers, or re-export a whole imported `*Module`, to modules that import this one — see below. |
 | `Lazy(func(l *gonest.LazyModule) {...})` | Decide which module(s) to `Imports`/`Exports` from a config value resolved inside the DI graph — see [Deciding an import from inside the DI graph](#deciding-an-import-from-inside-the-di-graph-modulelazy) below. |
-| `Use(...)` | Register global middleware. **Root module only.** |
-| `Filters(...)` | Register global exception filters. **Root module only.** |
-| `Listeners(...)` | Register event listeners for the [Emitter](/docs/emitter). |
-| `Schedulers(...)` | Register [Scheduler](/docs/scheduler) jobs. |
+| `Use(...TokenRef)` | Register global middleware. **Root module only.** |
+| `Filters(...TokenRef)` | Register global exception filters. **Root module only.** |
+| `Listeners(...TokenRef)` | Register event listeners for the [Emitter](/docs/emitter). |
+| `Schedulers(...TokenRef)` | Register [Scheduler](/docs/scheduler) jobs. |
 | `Name("...")` | Set a readable name used in error messages. |
+
+Every builder method above accepts `...gonest.TokenRef` — a single marker
+interface embedded by all 7 `XxxRef` marker interfaces (`ProviderRef`,
+`ControllerRef`, `ResolverRef`, `MiddlewareRef`, `FilterRef`, `ListenerRef`,
+`SchedulerRef`) as well as `*Module` itself. This means you can declare ONE
+typed slice and reuse it across multiple builder calls with no manual
+per-element conversion:
+
+```go
+var providers = []gonest.TokenRef{
+  UserProvider,
+}
+
+module.Providers(providers...)
+module.Exports(providers...) // same slice, no conversion needed
+```
+
+Passing the wrong kind of `TokenRef` to a given method (e.g. a
+`ControllerRef` to `Providers`) panics immediately, naming the method and the
+received type — the same fail-fast posture as `MustInject`.
 
 <Callout type="warn">
   `Use` and `Filters` are root-only when applied at the module level — they
@@ -78,9 +98,10 @@ something you didn't import is a Stage 1 assembly error, not a silent
 no-op.
 
 <Callout type="info">
-  `Exports` accepts anything implementing `gonest.ExportableRef` — a
-  `ProviderRef` (individual provider) or a `*Module` (whole re-export), in
-  any mix, in one call.
+  `Exports` accepts anything implementing `gonest.TokenRef` — a `ProviderRef`
+  (individual provider) or a `*Module` (whole re-export), in any mix, in one
+  call. Passing anything else (a `ControllerRef`, for example) panics
+  immediately.
 </Callout>
 
 A provider exported by its **concrete** type is only injectable by that
