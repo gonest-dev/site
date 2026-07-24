@@ -82,6 +82,9 @@ body.Email.Apply(&user.Email)
 // Sync writes into another Accessor[T] instead of a raw *T -- the dirty
 // state propagates along with the value (e.g. DTO -> entity, both Accessor)
 body.Email.Sync(&entity.Email)
+
+// Automatically sync all dirty Accessor fields from body to entity:
+gonest.SyncAccessorFields(entity, body)
 ```
 
 ## Next steps

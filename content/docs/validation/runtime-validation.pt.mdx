@@ -63,6 +63,30 @@ A validação sempre passa por um par unificado:
   sempre uma violação — **ausência não é a mesma coisa que nulo**.
 </Callout>
 
+## Atualizações parciais (`Accessor[T]`)
+
+`gonest.Accessor[T]` rastreia se um campo estava explicitamente presente no corpo
+JSON — incluindo `null` explícito — para handlers no estilo PATCH que
+devem alterar apenas o que o cliente realmente enviou:
+
+```go
+type UpdateUserDTO struct {
+  Name  gonest.Accessor[string] `json:"name"`
+  Email gonest.Accessor[string] `json:"email"`
+}
+
+body := gonest.MustParse[*UpdateUserDTO](req.Body().Json(), updateUserSchema)
+body.Name.OnDirty(func(name string) { user.Name = name })
+body.Email.Apply(&user.Email)
+
+// Sync escreve em outro Accessor[T] em vez de um *T cru -- o estado dirty
+// propaga junto com o valor (ex: DTO -> entidade, ambos Accessor)
+body.Email.Sync(&entity.Email)
+
+// Sincroniza automaticamente todos os campos Accessor em estado dirty do body para a entidade:
+gonest.SyncAccessorFields(entity, body)
+```
+
 ## Próximos passos
 
 <Cards>
