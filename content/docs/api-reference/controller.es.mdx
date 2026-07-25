@@ -56,7 +56,8 @@ var UserController_ = gonest.NewController(func(c *gonest.Controller) {
 	c.Guards(AuthGuard_)
 
 	// GET /users/:id - Buscar usuario por ID con documentación Swagger encadenada
-	c.RouteGet("/:id", func(req *gonest.Request, res *gonest.Response) {
+	c.RouteGet("/:id", func(c *gonest.HttpContext) {
+		req, res := c.Request(), c.Response()
 		id := req.Param("id")
 		
 		// Inyección de dependencia desde el contenedor de DI
@@ -77,7 +78,8 @@ var UserController_ = gonest.NewController(func(c *gonest.Controller) {
 	Response(http.StatusNotFound, ErrorResponseSchema_)
 
 	// POST /users - Crear nuevo usuario con validación de cuerpo y respuestas Swagger
-	c.RoutePost("", func(req *gonest.Request, res *gonest.Response) {
+	c.RoutePost("", func(c *gonest.HttpContext) {
+		req, res := c.Request(), c.Response()
 		var body CreateUserDto
 		req.MustParseRestJsonBody(&body)
 		

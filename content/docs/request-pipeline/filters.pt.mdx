@@ -8,8 +8,8 @@ padrão. Construa um com `gonest.NewFilter(func(filter *gonest.Filter) {...})`.
 
 ```go
 var FooFilter = gonest.NewFilter(func(filter *gonest.Filter) {
-  filter.Catch(&FooError{}, func(req *gonest.Request, res *gonest.Response, exc *FooError) {
-    res.Status(http.StatusTeapot).Json(map[string]any{"custom": true})
+  filter.Catch(&FooError{}, func(c *gonest.HttpContext, exc *FooError) {
+    c.Response().Status(http.StatusTeapot).Json(map[string]any{"custom": true})
   })
 })
 ```

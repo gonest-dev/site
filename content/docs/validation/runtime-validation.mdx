@@ -21,7 +21,8 @@ var UserController = gonest.NewController(func(controller *gonest.Controller) {
     route.Response(gonest.HttpStatusOk, func(response *gonest.Response) {
       response.Schema(userEntitySchema)
     })
-    route.Handler(func(req *gonest.Request, res *gonest.Response) {
+    route.Handler(func(c *gonest.HttpContext) {
+      req, res := c.Request(), c.Response()
       params := gonest.MustParse[UserIdParams](req.Params(), userIdParamsSchema)
       res.Json(params)
     })

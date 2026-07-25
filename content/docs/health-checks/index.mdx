@@ -18,20 +18,20 @@ var HealthController = gonest.NewController(func(controller *gonest.Controller) 
   pingables := gonest.MustInjectAll[Pingable](controller)
 
   controller.RouteGet("/readyz", func(route *gonest.Route) {
-    route.Handler(func(req *gonest.Request, res *gonest.Response) {
+    route.Handler(func(c *gonest.HttpContext) {
       status := gonest.HttpStatusOk
       for _, p := range pingables {
         if p.Ping(context.Background()) != nil {
           status = gonest.HttpStatusServiceUnavailable
         }
       }
-      res.Status(status).Json(map[string]string{"status": "ok"})
+      c.Response().Status(status).Json(map[string]string{"status": "ok"})
     })
   })
 
   controller.RouteGet("/livez", func(route *gonest.Route) {
-    route.Handler(func(req *gonest.Request, res *gonest.Response) {
-      res.Status(gonest.HttpStatusOk).Text("OK")
+    route.Handler(func(c *gonest.HttpContext) {
+      c.Response().Status(gonest.HttpStatusOk).Text("OK")
     })
   })
 })
@@ -40,11 +40,11 @@ var HealthController = gonest.NewController(func(controller *gonest.Controller) 
 - **`/readyz`** (readiness): pings every registered `Pingable` via
   [`MustInjectAll`](/docs/core-concepts/dependency-injection) — 200 if all are
   up, 503 if any is down.
-- **`/livez`** (liveness): a static 200 via `res.Status(...).Text("OK")` —
+- **`/livez`** (liveness): a static 200 via `c.Response().Status(...).Text("OK")` —
   `Text` forces `Content-Type: text/plain`, a raw, non-JSON body proving the
   process isn't deadlocked.
 
-`Response.Text(s string) error` and the `gonest.HttpStatusOk` /
+`Reply.Text(s string) error` and the `gonest.HttpStatusOk` /
 `gonest.HttpStatusServiceUnavailable` constants are general-purpose
 primitives, not Terminus-specific.
 

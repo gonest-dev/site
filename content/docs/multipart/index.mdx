@@ -21,7 +21,8 @@ var createPostFormSchema = gonest.NewSchema[CreatePostForm](func(t *CreatePostFo
 var PostController = gonest.NewController(func(controller *gonest.Controller) {
   controller.RoutePost("/", func(route *gonest.Route) {
     route.FormBody(createPostFormSchema, "file") // documents multipart/form-data in OpenAPI
-    route.Handler(func(req *gonest.Request, res *gonest.Response) {
+    route.Handler(func(c *gonest.HttpContext) {
+      req, res := c.Request(), c.Response()
       form := gonest.MustParse[CreatePostForm](req.Body().Form(func(f *gonest.FormFile) error {
         return uploadToS3(f.Filename(), f.ContentType(), f.Reader())
       }), createPostFormSchema)

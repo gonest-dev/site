@@ -7,7 +7,7 @@ description: Referência de gonest.NewGuard
 
 | Método | Descrição |
 |---|---|
-| `Handler(func(req *gonest.Request, res *gonest.Response) bool)` | `false` produz um erro 403 automático; dar panic com uma `Exception` produz a resposta dessa Exception. |
+| `Handler(func(c *gonest.HttpContext) bool)` | `false` produz um erro 403 automático; dar panic com uma `Exception` produz a resposta dessa Exception. |
 
 Aplicado via `Controller.Guards(...)`. Apenas no escopo do Controller — sem `Module.Guards`, sem `MustInject` dentro do construtor (builder).
 

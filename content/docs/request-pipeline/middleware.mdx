@@ -8,14 +8,14 @@ middleware. Build one with `gonest.NewMiddleware(func(middleware *gonest.Middlew
 
 ```go
 var RequestIdMiddleware = gonest.NewMiddleware(func(middleware *gonest.Middleware) {
-  middleware.Handler(func(req *gonest.Request, res *gonest.Response, next gonest.Next) {
-    res.SetHeader("X-Request-Id", "...")
-    next(req, res)
+  middleware.Handler(func(c *gonest.HttpContext, next gonest.Next) {
+    c.Response().SetHeader("X-Request-Id", "...")
+    next(c)
   })
 })
 ```
 
-Calling `next(req, res)` continues the chain. **Omitting it short-circuits**
+Calling `next(c)` continues the chain. **Omitting it short-circuits**
 the request — nothing downstream runs.
 
 ## Global vs. controller-scoped

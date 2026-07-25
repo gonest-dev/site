@@ -7,7 +7,7 @@ description: Referencia de gonest.NewInterceptor
 
 | Método | Descripción |
 |---|---|
-| `Handler(func(req *gonest.Request, res *gonest.Response, next gonest.InterceptorNext))` | El código antes de `next(req, res)` se ejecuta antes del Handler; el código después se ejecuta después. |
+| `Handler(func(c *gonest.HttpContext, next gonest.InterceptorNext))` | El código antes de `next(c)` se ejecuta antes del Handler; el código después se ejecuta después. |
 
 Aplicado a través de `Controller.Interceptors(...)`. Solo en el ámbito del Controller.
 

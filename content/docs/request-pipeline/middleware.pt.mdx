@@ -8,14 +8,14 @@ do Express. Construa um com `gonest.NewMiddleware(func(middleware *gonest.Middle
 
 ```go
 var RequestIdMiddleware = gonest.NewMiddleware(func(middleware *gonest.Middleware) {
-  middleware.Handler(func(req *gonest.Request, res *gonest.Response, next gonest.Next) {
-    res.SetHeader("X-Request-Id", "...")
-    next(req, res)
+  middleware.Handler(func(c *gonest.HttpContext, next gonest.Next) {
+    c.Response().SetHeader("X-Request-Id", "...")
+    next(c)
   })
 })
 ```
 
-Chamar `next(req, res)` continua a cadeia. **Omitir essa chamada encerra (short-circuits)**
+Chamar `next(c)` continua a cadeia. **Omitir essa chamada encerra (short-circuits)**
 a requisição — nada a jusante (downstream) roda.
 
 ## Global vs. escopo de controller

@@ -8,9 +8,9 @@ Um `Interceptor` envolve o Handler no estilo AOP. Construa um com
 
 ```go
 var TimingInterceptor = gonest.NewInterceptor(func(interceptor *gonest.Interceptor) {
-  interceptor.Handler(func(req *gonest.Request, res *gonest.Response, next gonest.InterceptorNext) {
+  interceptor.Handler(func(c *gonest.HttpContext, next gonest.InterceptorNext) {
     // code here runs BEFORE the handler
-    next(req, res)
+    next(c)
     // code here runs AFTER the handler
   })
 })
