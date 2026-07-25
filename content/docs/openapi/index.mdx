@@ -15,7 +15,7 @@ doc := gonest.NewOpenAPI("3.1.0", func(b *gonest.OpenAPI) {
 
 gonest.OpenapiGenerate(app, doc) // walks the whole module tree
 
-gonest.SetupSwagger(app, "/docs", doc, gonest.SwaggerOptions{
+gonest.MustSetupSwagger(app, "/docs", doc, gonest.SwaggerOptions{
   JsonDocumentUrl: "/openapi.json",
   PersistAuth:     true,
 })
@@ -70,7 +70,9 @@ family (String/Numeric/Boolean/DateTime/Array/Object) — a field with
 `SetupSwagger` registers 2 plain routes directly on the adapter — no
 DI/Module involvement — one serving `doc.Document()` JSON, one serving an
 HTML page loading Swagger UI via CDN (no vendored assets). Configure via
-`SwaggerOptions{JsonDocumentUrl, PersistAuth, DocExpansion}`.
+`SwaggerOptions{JsonDocumentUrl, PersistAuth, DocExpansion}`. It returns an
+`error`; `MustSetupSwagger` is the same call wrapped to panic on error, for
+the common case where a setup failure should just crash startup.
 
 ## Try it
 
