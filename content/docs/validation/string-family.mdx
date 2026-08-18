@@ -20,10 +20,10 @@ All string-family branches share `Min(n)`, `Max(n)`, `Pattern(regex)`, and
 | `Binary()` | `binary` |
 
 ```go
-m.Property(&t.Name).String().Required().Min(1).Max(50)
-m.Property(&t.Email).Email().Required()
-m.Property(&t.Id).Uuid().Required()
-m.Property(&t.Status).String().Required().Enum("active", "inactive")
+s.Property(&t.Name).String().Required().Min(1).Max(50)
+s.Property(&t.Email).Email().Required()
+s.Property(&t.Id).Uuid().Required()
+s.Property(&t.Status).String().Required().Enum("active", "inactive")
 ```
 
 `Enum` rejects any value outside the given list at request time (collected

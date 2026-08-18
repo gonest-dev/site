@@ -8,7 +8,7 @@ em todo `PropertyBuilder` — funciona de forma idêntica em corpo JSON, parâme
 query string e campos de formulário.
 
 ```go
-m.Property(&t.Slug).Custom(func(raw any) (any, error) {
+s.Property(&t.Slug).Custom(func(raw any) (any, error) {
   s, ok := raw.(string)
   if !ok || !slugPattern.MatchString(s) {
     return nil, fmt.Errorf("must be a URL-safe slug")

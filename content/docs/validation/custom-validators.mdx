@@ -8,7 +8,7 @@ on every `PropertyBuilder` — it works identically across JSON body, path
 params, query string, and form fields.
 
 ```go
-m.Property(&t.Slug).Custom(func(raw any) (any, error) {
+s.Property(&t.Slug).Custom(func(raw any) (any, error) {
   s, ok := raw.(string)
   if !ok || !slugPattern.MatchString(s) {
     return nil, fmt.Errorf("must be a URL-safe slug")
@@ -45,7 +45,7 @@ afterwards). `Sanitize(fn func(raw any) any)` is different: it transforms
 if both are set) still run afterwards, on the transformed value:
 
 ```go
-m.Property(&t.Cpf).String().Min(11).Max(11).Pattern(`^\d{11}$`).Sanitize(func(raw any) any {
+s.Property(&t.Cpf).String().Min(11).Max(11).Pattern(`^\d{11}$`).Sanitize(func(raw any) any {
   s, _ := raw.(string)
   return strings.TrimSpace(s) // "  12345678901  " still passes Min/Max/Pattern
 }).Required()

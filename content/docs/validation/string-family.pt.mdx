@@ -20,9 +20,9 @@ cada uma define um valor `format` no OpenAPI.
 | `Binary()` | `binary` |
 
 ```go
-m.Property(&t.Name).String().Required().Min(1).Max(50)
-m.Property(&t.Email).Email().Required()
-m.Property(&t.Id).Uuid().Required()
+s.Property(&t.Name).String().Required().Min(1).Max(50)
+s.Property(&t.Email).Email().Required()
+s.Property(&t.Id).Uuid().Required()
 ```
 
 ## Próximos passos

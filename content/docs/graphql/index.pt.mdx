@@ -171,7 +171,7 @@ Todo formato distinto usado em qualquer lugar do app deduplica pra UMA declaraç
 Um tipo sem `format` OpenAPI equivalente (já resolvido para REST via `Custom(fn)`) não tem nome de scalar óbvio. `Custom(fn)` ganha `.GraphqlScalar(name)`, relevante só quando a `Schema` é consumida por um Resolver — REST/OpenAPI ignoram esse valor por completo:
 
 ```go
-m.Property(&t.Id).Custom(decodeObjectID).GraphqlScalar("ObjectID").Required()
+s.Property(&t.Id).Custom(decodeObjectID).GraphqlScalar("ObjectID").Required()
 ```
 
 Dois campos compartilhando o mesmo `.GraphqlScalar("ObjectID")` deduplicam pra uma única declaração `scalar ObjectID`. `Custom(fn)` sem `.GraphqlScalar(name)` num schema consumido por um Resolver falha em TEMPO DE BUILD do SDL (um erro de configuração, não uma falha por request).

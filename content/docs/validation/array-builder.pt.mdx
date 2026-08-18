@@ -17,7 +17,7 @@ onde você chamar as funções.
 </Callout>
 
 ```go
-m.Property(&t.Tags).Array().Items(func(m *gonest.ArrayMetadata) {
+s.Property(&t.Tags).Array().Items(func(m *gonest.ArrayMetadata) {
   m.String().Min(1).Max(50) // item: each string 1-50 chars
   m.Required()              // item: required (non-null entries)
   m.Description("Tags do usuário")
@@ -32,7 +32,7 @@ m.Property(&t.Tags).Array().Items(func(m *gonest.ArrayMetadata) {
 distinto dos próprios `Min`/`Max` do item definidos dentro do callback.
 
 ```go
-m.Property(&t.Tags).Array().Items(func(m *gonest.ArrayMetadata) {
+s.Property(&t.Tags).Array().Items(func(m *gonest.ArrayMetadata) {
   m.String().Min(1).Max(50) // each item: 1-50 characters
 }).Min(1).Max(10) // the array itself: 1-10 items
 ```
@@ -40,7 +40,7 @@ m.Property(&t.Tags).Array().Items(func(m *gonest.ArrayMetadata) {
 ## Arrays de objetos aninhados (reuso de $ref)
 
 ```go
-m.Property(&t.Addresses).Array().Items(func(m *gonest.ArrayMetadata) {
+s.Property(&t.Addresses).Array().Items(func(m *gonest.ArrayMetadata) {
   m.Object(addressMetadata) // reuse an already-registered schema
   m.Required()
 }).Min(1)

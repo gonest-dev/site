@@ -10,7 +10,7 @@ un concepto separado de "elemento". Todo el campo *es* el objeto.
 ## Reutilizando un schema registrado (`$ref`)
 
 ```go
-m.Property(&t.Address).Object(func(om *gonest.ObjectMetadata) {
+s.Property(&t.Address).Object(func(om *gonest.ObjectMetadata) {
   om.Metadata(addressMetadata) // reuse an already-registered *Schema
   om.Required()
   om.Description("Endereço principal")
@@ -20,7 +20,7 @@ m.Property(&t.Address).Object(func(om *gonest.ObjectMetadata) {
 ## Objetos abiertos / formato libre (free-form)
 
 ```go
-m.Property(&t.Metadata).Object(func(om *gonest.ObjectMetadata) {
+s.Property(&t.Metadata).Object(func(om *gonest.ObjectMetadata) {
   om.AdditionalProperties() // e.g. for map[string]any
 }).Nullable().Description("Metadados abertos do usuário")
 ```

@@ -25,7 +25,7 @@ O gonest replica os padrões do Nest que os desenvolvedores JS/TS já conhecem, 
 - **Sem decoradores, sem struct tags para formato.** O Go não possui macros nem
   decoradores, então o gonest utiliza **generics + funções construtoras (builder functions)**
   (`gonest.NewX(func(x *gonest.X) {...})`) em vez da sintaxe `@Decorator()`.
-- **Campos são identificados pelo seu próprio ponteiro.** `m.Property(&t.Id)` usa o
+- **Campos são identificados pelo seu próprio ponteiro.** `s.Property(&t.Id)` usa o
   endereço do campo — não um nome em string ou uma struct tag — garantindo que renomeações permaneçam type-safe e seguras contra refatorações.
 - **Uma declaração, múltiplos consumidores.** O mesmo `*Schema` construído via
   `NewSchema[T]` gerencia tanto a validação em tempo de execução (`gonest.Parse`/`gonest.MustParse`) **quanto** a
