@@ -11,6 +11,7 @@
     "guard",
     "interceptor",
     "filter",
+    "logger",
     "emitter",
     "scheduler",
     "testing"

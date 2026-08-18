@@ -1,0 +1,16 @@
+---
+title: Logger
+description: gonest.Logger, AppOptions.Logger, GetLogger/GetLoggerFor reference
+---
+
+`gonest.Logger` — pluggable structured logging contract, shared by every framework-internal
+diagnostic and error path.
+
+| Symbol | Description |
+|---|---|
+| `Logger` (interface) | `Error`/`Warn`/`Info`/`Debug`/`Verbose(message string, meta ...map[string]any)`. |
+| `AppOptions.Logger` | Swaps the active implementation at bootstrap (`NewApp`/`MustNewApp`); `nil` keeps the built-in console logger. `MustNewTestApp` always resets to the default. |
+| `GetLogger(optionalNamedContext ...string)` | Returns the active `Logger`, optionally prefixing every line with a string context. Direct package access — not `MustInject`, works anywhere. |
+| `GetLoggerFor[T any]()` | Same as `GetLogger`, context derived from `T`'s type name via reflect. |
+
+See: [Logger](/docs/logger)

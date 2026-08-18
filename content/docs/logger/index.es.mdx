@@ -1,0 +1,88 @@
+---
+title: Logger
+description: Logging estructurado y conectable, usado por todo el ecosistema
+---
+
+La salida de diagnóstico propia de gonest — banner de inicio, conteo de módulos/controllers/rutas,
+"Listening on", y todo panic no manejado recuperado en cualquier parte del framework — pasa por una
+única instancia `gonest.Logger` intercambiable. Impleméntala una vez, pásala en el bootstrap, y cada
+ruta de error interna más tu propio código de aplicación comparten el mismo log.
+
+```go
+type Logger interface {
+  Error(message string, meta ...map[string]any)
+  Warn(message string, meta ...map[string]any)
+  Info(message string, meta ...map[string]any)
+  Debug(message string, meta ...map[string]any)
+  Verbose(message string, meta ...map[string]any)
+}
+```
+
+## Cambiar la implementación
+
+`AppOptions.Logger` reemplaza el logger de consola integrado ya en el factory — sin necesidad de una
+llamada `useLogger()` separada, ya que gonest no tiene la ventana asíncrona entre "contenedor creado"
+y "logger adjuntado" que sí tiene Nest:
+
+```go
+type AppLogger struct{}
+
+func (l *AppLogger) Error(message string, meta ...map[string]any)   { /* envía a tu destino */ }
+func (l *AppLogger) Warn(message string, meta ...map[string]any)    { /* ... */ }
+func (l *AppLogger) Info(message string, meta ...map[string]any)    { /* ... */ }
+func (l *AppLogger) Debug(message string, meta ...map[string]any)   { /* ... */ }
+func (l *AppLogger) Verbose(message string, meta ...map[string]any) { /* ... */ }
+
+app := gonest.MustNewApp[gonest.FiberApp](AppModule_, gonest.AppOptions{
+  Logger: &AppLogger{},
+})
+```
+
+Dejar `Logger` sin definir (el valor cero, `nil`) mantiene el formato de consola por defecto:
+
+```
+2026-08-18T10:18:07.123Z [INFO] Listening on: http://localhost:3000, PID: 1234
+```
+
+## Leer el logger activo desde cualquier lugar
+
+`gonest.GetLogger`/`gonest.GetLoggerFor[T]` leen la instancia activa DIRECTAMENTE — **no** pasan por
+`MustInject`, así que funcionan literalmente desde cualquier lugar, incluso dentro del propio
+`Constructor` de un `Provider`, donde inyectar una dependencia de interfaz no está soportado (las
+dependencias Provider-a-Provider solo resuelven tipos pointer):
+
+```go
+var ServiceProvider_ = gonest.NewProvider(func(p *gonest.Provider) {
+  p.Constructor(func() *Service {
+    return &Service{logger: gonest.GetLoggerFor[Service]()} // prefija cada línea con "[Service] ..."
+  })
+})
+```
+
+`GetLogger(name)` recibe un string explícito en lugar de un tipo Go — útil cuando el contexto no es un
+tipo en absoluto (el nombre de un cron job, el tipo en runtime de un evento):
+
+```go
+gonest.GetLogger("cron:invoice-sync").Info("tick")
+```
+
+<Callout type="info">
+  Ambas funciones leen el valor activo a nivel de paquete de `internal/logger` en el momento de la
+  llamada — sin argumento de owner, sin pasar por el grafo de DI. Un `Logger` obtenido dentro de un
+  `Constructor` y guardado en un campo de struct queda fijo a la instancia que estaba activa en ese
+  momento, igual que cualquier otro valor resuelto por DI en gonest.
+</Callout>
+
+## Qué ya registra a través de él
+
+Todo panic que gonest mismo recupera — un Handler HTTP, un resolver GraphQL, el stream SSE/WS de una
+Subscription, el Constructor o un lifecycle hook de un Provider — llama a `Error` antes de convertir
+el panic en una respuesta o un fallo de bootstrap. Una `Exception` manejada (un 400/404/etc esperado)
+**no** se registra de esta forma — solo los panics genuinamente inesperados sí, para que el log siga
+siendo señal, no ruido.
+
+## Próximos pasos
+
+<Cards>
+  <Card title="Testing" href="/docs/testing" />
+</Cards>
