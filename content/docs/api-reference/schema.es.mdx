@@ -21,6 +21,7 @@ description: Referencia de gonest.NewSchema y ramificaciones de PropertyBuilder
 | `String()`, `Email()`, `Uuid()`, `Uri()`, `Hostname()`, `Ipv4()`, `Ipv6()`, `Password()`, `Byte()`, `Binary()` | `*StringMetadata` | `Min`/`Max`/`Pattern` |
 | `Integer()`, `Int32()`, `Float()`, `Double()` | `*NumericMetadata` | `Min`/`Max` |
 | `Boolean()`, `Date()`, `DateTime()` | `*PropertyBuilder` | sin wrapper (wrapper-less), solo restricciones base |
+| `Duration()` | `*DurationSchema` | `Min`/`Max`/`Enum` en `time.Duration`; formato de transporte `"5s"`/`"1h30m"` (`time.ParseDuration`), no ISO-8601 |
 | `Array()` | `*ArrayMetadata` | estado doble (contenedor vs. ítem), vea `.Items(fn)` |
 | `Object(fn)` | `*ObjectMetadata` | estado único, `.Metadata(ref)` / `.AdditionalProperties()` |
 | `Custom(fn func(raw any) (any, error))` | `*PropertyBuilder` | salida de escape universal (universal escape hatch) |

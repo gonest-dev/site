@@ -23,7 +23,7 @@ var userEntitySchema = gonest.NewSchema[UserEntity](func(t *UserEntity, s *gones
 
 <Callout type="info">
   Os campos são identificados pelo seu próprio **endereço de ponteiro**
-  (`m.Property(&t.Name)`) — não uma struct tag, não um nome de campo em string. Renomeie
+  (`s.Property(&t.Name)`) — não uma struct tag, não um nome de campo em string. Renomeie
   o campo e o compilador pega todas as referências; não há string para
   ficar fora de sincronia.
 </Callout>
@@ -40,7 +40,7 @@ builder encadeável (chainable builder) que sempre tem estes quatro:
 | `Description("...")` | Descrição do campo OpenAPI. |
 | `Examples(...)` | Valores de exemplo OpenAPI. |
 
-`m.Title("...")` define o nome com o qual este schema aparece no
+`s.Title("...")` define o nome com o qual este schema aparece no
 `components.schemas` do OpenAPI — o padrão é o nome do tipo Go.
 
 <Callout type="warn">

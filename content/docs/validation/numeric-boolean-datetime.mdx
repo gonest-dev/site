@@ -1,6 +1,6 @@
 ---
 title: Numeric, Boolean & Date/Time
-description: Integer, Float, Boolean, Date and DateTime branches
+description: Integer, Float, Boolean, Date, DateTime and Duration branches
 ---
 
 ## Numeric
@@ -9,8 +9,8 @@ description: Integer, Float, Boolean, Date and DateTime branches
 `Min(int)`/`Max(int)` and `Enum(items ...int64)`:
 
 ```go
-m.Property(&t.Age).Integer().Required().Min(0).Max(150)
-m.Property(&t.Priority).Integer().Required().Enum(1, 2, 3)
+s.Property(&t.Age).Integer().Required().Min(0).Max(150)
+s.Property(&t.Priority).Integer().Required().Enum(1, 2, 3)
 ```
 
 Like the string family's own `Enum`, this rejects any value outside the
@@ -19,15 +19,36 @@ list at request time and emits `enum: [...]` in generated OpenAPI docs.
 ## Boolean, Date & DateTime — wrapper-less branches
 
 `Boolean()`, `Date()` (format `date`), and `DateTime()` (format `date-time`)
-are the first "wrapper-less" branches — no extra validators beyond the base
-four (`Required`/`Nullable`/`Description`/`Examples`). They return a bare
+are "wrapper-less" branches — no extra validators beyond the base four
+(`Required`/`Nullable`/`Description`/`Examples`). They return a bare
 `*PropertyBuilder` directly.
 
 ```go
-m.Property(&t.Active).Boolean().Required()
-m.Property(&t.BornAt).Date().Required()
-m.Property(&t.CreatedAt).DateTime().Required()
+s.Property(&t.Active).Boolean().Required()
+s.Property(&t.BornAt).Date().Required()
+s.Property(&t.CreatedAt).DateTime().Required()
 ```
+
+## Duration
+
+`Duration()` targets a `time.Duration` field. Unlike `Date`/`DateTime`, it
+DOES carry extra validators — `Min(time.Duration)`, `Max(time.Duration)`,
+and `Enum(items ...time.Duration)` — because a duration bound needs to
+compare the parsed VALUE, not string length.
+
+```go
+s.Property(&t.RelayInterval).
+  Duration().
+  Min(1 * time.Second).
+  Max(1 * time.Hour).
+  Default(5 * time.Second)
+```
+
+The wire format is Go's own duration string (`"5s"`, `"1h30m"`, parsed via
+`time.ParseDuration`) — not ISO-8601. It works the same way across every
+source: JSON body, path/query params, headers, form fields, and env vars.
+An invalid string (e.g. `"not-a-duration"`) or an out-of-range value
+produces a normal per-field validation violation, same as any other branch.
 
 ## Next steps
 

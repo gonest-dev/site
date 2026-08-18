@@ -23,7 +23,7 @@ var userEntitySchema = gonest.NewSchema[UserEntity](func(t *UserEntity, s *gones
 
 <Callout type="info">
   Los campos se identifican por su propia **dirección de puntero**
-  (`m.Property(&t.Name)`) — no una struct tag, ni un nombre de campo de cadena. Renombra
+  (`s.Property(&t.Name)`) — no una struct tag, ni un nombre de campo de cadena. Renombra
   el campo y el compilador capta todas las referencias; no hay una cadena (string) que
   se desincronice.
 </Callout>
@@ -40,7 +40,7 @@ constructor encadenable (chainable builder) que siempre tiene estos cuatro:
 | `Description("...")` | Descripción del campo OpenAPI. |
 | `Examples(...)` | Valores de ejemplo OpenAPI. |
 
-`m.Title("...")` establece el nombre bajo el cual aparece este schema en
+`s.Title("...")` establece el nombre bajo el cual aparece este schema en
 `components.schemas` de OpenAPI — por defecto es el nombre del tipo de Go.
 
 <Callout type="warn">

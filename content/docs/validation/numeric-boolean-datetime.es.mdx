@@ -1,6 +1,6 @@
 ---
 title: Numérico, Booleano & Fecha/Hora
-description: Ramas Integer, Float, Boolean, Date y DateTime
+description: Ramas Integer, Float, Boolean, Date, DateTime y Duration
 ---
 
 ## Numeric
@@ -9,21 +9,43 @@ description: Ramas Integer, Float, Boolean, Date y DateTime
 `Min(int)`/`Max(int)`:
 
 ```go
-m.Property(&t.Age).Integer().Required().Min(0).Max(150)
+s.Property(&t.Age).Integer().Required().Min(0).Max(150)
 ```
 
 ## Boolean, Date y DateTime — ramas sin wrappers
 
 `Boolean()`, `Date()` (formato `date`), y `DateTime()` (formato `date-time`)
-son las primeras ramas "sin wrappers" — sin validadores adicionales más allá de los cuatro
+son ramas "sin wrappers" — sin validadores adicionales más allá de los cuatro
 base (`Required`/`Nullable`/`Description`/`Examples`). Devuelven un
 `*PropertyBuilder` simple directamente.
 
 ```go
-m.Property(&t.Active).Boolean().Required()
-m.Property(&t.BornAt).Date().Required()
-m.Property(&t.CreatedAt).DateTime().Required()
+s.Property(&t.Active).Boolean().Required()
+s.Property(&t.BornAt).Date().Required()
+s.Property(&t.CreatedAt).DateTime().Required()
 ```
+
+## Duration
+
+`Duration()` apunta a un campo `time.Duration`. A diferencia de
+`Date`/`DateTime`, SÍ tiene validadores adicionales — `Min(time.Duration)`,
+`Max(time.Duration)` y `Enum(items ...time.Duration)` — porque un límite de
+duración necesita comparar el VALOR parseado, no la longitud del string.
+
+```go
+s.Property(&t.RelayInterval).
+  Duration().
+  Min(1 * time.Second).
+  Max(1 * time.Hour).
+  Default(5 * time.Second)
+```
+
+El formato de transporte es el string de duración nativo de Go (`"5s"`,
+`"1h30m"`, parseado vía `time.ParseDuration`) — no ISO-8601. Funciona igual
+en cualquier origen: JSON body, path/query params, headers, campos de form
+y variables de entorno. Un string inválido (ej: `"not-a-duration"`) o un
+valor fuera de rango produce una violación de validación por campo normal,
+igual que cualquier otra rama.
 
 ## Próximos pasos
 

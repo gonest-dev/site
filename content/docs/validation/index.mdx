@@ -23,7 +23,7 @@ var userEntitySchema = gonest.NewSchema[UserEntity](func(t *UserEntity, s *gones
 
 <Callout type="info">
   Fields are identified by their own **pointer address**
-  (`m.Property(&t.Name)`) — not a struct tag, not a string field name. Rename
+  (`s.Property(&t.Name)`) — not a struct tag, not a string field name. Rename
   the field and the compiler catches every reference; there's no string to
   fall out of sync.
 </Callout>
@@ -40,7 +40,7 @@ chainable builder that always has these four:
 | `Description("...")` | OpenAPI field description. |
 | `Examples(...)` | OpenAPI example values. |
 
-`m.Title("...")` sets the name this schema appears under in OpenAPI's
+`s.Title("...")` sets the name this schema appears under in OpenAPI's
 `components.schemas` — defaults to the Go type name.
 
 <Callout type="warn">
