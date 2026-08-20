@@ -67,6 +67,37 @@ contract as the direct-resolver path above.
 because a single guard can be attached across multiple controllers/modules —
 there's no single "owner" to resolve against.
 
+## Builder fn, not `Constructor`
+
+`MustInject`/`MustInjectAll` must be called in the **builder fn** — the
+function passed to `gonest.NewProvider`/`NewController`/etc — **before**
+`Constructor(...)` is registered, never from inside the `Constructor`
+closure itself:
+
+```go
+var UserService_ = gonest.NewProvider(func(p *gonest.Provider) {
+  // ✅ correct: resolved here, in the builder fn
+  repo := gonest.MustInject[*UserRepository](p)
+
+  p.Constructor(func() *UserService {
+    // ❌ wrong: calling MustInject/MustInjectAll INSIDE Constructor
+    // repo := gonest.MustInject[*UserRepository](p)
+    return &UserService{repo: repo}
+  })
+})
+```
+
+A `Provider`'s builder fn runs during Stage 2 (Declare), before Stage 3 has
+built its dependency graph or invoked a single `Constructor`. Calling it
+correctly there lets Stage 3 resolve the dependency and fill it in before
+`Constructor` ever runs. Calling it from inside `Constructor` instead means
+Stage 3 is already running — the dependency graph is already built, every
+goroutine already dispatched — so the call arrives too late for anything to
+consult. `NewApp`/`New` now panics with a message naming the exact type
+(`gonest: MustInject[T] called from inside a Constructor — ...`) if this
+happens, so the mistake surfaces immediately at bootstrap instead of leaving
+a permanently zero-value dependency with no error anywhere.
+
 ## Next steps
 
 <Cards>

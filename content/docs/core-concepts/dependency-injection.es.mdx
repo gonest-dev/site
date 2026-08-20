@@ -67,6 +67,35 @@ Los constructores de `Guard` son la única excepción: **no** tienen soporte par
 porque un solo Guard se puede adjuntar a través de múltiples Controllers/Modules —
 no hay un único "propietario" (owner) con el cual resolver.
 
+## Builder fn, no `Constructor`
+
+`MustInject`/`MustInjectAll` deben llamarse en el **builder fn** — la función pasada a
+`gonest.NewProvider`/`NewController`/etc — **antes** de que `Constructor(...)` se registre,
+nunca desde dentro del propio closure de `Constructor`:
+
+```go
+var UserService_ = gonest.NewProvider(func(p *gonest.Provider) {
+  // ✅ correcto: resuelto aquí, en el builder fn
+  repo := gonest.MustInject[*UserRepository](p)
+
+  p.Constructor(func() *UserService {
+    // ❌ incorrecto: llamando a MustInject/MustInjectAll DENTRO de Constructor
+    // repo := gonest.MustInject[*UserRepository](p)
+    return &UserService{repo: repo}
+  })
+})
+```
+
+El builder fn de un `Provider` corre durante la Fase 2 (Declare), antes de que la Fase 3
+construya su grafo de dependencias o invoque un solo `Constructor`. Llamarlo correctamente ahí
+permite que la Fase 3 resuelva la dependencia y la complete antes de que `Constructor` siquiera
+corra. Llamarlo desde dentro de `Constructor` en cambio significa que la Fase 3 ya está
+corriendo — el grafo de dependencias ya está construido, cada goroutine ya fue despachada — así
+que la llamada llega demasiado tarde para que algo la consulte. `NewApp`/`New` ahora lanza panic
+con un mensaje que nombra el tipo exacto (`gonest: MustInject[T] called from inside a
+Constructor — ...`) si esto ocurre, así que el error aparece de inmediato en el bootstrap en
+lugar de dejar una dependencia permanentemente en valor cero sin ningún error en ningún lado.
+
 ## Próximos pasos
 
 <Cards>
