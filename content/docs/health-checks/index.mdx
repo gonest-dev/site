@@ -48,6 +48,14 @@ var HealthController = gonest.NewController(func(controller *gonest.Controller) 
 `gonest.HttpStatusServiceUnavailable` constants are general-purpose
 primitives, not Terminus-specific.
 
+<Callout type="info">
+  The same `MustInjectAll[Pingable](owner)` pattern also works from a
+  `Provider` owner, not only a `Controller` — useful for aggregating every
+  `Pingable` adapter into a health-check usecase/service instead of exposing
+  it directly through the controller. See
+  [Where `MustInject` can be called](/docs/core-concepts/dependency-injection#where-mustinject-can-be-called).
+</Callout>
+
 ## Next steps
 
 <Cards>

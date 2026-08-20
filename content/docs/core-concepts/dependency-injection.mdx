@@ -51,6 +51,18 @@ var HealthController_ = gonest.NewController(func(controller *gonest.Controller)
 builders — anywhere the framework guarantees Phase 1 (provider resolution) has
 already completed. See [Bootstrap](/docs/getting-started/bootstrap).
 
+From a `Provider` owner, `MustInjectAll[T](owner)` resolves differently than
+it does from a `Controller`/`Middleware`/`Guard`/`Interceptor`/`Filter`
+owner. A `Provider`'s builder fn runs before any instance exists, so instead
+of resolving immediately, `MustInjectAll` returns a fixed-length slice right
+away — already sized to however many providers in scope match `T` — and each
+element is filled in place once its matching provider actually resolves. Only
+`gonest.ScopeSingleton` providers can be members of that slice: a
+`ScopeTransient` provider that would otherwise match makes
+`NewApp`/`MustNewApp` panic. The slice's element order is not guaranteed, and
+zero matches still returns an empty slice rather than panicking — the same
+contract as the direct-resolver path above.
+
 `Guard` builders are the one exception: they have **no** `MustInject` support,
 because a single guard can be attached across multiple controllers/modules —
 there's no single "owner" to resolve against.

@@ -15,7 +15,7 @@ description: gonest.NewProvider reference
 | Function | Behavior |
 |---|---|
 | `MustInject[T](owner)` | Resolves exactly one match; panics on 0 or N. |
-| `MustInjectAll[T](owner)` | Resolves every match; never panics. |
+| `MustInjectAll[T](owner)` | Resolves every match. Never panics on 0 or N matches — except from a `Provider` owner, where a matched `ScopeTransient` provider makes `NewApp`/`MustNewApp` panic (only `ScopeSingleton` providers can be slice members there). |
 | `ProviderAs[T any](ref ProviderRef) ProviderRef` | Wraps `ref`, registering it as interface `T` — the only way `T` becomes resolvable by `MustInject`/`MustInjectAll`. `ref`'s own concrete registration must also be passed to `Providers(...)`. Panics immediately if `T` isn't an interface, or if `ref` is itself the result of another `ProviderAs` call (chaining). |
 
 ## Code Examples

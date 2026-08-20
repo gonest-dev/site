@@ -54,7 +54,12 @@ si fue envuelto explícitamente para `T` vía
 [`ProviderAs`](#exportando-un-provider-como-una-interfaz), abajo.
 
 `MustInjectAll[T](owner)` devuelve cada coincidencia para `T` — utilizado para
-patrones de plugin/estrategia — y nunca da panic en 0 o N coincidencias.
+patrones de plugin/estrategia — y nunca da panic en 0 o N coincidencias. También
+funciona desde un owner `Provider` (dentro de su propio builder fn de
+`Constructor`), con una restricción: solo los Providers `gonest.ScopeSingleton`
+pueden ser miembros del slice devuelto, y el orden de los elementos del slice no
+está garantizado. Consulta
+[Dónde se puede llamar a `MustInject`](/docs/core-concepts/dependency-injection#dónde-se-puede-llamar-a-mustinject).
 
 ```go
 type Connectable interface{ Ping() bool }

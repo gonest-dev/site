@@ -53,7 +53,11 @@ becomes resolvable by an interface `T` if it was explicitly wrapped for `T`
 via [`ProviderAs`](#exporting-a-provider-as-an-interface), below.
 
 `MustInjectAll[T](owner)` returns every match for `T` — used for
-plugin/strategy patterns — and never panics on 0 or N matches.
+plugin/strategy patterns — and never panics on 0 or N matches. It also works
+from a `Provider` owner (inside its own `Constructor` builder fn), with one
+restriction: only `gonest.ScopeSingleton` providers can be members of the
+returned slice, and the slice's element order is not guaranteed. See
+[Where `MustInject` can be called](/docs/core-concepts/dependency-injection#where-mustinject-can-be-called).
 
 ```go
 type Connectable interface{ Ping() bool }

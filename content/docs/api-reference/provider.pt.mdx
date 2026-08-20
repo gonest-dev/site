@@ -15,7 +15,7 @@ description: Referência de gonest.NewProvider
 | Função | Comportamento |
 |---|---|
 | `MustInject[T](owner)` | Resolve exatamente uma correspondência; dá panic se houver 0 ou N. |
-| `MustInjectAll[T](owner)` | Resolve todas as correspondências; nunca dá panic. |
+| `MustInjectAll[T](owner)` | Resolve todas as correspondências. Nunca dá panic em 0 ou N correspondências — exceto a partir de um owner `Provider`, onde um Provider `ScopeTransient` casado faz `NewApp`/`MustNewApp` dar panic (só Providers `ScopeSingleton` podem ser membros do slice nesse caso). |
 | `ProviderAs[T any](ref ProviderRef) ProviderRef` | Embrulha (wrap) `ref`, registrando-o como a interface `T` — o único jeito de `T` se tornar resolvível por `MustInject`/`MustInjectAll`. O registro concreto do próprio `ref` também precisa ser passado pra `Providers(...)`. Dá panic imediatamente se `T` não for uma interface, ou se `ref` for o resultado de outra chamada de `ProviderAs` (encadeamento). |
 
 ## Exemplos de uso
