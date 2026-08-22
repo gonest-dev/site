@@ -10,7 +10,7 @@ Por convenção no GoNest, a referência do resolver termina com um underline (`
 ```go
 package user
 
-import "github.com/gonest/gonest"
+import "gonest.dev/gonest"
 
 var UserResolver_ = gonest.NewGraphqlResolver(func(resolver *gonest.GraphqlResolver) {
 	userService := gonest.MustInject[UserService](resolver)
@@ -40,7 +40,7 @@ Para registrar resolvers em um módulo GoNest, utilize `m.Resolvers(...)`:
 ```go
 package user
 
-import "github.com/gonest/gonest"
+import "gonest.dev/gonest"
 
 var UserModule_ = gonest.NewModule(func(m *gonest.Module) {
 	m.Name("UserModule")

@@ -27,7 +27,7 @@ Todo método builder aceita `...gonest.TokenRef` — a interface marker que todo
 ```go
 package user
 
-import "github.com/gonest/gonest"
+import "gonest.dev/gonest"
 
 // Por convenção no GoNest, a referência exportada do módulo termina com um underline (_)
 var UserModule_ = gonest.NewModule(func(m *gonest.Module) {
@@ -59,7 +59,7 @@ var UserModule_ = gonest.NewModule(func(m *gonest.Module) {
 package app
 
 import (
-	"github.com/gonest/gonest"
+	"gonest.dev/gonest"
 	"your-project/user"
 )
 

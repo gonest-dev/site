@@ -36,9 +36,9 @@ cada um com um getter correspondente (`TitleText()`, `ContactInfo()`, `HasBearer
 | `Tags(...)` | Sobrescreve as tags do Controller para esta rota. |
 | `BearerAuth()` | Sobrescreve a configuração bearer-auth do Controller para esta rota. |
 | `RequestBody(schema)` | Documenta o schema do corpo da requisição. |
-| `Response(status, schema...)` | Documenta uma resposta; variádico — 0 argumentos documenta um status sem corpo; repita para múltiplos status (o mesmo status sobrescreve). |
-| `PathParams(schema)` | Documenta os parâmetros de rota (path). |
-| `QueryParams(schema)` | Documenta os parâmetros de query. |
+| `Response(status, fn...)` | Documenta uma resposta; o callback opcional recebe um `*gonest.Response` para `.Schema(...)`/`.Description(...)` — 0 argumentos documenta um status sem corpo; repita para múltiplos status (o mesmo status sobrescreve). |
+| `Params(schema)` | Documenta os parâmetros de rota (path). |
+| `Query(schema)` | Documenta os parâmetros de query. |
 | `ExcludeFromDocs()` | Oculta esta rota das documentações geradas. |
 | `Deprecated()` | Marca esta rota como descontinuada (deprecated). |
 

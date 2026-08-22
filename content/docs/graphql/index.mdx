@@ -10,7 +10,7 @@ By convention in GoNest projects, resolver reference variables end with a traili
 ```go
 package user
 
-import "github.com/gonest/gonest"
+import "gonest.dev/gonest"
 
 var UserResolver_ = gonest.NewGraphqlResolver(func(resolver *gonest.GraphqlResolver) {
 	userService := gonest.MustInject[UserService](resolver)
@@ -38,7 +38,7 @@ To register resolvers inside a GoNest module, pass them to `m.Resolvers(...)`:
 ```go
 package user
 
-import "github.com/gonest/gonest"
+import "gonest.dev/gonest"
 
 var UserModule_ = gonest.NewModule(func(m *gonest.Module) {
 	m.Name("UserModule")

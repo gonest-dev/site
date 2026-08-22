@@ -49,6 +49,31 @@ controller.RouteGet("/:user_id", func(route *gonest.Route) {
 })
 ```
 
+## Injetando dependências por rota
+
+`gonest.MustInject`/`gonest.MustInjectAll` também funcionam de dentro do
+próprio `fn` de uma rota — basta passar o próprio `*gonest.Route` como
+owner em vez do controller. A resolução usa o mesmo escopo de módulo que o
+controller usaria, então um controller com várias rotas pode manter a
+dependência de cada rota junto do handler que a usa, em vez de empilhar
+todos os usecases no topo do controller:
+
+```go
+var UserController = gonest.NewController(func(controller *gonest.Controller) {
+  controller.Path("/users")
+
+  controller.RouteGet("/:user_id", func(route *gonest.Route) {
+    userService := gonest.MustInject[*UserService](route)
+
+    route.Handler(func(c *gonest.HttpContext) {
+      c.Response().Json(userService.FindByID(c.Request().Param("user_id")))
+    })
+  })
+})
+```
+
+Veja [Onde `MustInject` pode ser chamado](/docs/core-concepts/dependency-injection#where-mustinject-can-be-called).
+
 ## Próximos passos
 
 <Cards>

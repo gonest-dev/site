@@ -36,9 +36,9 @@ each with a matching getter (`TitleText()`, `ContactInfo()`, `HasBearerAuth()`, 
 | `Tags(...)` | Overrides the controller's tags for this route. |
 | `BearerAuth()` | Overrides the controller's bearer-auth setting for this route. |
 | `RequestBody(schema)` | Document the request body schema. |
-| `Response(status, schema...)` | Document a response; variadic — 0 args documents a bodyless status; repeat for multiple statuses (same status overwrites). |
-| `PathParams(schema)` | Document path parameters. |
-| `QueryParams(schema)` | Document query parameters. |
+| `Response(status, fn...)` | Document a response; the optional callback receives a `*gonest.Response` for `.Schema(...)`/`.Description(...)` — 0 args documents a bodyless status; repeat for multiple statuses (same status overwrites). |
+| `Params(schema)` | Document path parameters. |
+| `Query(schema)` | Document query parameters. |
 | `ExcludeFromDocs()` | Hide this route from generated docs. |
 | `Deprecated()` | Mark this route as deprecated. |
 

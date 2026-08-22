@@ -14,10 +14,13 @@ description: Referência de gonest.NewController e gonest.Route
 | `Guards(...)` | Guards no escopo do Controller. |
 | `Interceptors(...)` | Interceptors no escopo do Controller. |
 | `Filters(...)` | Filters de exceção no escopo do Controller. |
-| `Route(method, path, fn)` | Declaração genérica de rota. |
-| `RouteGet(path, fn)` / `RoutePost(path, fn)` / `RoutePut(path, fn)` / `RoutePatch(path, fn)` / `RouteDelete(path, fn)` / `RouteHead(path, fn)` / `RouteOptions(path, fn)` / `RouteTrace(path, fn)` / `RouteConnect(path, fn)` / `RouteQuery(path, fn)` | Atalhos por verbo HTTP. |
+| `Route(method, path, fn)` | Declaração genérica de rota. `fn` roda imediatamente e recebe o `*gonest.Route` recém-criado. |
+| `RouteGet(path, fn)` / `RoutePost(path, fn)` / `RoutePut(path, fn)` / `RoutePatch(path, fn)` / `RouteDelete(path, fn)` / `RouteHead(path, fn)` / `RouteOptions(path, fn)` / `RouteTrace(path, fn)` / `RouteConnect(path, fn)` / `RouteQuery(path, fn)` | Atalhos por verbo HTTP. Nenhum deles retorna valor — construa a rota inteira dentro de `fn`. |
 
 ## Métodos de documentação do `Route` (Swagger / OpenAPI)
+
+Todo método abaixo é um método do `*gonest.Route` recebido em `fn`, e
+retorna esse mesmo `*gonest.Route` para permitir encadeamento.
 
 | Método | Descrição |
 |---|---|
@@ -26,14 +29,43 @@ description: Referência de gonest.NewController e gonest.Route
 | `OperationId(...)` | ID único da operação no spec do OpenAPI. |
 | `Tags(...)` | Define ou sobrescreve as tags do Controller para esta rota. |
 | `BearerAuth()` | Marca a rota individual com suporte a autenticação Bearer. |
-| `RequestBody(schema)` | Associa o esquema de validação do corpo da requisição ao Swagger. |
-| `Response(status, schema...)` | Documenta uma resposta HTTP com seu código de status e schema associado. |
-| `PathParams(schema)` | Documenta os parâmetros de caminho (ex: `:id`). |
-| `QueryParams(schema)` | Documenta os parâmetros de busca (query string). |
-| `ExcludeFromDocs()` | Oculta a rota da documentação gerada pelo Swagger. |
+| `RequestBody(schema)` | Associa um schema de validação/documentação ao corpo da requisição. |
+| `Response(status, fn...)` | Documenta um código de status; o callback opcional recebe um `*gonest.Response` para `.Schema(...)`/`.Description(...)`. |
+| `Params(schema)` | Documenta os parâmetros de caminho (ex: `:id`). |
+| `Query(schema)` | Documenta os parâmetros de busca (query string). |
+| `ExcludeFromDocs()` | Oculta a rota da documentação Swagger gerada. |
 | `Deprecated()` | Marca a rota como obsoleta (deprecated) no Swagger. |
+| `Handler(fn)` | Armazena `fn` como o handler de requisição da rota. Não retorna valor — chame por último. |
 
 Por convenção nos projetos GoNest, referências são declaradas como variáveis de pacote com um underline no final (`_`).
+
+## Injetando dependências por rota
+
+`gonest.MustInject[T]`/`gonest.MustInjectAll[T]` também funcionam de dentro
+do `fn` de uma rota, não só no topo do builder do Controller — basta passar
+o próprio `*gonest.Route` como owner. A resolução usa exatamente o mesmo
+escopo de módulo que o Controller usaria, então um Controller com várias
+rotas pode manter a dependência de cada rota junto do handler que
+realmente a usa, em vez de empilhar todos os usecases no topo do
+Controller:
+
+```go
+c.RouteGet("/:id", func(r *gonest.Route) {
+	userRepo := gonest.MustInject[UserRepository](r)
+
+	r.Summary("Get user by id")
+	r.Handler(func(ctx *gonest.HttpContext) {
+		user, err := userRepo.FindByID(ctx.Request().Param("id"))
+		if err != nil {
+			ctx.Response().Status(gonest.HttpStatusNotFound).Json(map[string]string{"error": "user not found"})
+			return
+		}
+		ctx.Response().Status(gonest.HttpStatusOk).Json(user)
+	})
+})
+```
+
+Veja: [Onde `MustInject` pode ser chamado](/docs/core-concepts/dependency-injection#where-mustinject-can-be-called).
 
 ## Exemplos de uso
 
@@ -45,8 +77,7 @@ O exemplo abaixo demonstra como declarar um `UserController_`, definir prefixo d
 package user
 
 import (
-	"net/http"
-	"github.com/gonest/gonest"
+	"gonest.dev/gonest"
 )
 
 // Por convenção no GoNest, a referência do controller termina com um underline (_)
@@ -55,48 +86,55 @@ var UserController_ = gonest.NewController(func(c *gonest.Controller) {
 	c.Tags("Users")
 	c.Guards(AuthGuard_)
 
-	// GET /users/:id - Buscar usuário por ID com documentação Swagger encadeada
-	c.RouteGet("/:id", func(c *gonest.HttpContext) {
-		req, res := c.Request(), c.Response()
-		id := req.Param("id")
-		
-		// Injeção de dependência do serviço ou repositório
-		userRepo := gonest.MustInject[UserRepository](req)
-		
-		user, err := userRepo.FindByID(id)
-		if err != nil {
-			res.Status(http.StatusNotFound).JSON(gonest.Map{"error": "Usuário não encontrado"})
-			return
-		}
-		
-		res.Status(http.StatusOK).JSON(user)
-	}).
-	Summary("Buscar usuário por ID").
-	Description("Retorna o perfil completo de um usuário a partir do seu identificador único.").
-	PathParams(UserIdParamSchema_).
-	Response(http.StatusOK, UserResponseSchema_).
-	Response(http.StatusNotFound, ErrorResponseSchema_)
+	// GET /users/:id - Buscar usuário por ID, dependência injetada por rota
+	c.RouteGet("/:id", func(r *gonest.Route) {
+		userRepo := gonest.MustInject[UserRepository](r)
+
+		r.Summary("Get user by ID").
+			Description("Fetches a user profile given a unique identifier.").
+			Params(UserIdParamSchema_).
+			Response(gonest.HttpStatusOk, func(response *gonest.Response) {
+				response.Schema(UserResponseSchema_)
+			}).
+			Response(gonest.HttpStatusNotFound, func(response *gonest.Response) {
+				response.Schema(ErrorResponseSchema_)
+			})
+
+		r.Handler(func(ctx *gonest.HttpContext) {
+			user, err := userRepo.FindByID(ctx.Request().Param("id"))
+			if err != nil {
+				ctx.Response().Status(gonest.HttpStatusNotFound).Json(map[string]string{"error": "user not found"})
+				return
+			}
+			ctx.Response().Status(gonest.HttpStatusOk).Json(user)
+		})
+	})
 
 	// POST /users - Criar novo usuário com validação de corpo e respostas Swagger
-	c.RoutePost("", func(c *gonest.HttpContext) {
-		req, res := c.Request(), c.Response()
-		var body CreateUserDto
-		req.MustParseRestJsonBody(&body)
-		
-		userRepo := gonest.MustInject[UserRepository](req)
-		user, err := userRepo.Create(body.Name, body.Email)
-		if err != nil {
-			res.Status(http.StatusBadRequest).JSON(gonest.Map{"error": err.Error()})
-			return
-		}
-		
-		res.Status(http.StatusCreated).JSON(user)
-	}).
-	Summary("Criar novo usuário").
-	Description("Cadastra um novo usuário no sistema com corpo JSON validado.").
-	RequestBody(CreateUserSchema_).
-	Response(http.StatusCreated, UserResponseSchema_).
-	Response(http.StatusBadRequest, ErrorResponseSchema_)
+	c.RoutePost("", func(r *gonest.Route) {
+		userRepo := gonest.MustInject[UserRepository](r)
+
+		r.Summary("Create new user").
+			Description("Registers a new user account with validated JSON input.").
+			RequestBody(CreateUserSchema_).
+			Response(gonest.HttpStatusCreated, func(response *gonest.Response) {
+				response.Schema(UserResponseSchema_)
+			}).
+			Response(gonest.HttpStatusBadRequest, func(response *gonest.Response) {
+				response.Schema(ErrorResponseSchema_)
+			})
+
+		r.Handler(func(ctx *gonest.HttpContext) {
+			body := gonest.MustParse[CreateUserDto](ctx.Request().Body().Json(), CreateUserSchema_)
+
+			user, err := userRepo.Create(body.Name, body.Email)
+			if err != nil {
+				ctx.Response().Status(gonest.HttpStatusBadRequest).Json(map[string]string{"error": err.Error()})
+				return
+			}
+			ctx.Response().Status(gonest.HttpStatusCreated).Json(user)
+		})
+	})
 })
 ```
 

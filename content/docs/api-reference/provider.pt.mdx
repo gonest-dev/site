@@ -25,7 +25,7 @@ description: Referência de gonest.NewProvider
 ```go
 package user
 
-import "github.com/gonest/gonest"
+import "gonest.dev/gonest"
 
 type UserService struct{}
 
@@ -46,7 +46,7 @@ No GoNest, por convenção, referências terminam com um underline (`_`) e para 
 ```go
 package user
 
-import "github.com/gonest/gonest"
+import "gonest.dev/gonest"
 
 type UserRepository interface {
 	FindByID(id string) (*User, error)

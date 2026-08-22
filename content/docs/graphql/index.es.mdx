@@ -10,7 +10,7 @@ Por convención en proyectos GoNest, las variables de referencia de los resolver
 ```go
 package user
 
-import "github.com/gonest/gonest"
+import "gonest.dev/gonest"
 
 var UserResolver_ = gonest.NewGraphqlResolver(func(resolver *gonest.GraphqlResolver) {
 	userService := gonest.MustInject[UserService](resolver)
@@ -38,7 +38,7 @@ Para registrar resolvers dentro de un módulo GoNest, utilízalos con `m.Resolve
 ```go
 package user
 
-import "github.com/gonest/gonest"
+import "gonest.dev/gonest"
 
 var UserModule_ = gonest.NewModule(func(m *gonest.Module) {
 	m.Name("UserModule")

@@ -14,26 +14,57 @@ description: gonest.NewController and gonest.Route reference
 | `Guards(...)` | Controller-scoped guards. |
 | `Interceptors(...)` | Controller-scoped interceptors. |
 | `Filters(...)` | Controller-scoped exception filters. |
-| `Route(method, path, fn)` | Generic route declaration. |
-| `RouteGet(path, fn)` / `RoutePost(path, fn)` / `RoutePut(path, fn)` / `RoutePatch(path, fn)` / `RouteDelete(path, fn)` / `RouteHead(path, fn)` / `RouteOptions(path, fn)` / `RouteTrace(path, fn)` / `RouteConnect(path, fn)` / `RouteQuery(path, fn)` | Per-verb shorthands. |
+| `Route(method, path, fn)` | Generic route declaration. `fn` runs immediately and receives the new `*gonest.Route`. |
+| `RouteGet(path, fn)` / `RoutePost(path, fn)` / `RoutePut(path, fn)` / `RoutePatch(path, fn)` / `RouteDelete(path, fn)` / `RouteHead(path, fn)` / `RouteOptions(path, fn)` / `RouteTrace(path, fn)` / `RouteConnect(path, fn)` / `RouteQuery(path, fn)` | Per-verb shorthands. None of them return a value — build the route entirely inside `fn`. |
 
 ## `Route` Documentation Methods (Swagger / OpenAPI)
+
+Every method below is a method on the `*gonest.Route` passed into `fn`, and
+returns that same `*gonest.Route` so calls can chain.
 
 | Method | Description |
 |---|---|
 | `Summary(...)` | Short operation summary for Swagger UI. |
 | `Description(...)` | Detailed operation description in Swagger. |
 | `OperationId(...)` | Unique operation identifier in OpenAPI spec. |
-| `Tags(...)` | Set or override controller tags for this route. |
+| `Tags(...)` | Set or override the controller's tags for this route. |
 | `BearerAuth()` | Mark an individual route as supporting Bearer auth. |
-| `RequestBody(schema)` | Attach request body validation schema to Swagger documentation. |
-| `Response(status, schema...)` | Document an HTTP status response code and its optional response schema. |
-| `PathParams(schema)` | Document path parameters (e.g. `:id`). |
-| `QueryParams(schema)` | Document query string parameters. |
-| `ExcludeFromDocs()` | Hide route from generated Swagger documentation. |
-| `Deprecated()` | Mark route as deprecated in Swagger. |
+| `RequestBody(schema)` | Attach a request body validation/documentation schema. |
+| `Response(status, fn...)` | Document a status code; the optional callback receives a `*gonest.Response` for `.Schema(...)`/`.Description(...)`. |
+| `Params(schema)` | Document path parameters (e.g. `:id`). |
+| `Query(schema)` | Document query string parameters. |
+| `ExcludeFromDocs()` | Hide the route from generated Swagger documentation. |
+| `Deprecated()` | Mark the route as deprecated in Swagger. |
+| `Handler(fn)` | Store `fn` as the route's request handler. Does not return a value — call it last. |
 
 By convention in GoNest projects, declared reference variables end with a trailing underscore (`_`).
+
+## Injecting dependencies per-route
+
+`gonest.MustInject[T]`/`gonest.MustInjectAll[T]` work from inside a route's
+`fn` too, not just at the top of the controller's own builder — pass the
+`*gonest.Route` itself as the owner. This resolves from the exact same
+module scope as the controller would, so a controller with many routes can
+keep each route's dependency next to the handler that actually uses it,
+instead of stacking every usecase at the top of the controller:
+
+```go
+c.RouteGet("/:id", func(r *gonest.Route) {
+	userRepo := gonest.MustInject[UserRepository](r)
+
+	r.Summary("Get user by id")
+	r.Handler(func(ctx *gonest.HttpContext) {
+		user, err := userRepo.FindByID(ctx.Request().Param("id"))
+		if err != nil {
+			ctx.Response().Status(gonest.HttpStatusNotFound).Json(map[string]string{"error": "user not found"})
+			return
+		}
+		ctx.Response().Status(gonest.HttpStatusOk).Json(user)
+	})
+})
+```
+
+See: [Where `MustInject` can be called](/docs/core-concepts/dependency-injection#where-mustinject-can-be-called).
 
 ## Code Examples
 
@@ -45,8 +76,7 @@ The example below demonstrates how to declare a `UserController_`, configure a r
 package user
 
 import (
-	"net/http"
-	"github.com/gonest/gonest"
+	"gonest.dev/gonest"
 )
 
 // By convention in GoNest, controller reference variables end with a trailing underscore (_)
@@ -55,48 +85,55 @@ var UserController_ = gonest.NewController(func(c *gonest.Controller) {
 	c.Tags("Users")
 	c.Guards(AuthGuard_)
 
-	// GET /users/:id - Get user by ID with chained Swagger metadata
-	c.RouteGet("/:id", func(c *gonest.HttpContext) {
-		req, res := c.Request(), c.Response()
-		id := req.Param("id")
-		
-		// Inject dependency from DI container
-		userRepo := gonest.MustInject[UserRepository](req)
-		
-		user, err := userRepo.FindByID(id)
-		if err != nil {
-			res.Status(http.StatusNotFound).JSON(gonest.Map{"error": "User not found"})
-			return
-		}
-		
-		res.Status(http.StatusOK).JSON(user)
-	}).
-	Summary("Get user by ID").
-	Description("Fetches a user profile given a unique identifier.").
-	PathParams(UserIdParamSchema_).
-	Response(http.StatusOK, UserResponseSchema_).
-	Response(http.StatusNotFound, ErrorResponseSchema_)
+	// GET /users/:id - Get user by ID, dependency injected per-route
+	c.RouteGet("/:id", func(r *gonest.Route) {
+		userRepo := gonest.MustInject[UserRepository](r)
+
+		r.Summary("Get user by ID").
+			Description("Fetches a user profile given a unique identifier.").
+			Params(UserIdParamSchema_).
+			Response(gonest.HttpStatusOk, func(response *gonest.Response) {
+				response.Schema(UserResponseSchema_)
+			}).
+			Response(gonest.HttpStatusNotFound, func(response *gonest.Response) {
+				response.Schema(ErrorResponseSchema_)
+			})
+
+		r.Handler(func(ctx *gonest.HttpContext) {
+			user, err := userRepo.FindByID(ctx.Request().Param("id"))
+			if err != nil {
+				ctx.Response().Status(gonest.HttpStatusNotFound).Json(map[string]string{"error": "user not found"})
+				return
+			}
+			ctx.Response().Status(gonest.HttpStatusOk).Json(user)
+		})
+	})
 
 	// POST /users - Create new user with request validation and Swagger responses
-	c.RoutePost("", func(c *gonest.HttpContext) {
-		req, res := c.Request(), c.Response()
-		var body CreateUserDto
-		req.MustParseRestJsonBody(&body)
-		
-		userRepo := gonest.MustInject[UserRepository](req)
-		user, err := userRepo.Create(body.Name, body.Email)
-		if err != nil {
-			res.Status(http.StatusBadRequest).JSON(gonest.Map{"error": err.Error()})
-			return
-		}
-		
-		res.Status(http.StatusCreated).JSON(user)
-	}).
-	Summary("Create new user").
-	Description("Registers a new user account with validated JSON input.").
-	RequestBody(CreateUserSchema_).
-	Response(http.StatusCreated, UserResponseSchema_).
-	Response(http.StatusBadRequest, ErrorResponseSchema_)
+	c.RoutePost("", func(r *gonest.Route) {
+		userRepo := gonest.MustInject[UserRepository](r)
+
+		r.Summary("Create new user").
+			Description("Registers a new user account with validated JSON input.").
+			RequestBody(CreateUserSchema_).
+			Response(gonest.HttpStatusCreated, func(response *gonest.Response) {
+				response.Schema(UserResponseSchema_)
+			}).
+			Response(gonest.HttpStatusBadRequest, func(response *gonest.Response) {
+				response.Schema(ErrorResponseSchema_)
+			})
+
+		r.Handler(func(ctx *gonest.HttpContext) {
+			body := gonest.MustParse[CreateUserDto](ctx.Request().Body().Json(), CreateUserSchema_)
+
+			user, err := userRepo.Create(body.Name, body.Email)
+			if err != nil {
+				ctx.Response().Status(gonest.HttpStatusBadRequest).Json(map[string]string{"error": err.Error()})
+				return
+			}
+			ctx.Response().Status(gonest.HttpStatusCreated).Json(user)
+		})
+	})
 })
 ```
 

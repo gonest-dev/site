@@ -25,7 +25,7 @@ description: gonest.NewProvider reference
 ```go
 package user
 
-import "github.com/gonest/gonest"
+import "gonest.dev/gonest"
 
 type UserService struct{}
 
@@ -46,7 +46,7 @@ In GoNest, reference variables end with a trailing underscore (`_`) by conventio
 ```go
 package user
 
-import "github.com/gonest/gonest"
+import "gonest.dev/gonest"
 
 type UserRepository interface {
 	FindByID(id string) (*User, error)
