@@ -3,37 +3,39 @@ title: Exceptions & Panic Recovery
 description: HttpException, built-in exceptions, and the panic-recovery contract
 ---
 
-`gonest.HttpException` is the base type every gonest exception embeds.
+gonest.HttpException is the base type every gonest exception embeds.
 
-```go
+`go
 gonest.NewHttpException().
   SetStatus(http.StatusBadRequest).
   SetName("FooError").
   SetMessage("lorem ipsum").
   SetDetails(details)
-```
+`
 
-Any type embedding `HttpException` structurally satisfies the `Exception`
-interface — the recovery layer uses a type-assertion, never a closed
+Any type embedding HttpException structurally satisfies the Exception
+interface - the recovery layer uses a type-assertion, never a closed
 type-switch.
 
 ## Built-in exceptions
 
-| Exception | Status |
-|---|---|
-| `NotFoundException` | 404 |
-| `BadRequestException` | 400 |
-| `ConflictException` | 409 |
-| `UnauthorizedException` | 401 |
-| `ForbiddenException` | 403 |
+All constructors accept (message string, details ...any). Passing "" as
+message uses the type's built-in default (e.g. "Resource not found" for
+NotFoundException). All 40 standard HTTP error types are available — see
+the full list in [API Reference → Exceptions](/docs/api-reference/exceptions).
 
-Each has a `New*Exception(details any)` constructor.
+`go
+panic(gonest.NewNotFoundException("", map[string]any{"id": id}))
+panic(gonest.NewUnauthorizedException("Token expired", nil))
+panic(gonest.NewTooManyRequestsException("", nil))
+panic(gonest.NewInternalServerErrorException("", err.Error()))
+`
 
 ## Custom exceptions
 
-Embed `gonest.HttpException` exactly like a built-in:
+Embed gonest.HttpException exactly like a built-in:
 
-```go
+`go
 type FooError struct{ gonest.HttpException }
 
 func NewFooError(details any) *FooError {
@@ -45,23 +47,25 @@ func NewFooError(details any) *FooError {
       SetDetails(details),
   }
 }
-```
+`
 
 ## Panic → response contract
 
 <Callout type="info">
-  Any panic with a value satisfying `Exception` becomes
-  `{"name": ..., "message": ..., "details": ...}` JSON at that exception's own
+  Any panic with a value satisfying Exception becomes
+  {"name": ..., "message": ..., "details": ...} JSON at that exception's own
   status code. Any **other** panic (nil pointer, index out of range, etc.)
-  becomes a generic 500 with **zero leaked internal detail** — the process
+  becomes a generic 500 with **zero leaked internal detail** - the process
   never crashes.
 </Callout>
 
 ## HTTP status constants
 
-`gonest.HttpStatus*` re-exports all 63 standard `net/http.StatusXxx`
-constants under the `gonest` namespace (e.g. `gonest.HttpStatusNotFound`), so
-handler code never needs to import `net/http` just for status codes.
+gonest.HttpStatus* re-exports all 63 standard 
+et/http.StatusXxx
+constants under the gonest namespace (e.g. gonest.HttpStatusNotFound), so
+handler code never needs to import 
+et/http just for status codes.
 
 ## Next steps
 

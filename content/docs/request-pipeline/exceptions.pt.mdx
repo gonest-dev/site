@@ -1,39 +1,40 @@
 ---
-title: Exceptions & Recuperação de Panic
-description: HttpException, exceptions internas e o contrato de recuperação de panic
+title: Exceptions & Panic Recovery
+description: HttpException, exceções embutidas e o contrato de recuperação de panic
 ---
 
-O `gonest.HttpException` é o tipo base que toda exception do gonest embute (embeds).
+gonest.HttpException é o tipo base que toda exceção gonest embute.
 
-```go
+`go
 gonest.NewHttpException().
   SetStatus(http.StatusBadRequest).
   SetName("FooError").
   SetMessage("lorem ipsum").
   SetDetails(details)
-```
+`
 
-Qualquer tipo que embuta `HttpException` satisfaz estruturalmente a interface `Exception`
-— a camada de recuperação usa uma asserção de tipo (type-assertion), nunca um
-type-switch fechado.
+Qualquer tipo que embuta HttpException satisfaz estruturalmente a interface
+Exception — a camada de recovery usa type-assertion, nunca um type-switch fechado.
 
-## Exceptions embutidas (Built-in exceptions)
+## Exceções embutidas
 
-| Exception | Status |
-|---|---|
-| `NotFoundException` | 404 |
-| `BadRequestException` | 400 |
-| `ConflictException` | 409 |
-| `UnauthorizedException` | 401 |
-| `ForbiddenException` | 403 |
+Todos os construtores aceitam (message string, details ...any). Passar "" como
+message usa o default do tipo (ex: "Resource not found" para NotFoundException).
+Todos os 40 tipos de erro HTTP padrão estão disponíveis — veja a lista completa em
+[Referência de API → Exceptions](/docs/api-reference/exceptions).
 
-Cada uma possui um construtor `New*Exception(details any)`.
+`go
+panic(gonest.NewNotFoundException("", map[string]any{"id": id}))
+panic(gonest.NewUnauthorizedException("Token expirado", nil))
+panic(gonest.NewTooManyRequestsException("", nil))
+panic(gonest.NewInternalServerErrorException("", err.Error()))
+`
 
-## Exceptions customizadas
+## Exceções customizadas
 
-Embuta `gonest.HttpException` exatamente como uma embutida (built-in):
+Embuta gonest.HttpException exatamente como uma exceção embutida:
 
-```go
+`go
 type FooError struct{ gonest.HttpException }
 
 func NewFooError(details any) *FooError {
@@ -45,26 +46,27 @@ func NewFooError(details any) *FooError {
       SetDetails(details),
   }
 }
-```
+`
 
-## Contrato de Panic → resposta
+## Contrato panic → resposta
 
 <Callout type="info">
-  Qualquer panic com um valor que satisfaça `Exception` torna-se um JSON
-  `{"name": ..., "message": ..., "details": ...}` no próprio código de status daquela
-  exception. Qualquer **outro** panic (ponteiro nulo, índice fora dos limites, etc.)
-  torna-se um erro 500 genérico com **zero detalhe interno vazado** — o processo
-  nunca trava (crashes).
+  Qualquer panic com um valor que satisfaça Exception vira JSON
+  {"name": ..., "message": ..., "details": ...} com o status da exceção.
+  Qualquer **outro** panic (nil pointer, index out of range, etc.) vira um
+  500 genérico com **zero detalhe interno vazado** — o processo nunca crasha.
 </Callout>
 
 ## Constantes de status HTTP
 
-`gonest.HttpStatus*` reexporta todas as 63 constantes padrão `net/http.StatusXxx`
-sob o namespace `gonest` (ex: `gonest.HttpStatusNotFound`), para que
-o código do handler nunca precise importar `net/http` apenas para códigos de status.
+gonest.HttpStatus* reexporta todas as 63 constantes padrão 
+et/http.StatusXxx
+sob o namespace gonest (ex: gonest.HttpStatusNotFound), então o código de
+handler nunca precisa importar 
+et/http só por status codes.
 
 ## Próximos passos
 
 <Cards>
-  <Card title="Validation & Schemas" href="/docs/validation" />
+  <Card title="Validação & Schemas" href="/docs/validation" />
 </Cards>

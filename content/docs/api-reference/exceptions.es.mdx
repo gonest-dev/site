@@ -3,18 +3,63 @@ title: Exceptions
 description: Referencia de HttpException y excepciones integradas
 ---
 
-`gonest.HttpException` — tipo base. `NewHttpException().SetStatus(...).SetName(...).SetMessage(...).SetDetails(...)`
+gonest.HttpException - tipo base. NewHttpException().SetStatus(...).SetName(...).SetMessage(...).SetDetails(...)
 
 ## Excepciones Integradas (Built-ins)
 
-| Tipo | Estado | Constructor |
-|---|---|---|
-| `NotFoundException` | 404 | `NewNotFoundException(details any)` |
-| `BadRequestException` | 400 | `NewBadRequestException(details any)` |
-| `ConflictException` | 409 | `NewConflictException(details any)` |
-| `UnauthorizedException` | 401 | `NewUnauthorizedException(details any)` |
-| `ForbiddenException` | 403 | `NewForbiddenException(details any)` |
+Todos los constructores aceptan (message string, details ...any). Cuando message es "", se usa un mensaje predeterminado.
 
-`gonest.HttpStatus*` — las 63 constantes estándar `net/http.StatusXxx` reexportadas.
+### Errores de Cliente 4xx
+
+| Tipo | Estado | Mensaje Predeterminado |
+|---|---|---|
+| BadRequestException | 400 | "Bad request" |
+| UnauthorizedException | 401 | "Unauthorized" |
+| PaymentRequiredException | 402 | "Payment required" |
+| ForbiddenException | 403 | "Forbidden" |
+| NotFoundException | 404 | "Resource not found" |
+| MethodNotAllowedException | 405 | "Method not allowed" |
+| NotAcceptableException | 406 | "Not acceptable" |
+| ProxyAuthRequiredException | 407 | "Proxy authentication required" |
+| RequestTimeoutException | 408 | "Request timeout" |
+| ConflictException | 409 | "Conflict" |
+| GoneException | 410 | "Gone" |
+| LengthRequiredException | 411 | "Length required" |
+| PreconditionFailedException | 412 | "Precondition failed" |
+| RequestEntityTooLargeException | 413 | "Request entity too large" |
+| RequestURITooLongException | 414 | "Request URI too long" |
+| UnsupportedMediaTypeException | 415 | "Unsupported media type" |
+| RequestedRangeNotSatisfiableException | 416 | "Requested range not satisfiable" |
+| ExpectationFailedException | 417 | "Expectation failed" |
+| TeapotException | 418 | "I'm a teapot" |
+| MisdirectedRequestException | 421 | "Misdirected request" |
+| UnprocessableEntityException | 422 | "Unprocessable entity" |
+| LockedException | 423 | "Locked" |
+| FailedDependencyException | 424 | "Failed dependency" |
+| TooEarlyException | 425 | "Too early" |
+| UpgradeRequiredException | 426 | "Upgrade required" |
+| PreconditionRequiredException | 428 | "Precondition required" |
+| TooManyRequestsException | 429 | "Too many requests" |
+| RequestHeaderFieldsTooLargeException | 431 | "Request header fields too large" |
+| UnavailableForLegalReasonsException | 451 | "Unavailable for legal reasons" |
+
+### Errores de Servidor 5xx
+
+| Tipo | Estado | Mensaje Predeterminado |
+|---|---|---|
+| InternalServerErrorException | 500 | "Internal server error" |
+| NotImplementedException | 501 | "Not implemented" |
+| BadGatewayException | 502 | "Bad gateway" |
+| ServiceUnavailableException | 503 | "Service unavailable" |
+| GatewayTimeoutException | 504 | "Gateway timeout" |
+| HTTPVersionNotSupportedException | 505 | "HTTP version not supported" |
+| VariantAlsoNegotiatesException | 506 | "Variant also negotiates" |
+| InsufficientStorageException | 507 | "Insufficient storage" |
+| LoopDetectedException | 508 | "Loop detected" |
+| NotExtendedException | 510 | "Not extended" |
+| NetworkAuthenticationRequiredException | 511 | "Network authentication required" |
+
+gonest.HttpStatus* - las 63 constantes estándar 
+et/http.StatusXxx reexportadas.
 
 Consulta: [Exceptions & Panic Recovery](/docs/request-pipeline/exceptions)
