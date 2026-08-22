@@ -36,6 +36,7 @@ retorna esse mesmo `*gonest.Route` para permitir encadeamento.
 | `ExcludeFromDocs()` | Oculta a rota da documentação Swagger gerada. |
 | `Deprecated()` | Marca a rota como obsoleta (deprecated) no Swagger. |
 | `Handler(fn)` | Armazena `fn` como o handler de requisição da rota. Não retorna valor — chame por último. |
+| `Redirect(url, status...)` | Registra esta rota como um redirect estático para `url` — açúcar sobre `Handler`, sem precisar de handler. `status` usa `gonest.HttpStatusFound` (302) como padrão. |
 
 Por convenção nos projetos GoNest, referências são declaradas como variáveis de pacote com um underline no final (`_`).
 
@@ -66,6 +67,35 @@ c.RouteGet("/:id", func(r *gonest.Route) {
 ```
 
 Veja: [Onde `MustInject` pode ser chamado](/docs/core-concepts/dependency-injection#where-mustinject-can-be-called).
+
+## Redirecionamentos
+
+O GoNest espelha a ergonomia do `@Redirect()` do NestJS com dois métodos,
+ambos usando `gonest.HttpStatusFound` (302, igual ao padrão do NestJS) por
+padrão — `status` é um argumento final opcional que sobrescreve isso:
+
+- **Dinâmico** — `ctx.Response().Redirect(url, status...)`, chamado de
+  dentro de um `Handler`, para uma URL só conhecida em runtime (ex: a URL
+  de callback do OAuth calculada por um usecase):
+
+  ```go
+  r.Handler(func(ctx *gonest.HttpContext) {
+  	authURL, err := ssoUseCase.Execute(provider)
+  	if err != nil {
+  		panic(err)
+  	}
+  	ctx.Response().Redirect(authURL) // 302 por padrão
+  })
+  ```
+
+- **Estático** — `r.Redirect(url, status...)`, declarado direto na rota,
+  sem precisar de `Handler`, para um destino fixo:
+
+  ```go
+  c.RouteGet("/docs", func(r *gonest.Route) {
+  	r.Redirect("/docs/", gonest.HttpStatusMovedPermanently)
+  })
+  ```
 
 ## Exemplos de uso
 

@@ -36,6 +36,7 @@ returns that same `*gonest.Route` so calls can chain.
 | `ExcludeFromDocs()` | Hide the route from generated Swagger documentation. |
 | `Deprecated()` | Mark the route as deprecated in Swagger. |
 | `Handler(fn)` | Store `fn` as the route's request handler. Does not return a value — call it last. |
+| `Redirect(url, status...)` | Register this route as a static redirect to `url` — sugar over `Handler`, no handler needed. `status` defaults to `gonest.HttpStatusFound` (302). |
 
 By convention in GoNest projects, declared reference variables end with a trailing underscore (`_`).
 
@@ -65,6 +66,35 @@ c.RouteGet("/:id", func(r *gonest.Route) {
 ```
 
 See: [Where `MustInject` can be called](/docs/core-concepts/dependency-injection#where-mustinject-can-be-called).
+
+## Redirects
+
+GoNest mirrors NestJS's `@Redirect()` ergonomics with two methods, both
+defaulting to `gonest.HttpStatusFound` (302, matching NestJS's own default) —
+`status` is an optional trailing argument that overrides it:
+
+- **Dynamic** — `ctx.Response().Redirect(url, status...)`, called from
+  inside a `Handler`, for a URL only known at runtime (e.g. an OAuth
+  callback target computed by a use case):
+
+  ```go
+  r.Handler(func(ctx *gonest.HttpContext) {
+  	authURL, err := ssoUseCase.Execute(provider)
+  	if err != nil {
+  		panic(err)
+  	}
+  	ctx.Response().Redirect(authURL) // 302 by default
+  })
+  ```
+
+- **Static** — `r.Redirect(url, status...)`, declared directly on the
+  route, no `Handler` needed, for a fixed target:
+
+  ```go
+  c.RouteGet("/docs", func(r *gonest.Route) {
+  	r.Redirect("/docs/", gonest.HttpStatusMovedPermanently)
+  })
+  ```
 
 ## Code Examples
 
