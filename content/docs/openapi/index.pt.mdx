@@ -36,7 +36,7 @@ cada um com um getter correspondente (`TitleText()`, `ContactInfo()`, `HasBearer
 | `Tags(...)` | Sobrescreve as tags do Controller para esta rota. |
 | `BearerAuth()` | Sobrescreve a configuração bearer-auth do Controller para esta rota. |
 | `RequestBody(schema)` | Documenta o schema do corpo da requisição. |
-| `Response(status, fn...)` | Documenta uma resposta; o callback opcional recebe um `*gonest.Response` para `.Schema(...)`/`.Description(...)` — 0 argumentos documenta um status sem corpo; repita para múltiplos status (o mesmo status sobrescreve). |
+| `Response(status, fn...)` | Documenta uma resposta; o callback opcional recebe um `*gonest.Response` para `.Schema(...)`/`.Description(...)` — 0 argumentos documenta um status sem corpo; repita para múltiplos status (o mesmo status sobrescreve). Sem `.Description(...)`, a descrição da resposta usa `http.StatusText(status)` como padrão (ex: `201` → `"Created"`) — inclusive em rotas não documentadas, que inferem o status a partir de `HttpCode`. |
 | `Params(schema)` | Documenta os parâmetros de rota (path). |
 | `Query(schema)` | Documenta os parâmetros de query. |
 | `ExcludeFromDocs()` | Oculta esta rota das documentações geradas. |

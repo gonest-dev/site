@@ -36,7 +36,7 @@ each with a matching getter (`TitleText()`, `ContactInfo()`, `HasBearerAuth()`, 
 | `Tags(...)` | Overrides the controller's tags for this route. |
 | `BearerAuth()` | Overrides the controller's bearer-auth setting for this route. |
 | `RequestBody(schema)` | Document the request body schema. |
-| `Response(status, fn...)` | Document a response; the optional callback receives a `*gonest.Response` for `.Schema(...)`/`.Description(...)` — 0 args documents a bodyless status; repeat for multiple statuses (same status overwrites). |
+| `Response(status, fn...)` | Document a response; the optional callback receives a `*gonest.Response` for `.Schema(...)`/`.Description(...)` — 0 args documents a bodyless status; repeat for multiple statuses (same status overwrites). Without `.Description(...)`, the response description defaults to `http.StatusText(status)` (e.g. `201` → `"Created"`) — including undocumented routes, which infer the status from `HttpCode`. |
 | `Params(schema)` | Document path parameters. |
 | `Query(schema)` | Document query parameters. |
 | `ExcludeFromDocs()` | Hide this route from generated docs. |

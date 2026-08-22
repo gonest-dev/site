@@ -36,7 +36,7 @@ cada uno con un getter correspondiente (`TitleText()`, `ContactInfo()`, `HasBear
 | `Tags(...)` | Sobrescribe las etiquetas del Controller para esta ruta. |
 | `BearerAuth()` | Sobrescribe la configuración bearer-auth del Controller para esta ruta. |
 | `RequestBody(schema)` | Documenta el schema del cuerpo de la solicitud. |
-| `Response(status, fn...)` | Documenta una respuesta; el callback opcional recibe un `*gonest.Response` para `.Schema(...)`/`.Description(...)` — 0 argumentos documenta un estado sin cuerpo; repite para múltiples estados (el mismo estado sobrescribe). |
+| `Response(status, fn...)` | Documenta una respuesta; el callback opcional recibe un `*gonest.Response` para `.Schema(...)`/`.Description(...)` — 0 argumentos documenta un estado sin cuerpo; repite para múltiples estados (el mismo estado sobrescribe). Sin `.Description(...)`, la descripción de la respuesta usa `http.StatusText(status)` por defecto (ej: `201` → `"Created"`) — incluso en rutas no documentadas, que infieren el estado desde `HttpCode`. |
 | `Params(schema)` | Documenta los parámetros de ruta (path). |
 | `Query(schema)` | Documenta los parámetros de query. |
 | `ExcludeFromDocs()` | Oculta esta ruta de las documentaciones generadas. |
