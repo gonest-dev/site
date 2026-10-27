@@ -33,7 +33,7 @@ func (l *AppLogger) Info(message string, meta ...map[string]any)    { /* ... */ 
 func (l *AppLogger) Debug(message string, meta ...map[string]any)   { /* ... */ }
 func (l *AppLogger) Verbose(message string, meta ...map[string]any) { /* ... */ }
 
-app := gonest.MustNewApp[gonest.FiberApp](AppModule_, gonest.AppOptions{
+app := gonest.NewApp[gonest.FiberApp](AppModule_, gonest.AppOptions{
   Logger: &AppLogger{},
 })
 ```
@@ -47,7 +47,7 @@ Dejar `Logger` sin definir (el valor cero, `nil`) mantiene el formato de consola
 ## Leer el logger activo desde cualquier lugar
 
 `gonest.GetLogger`/`gonest.GetLoggerFor[T]` leen la instancia activa DIRECTAMENTE — **no** pasan por
-`MustInject`, así que funcionan literalmente desde cualquier lugar, incluso dentro del propio
+`Inject`, así que funcionan literalmente desde cualquier lugar, incluso dentro del propio
 `Constructor` de un `Provider`, donde inyectar una dependencia de interfaz no está soportado (las
 dependencias Provider-a-Provider solo resuelven tipos pointer):
 

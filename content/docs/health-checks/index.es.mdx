@@ -15,7 +15,7 @@ type Pingable interface {
 
 var HealthController = gonest.NewController(func(controller *gonest.Controller) {
   controller.Path("/health")
-  pingables := gonest.MustInjectAll[Pingable](controller)
+  pingables := controller.InjectAll[Pingable]()
 
   controller.RouteGet("/readyz", func(route *gonest.Route) {
     route.Handler(func(c *gonest.HttpContext) {
@@ -38,7 +38,7 @@ var HealthController = gonest.NewController(func(controller *gonest.Controller) 
 ```
 
 - **`/readyz`** (readiness): hace ping a cada `Pingable` registrado a través de
-  [`MustInjectAll`](/docs/core-concepts/dependency-injection) — 200 si todos están
+  [`InjectAll`](/docs/core-concepts/dependency-injection) — 200 si todos están
   activos, 503 si alguno está caído.
 - **`/livez`** (liveness): un 200 estático a través de `c.Response().Status(...).Text("OK")` —
   `Text` fuerza `Content-Type: text/plain`, un cuerpo en bruto, no JSON, lo que demuestra que el
@@ -48,11 +48,11 @@ var HealthController = gonest.NewController(func(controller *gonest.Controller) 
 `gonest.HttpStatusServiceUnavailable` son primitivas de propósito general, no específicas de Terminus.
 
 <Callout type="info">
-  El mismo patrón `MustInjectAll[Pingable](owner)` también funciona desde un owner
+  El mismo patrón `owner.InjectAll[Pingable]()` también funciona desde un owner
   `Provider`, no solo desde un `Controller` — útil para agregar cada adaptador `Pingable`
   en un usecase/service de health check en vez de exponerlo directamente a través del
   Controller. Consulta
-  [Dónde se puede llamar a `MustInject`](/docs/core-concepts/dependency-injection#dónde-se-puede-llamar-a-mustinject).
+  [Dónde se puede llamar a `Inject`](/docs/core-concepts/dependency-injection#dónde-se-puede-llamar-a-mustinject).
 </Callout>
 
 ## Próximos pasos

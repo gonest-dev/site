@@ -5,7 +5,7 @@ description: MustInject, MustInjectAll, and multi-binding
 
 gonest resolves dependencies by **type**, not by name or string token.
 
-## `MustInject[T](owner)`
+## `owner.Inject[T]()`
 
 Resolves exactly one instance of `T`. Panics if zero or more than one match is
 found.
@@ -13,14 +13,14 @@ found.
 - **Pointer types** (`*UserService`) require an exact type match.
 - **Interface types** also require an exact match — there is no structural
   fallback. A provider becomes resolvable by an interface `T` only if it was
-  explicitly wrapped for `T` via `gonest.ProviderAs[T](ref)`; see
+  explicitly wrapped for `T` via `ref.As[T]()`; see
   [Exporting a provider as an interface](/docs/core-concepts/providers#exporting-a-provider-as-an-interface).
 
 ```go
-userService := gonest.MustInject[*UserService](controller)
+userService := controller.Inject[*UserService]()
 ```
 
-## `MustInjectAll[T](owner)`
+## `owner.InjectAll[T]()`
 
 Resolves **every** provider matching `T`. Never panics on 0 or N matches — use
 it for plugin/strategy patterns where multiple providers legitimately
@@ -34,7 +34,7 @@ type Pingable interface {
 
 var HealthController_ = gonest.NewController(func(controller *gonest.Controller) {
   controller.Path("/health")
-  pingables := gonest.MustInjectAll[Pingable](controller)
+  pingables := controller.InjectAll[Pingable]()
   _ = pingables
 })
 ```
@@ -45,31 +45,31 @@ var HealthController_ = gonest.NewController(func(controller *gonest.Controller)
   discovers all of them automatically.
 </Callout>
 
-## Where `MustInject` can be called
+## Where `Inject` can be called
 
-`MustInject`/`MustInjectAll` are legal inside `Provider`, `Controller`
+`Inject`/`InjectAll` are legal inside `Provider`, `Controller`
 builders — anywhere the framework guarantees Phase 1 (provider resolution) has
 already completed. See [Bootstrap](/docs/getting-started/bootstrap).
 
-From a `Provider` owner, `MustInjectAll[T](owner)` resolves differently than
+From a `Provider` owner, `owner.InjectAll[T]()` resolves differently than
 it does from a `Controller`/`Middleware`/`Guard`/`Interceptor`/`Filter`
 owner. A `Provider`'s builder fn runs before any instance exists, so instead
-of resolving immediately, `MustInjectAll` returns a fixed-length slice right
+of resolving immediately, `InjectAll` returns a fixed-length slice right
 away — already sized to however many providers in scope match `T` — and each
 element is filled in place once its matching provider actually resolves. Only
 `gonest.ScopeSingleton` providers can be members of that slice: a
 `ScopeTransient` provider that would otherwise match makes
-`NewApp`/`MustNewApp` panic. The slice's element order is not guaranteed, and
+`NewApp`/`NewApp` panic. The slice's element order is not guaranteed, and
 zero matches still returns an empty slice rather than panicking — the same
 contract as the direct-resolver path above.
 
-`Guard` builders are the one exception: they have **no** `MustInject` support,
+`Guard` builders are the one exception: they have **no** `Inject` support,
 because a single guard can be attached across multiple controllers/modules —
 there's no single "owner" to resolve against.
 
 ## Builder fn, not `Constructor`
 
-`MustInject`/`MustInjectAll` must be called in the **builder fn** — the
+`Inject`/`InjectAll` must be called in the **builder fn** — the
 function passed to `gonest.NewProvider`/`NewController`/etc — **before**
 `Constructor(...)` is registered, never from inside the `Constructor`
 closure itself:
@@ -77,11 +77,11 @@ closure itself:
 ```go
 var UserService_ = gonest.NewProvider(func(p *gonest.Provider) {
   // ✅ correct: resolved here, in the builder fn
-  repo := gonest.MustInject[*UserRepository](p)
+  repo := p.Inject[*UserRepository]()
 
   p.Constructor(func() *UserService {
     // ❌ wrong: calling MustInject/MustInjectAll INSIDE Constructor
-    // repo := gonest.MustInject[*UserRepository](p)
+    // repo := p.Inject[*UserRepository]()
     return &UserService{repo: repo}
   })
 })

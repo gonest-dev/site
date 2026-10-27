@@ -44,7 +44,7 @@ OnModuleInit    — once this provider's own dependencies are ready
 OnApplicationBootstrap — once EVERY provider in the whole app has finished OnModuleInit
 ```
 
-A hook returning a non-nil `error` makes `NewApp` return that error (`MustNewApp` panics on it) — the
+A hook returning a non-nil `error` makes `NewApp` return that error (`NewApp` panics on it) — the
 exact same contract a failing `Constructor` already has.
 
 ## Shutdown: OnModuleDestroy, BeforeApplicationShutdown, OnApplicationShutdown
@@ -53,9 +53,9 @@ Shutdown hooks are **opt-in**, exactly like Nest's `app.enableShutdownHooks()` �
 `App.EnableShutdownHooks()` before `Listen`:
 
 ```go
-app := gonest.MustNewApp[gonest.FiberApp](AppModule)
+app := gonest.NewApp[gonest.FiberApp](AppModule)
 app.EnableShutdownHooks()
-app.MustListen(":3000")
+app.Listen(":3000")
 ```
 
 Once enabled, an OS termination signal (`SIGINT` everywhere; `SIGTERM` on non-Windows — Windows itself

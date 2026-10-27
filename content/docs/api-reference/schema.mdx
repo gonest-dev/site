@@ -28,7 +28,7 @@ description: gonest.NewSchema and PropertyBuilder branch reference
 
 ## Parsing Functions
 
-`gonest.MustParse[T](src, schema) T` / `gonest.Parse[T](src, schema) (T, error)`, where `src` is one of `req.Params()`, `req.Query()`, `req.Headers()`, `req.Body().Json()`, or `req.Body().Form(onFile)`.
+`src.Parse[T](schema) T` / `gonest.Parse[T](src, schema) (T, error)`, where `src` is one of `req.Params()`, `req.Query()`, `req.Headers()`, `req.Body().Json()`, or `req.Body().Form(onFile)`.
 
 By convention in GoNest projects, schema reference variables end with a trailing underscore (`_`).
 
@@ -78,7 +78,7 @@ var CreateUserSchema_ = gonest.NewSchema(func(t *CreateUserDto, s *gonest.Schema
 })
 ```
 
-### Runtime Validation with `MustParse`
+### Runtime Validation with `Parse`
 
 ```go
 // Parsing raw payload into a validated DTO struct
@@ -92,7 +92,7 @@ rawInput := map[string]any{
 }
 
 // Returns a strongly-typed and validated CreateUserDto struct
-userDto := gonest.MustParse[CreateUserDto](rawInput, CreateUserSchema_)
+userDto := rawInput.Parse[CreateUserDto](CreateUserSchema_)
 ```
 
 See: [Schema Builder Basics](/docs/validation), [Array Builder](/docs/validation/array-builder), [Object Builder](/docs/validation/object-builder), [Runtime Validation](/docs/validation/runtime-validation)

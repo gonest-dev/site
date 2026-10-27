@@ -70,7 +70,7 @@ gonest is a complete, NestJS-inspired Go framework (all v1 milestones + Mileston
 3. WHEN a page documents execution-order-sensitive behavior (Pipeline stages) THEN the system SHALL include a diagram or ordered list showing: global Middleware → controller Middleware → Guard → Interceptor(before) → Handler → Interceptor(after), with Filter wrapping the whole chain.
 4. WHEN a page documents the Array Builder THEN the system SHALL clearly distinguish container-field configuration (`Required`/`Nullable`/`Description`/`Examples` before or without `Items`) from item configuration (inside the `Items(func(m *ArrayMetadata){...})` callback) and from post-`Items` count bounds (`.Min(n)`/`.Max(n)` chained after `Items(fn)`).
 5. WHEN a page documents Multipart Form Streaming THEN the system SHALL state the streaming trade-off explicitly (files may have already been processed via `onFile` before a later field fails validation).
-6. WHEN a page documents any exported symbol or helper function (e.g., `ProviderAs`, `MustInject`, `MustInjectAll`) THEN the system SHALL include a minimal, clear code example demonstrating how to register, bind, or inject using that symbol to accommodate developers transitioning from NestJS/TypeScript.
+6. WHEN a page documents any exported symbol or helper function (e.g., `As`, `Inject`, `InjectAll`) THEN the system SHALL include a minimal, clear code example demonstrating how to register, bind, or inject using that symbol to accommodate developers transitioning from NestJS/TypeScript.
 
 **Independent Test**: Cross-check 5 random doc pages against `README.md` — every symbol name, method signature, and example must match the README's current API exactly.
 
@@ -152,7 +152,7 @@ gonest is a complete, NestJS-inspired Go framework (all v1 milestones + Mileston
 ## Success Criteria
 
 - [ ] All 10 capability sections documented with README-accurate API names and examples (validated against README.md line-by-line).
-- [ ] Search returns correct top-3 result for at least 20 spot-check queries covering major symbols (`MustInject`, `NewSchema`, `Guard`, `Interceptor`, `Filter`, `Emitter`, `Scheduler`, `MustParseRestJsonBody`, `SetupSwagger`, `MustNewTestApp`).
+- [ ] Search returns correct top-3 result for at least 20 spot-check queries covering major symbols (`Inject`, `NewSchema`, `Guard`, `Interceptor`, `Filter`, `Emitter`, `Scheduler`, `MustParseRestJsonBody`, `SetupSwagger`, `NewTestApp`).
 - [ ] Lighthouse/perf: docs pages are statically generated, first content paint fast (no client-side content fetch waterfall for text content).
 - [ ] WASM playground produces correct validation output for at least 3 distinct scenarios (required-field violation, nested array item violation, custom `Custom(fn)` transform).
 - [ ] Live demo "Try it" panel returns real responses for at least 3 endpoints spanning a public route, a guarded route, and a validated route.

@@ -9,6 +9,6 @@ description: Referencia de gonest.NewGuard
 |---|---|
 | `Handler(func(c *gonest.HttpContext) bool)` | `false` produce un error 403 automático; dar panic con una `Exception` produce la respuesta de esa Exception. |
 
-Aplicado a través de `Controller.Guards(...)`. Solo en el ámbito del Controller — no hay `Module.Guards`, no hay `MustInject` dentro del constructor (builder).
+Aplicado a través de `Controller.Guards(...)`. Solo en el ámbito del Controller — no hay `Module.Guards`, no hay `Inject` dentro del constructor (builder).
 
 Consulta: [Guards](/docs/request-pipeline/guards)

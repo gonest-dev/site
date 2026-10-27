@@ -59,7 +59,7 @@
 - Emitter page
 - Scheduler page
 - Health Checks (Terminus-style) page
-- Testing helpers page (`MustNewTestApp`, `MustOverride`, `MustRequest`)
+- Testing helpers page (`NewTestApp`, `Override`, `Request`)
 
 **api-reference** - PLANNED
 

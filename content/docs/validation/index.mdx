@@ -48,7 +48,7 @@ chainable builder that always has these four:
   `*Metadata` and `MustJsonBody[T]`, then a later pre-release revision used
   a family of body/params/query-specific `Must...`-prefixed parsing functions.
   All of these were superseded before release — `NewSchema[T]` / `*Schema`
-  and `gonest.MustParse[T](src, schema)` (with `src` from
+  and `src.Parse[T](schema)` (with `src` from
   `req.Body().Json()`, `req.Params()`, `req.Query()`, `req.Headers()`, or
   `req.Body().Form(onFile)`) are the current, correct names. This site uses
   only the current API.

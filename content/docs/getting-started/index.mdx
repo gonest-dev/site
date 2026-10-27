@@ -38,7 +38,7 @@ backend to Go.
   requires it (e.g. reading a field's type via `Property(&t.X)`), never as a
   substitute for an explicit builder call.
 - **Three-phase bootstrap.** Provider resolution → Controller declaration →
-  Pipeline-stage declaration, so `MustInject` inside any builder is always a
+  Pipeline-stage declaration, so `Inject` inside any builder is always a
   direct, already-resolved lookup — never a placeholder. See
   [Bootstrap](/docs/getting-started/bootstrap) for details.
 

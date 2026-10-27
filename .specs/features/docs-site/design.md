@@ -50,7 +50,7 @@ graph TD
 ## Information Architecture (Sidebar Sections)
 
 1. **Getting Started** — Introduction, Installation, Quickstart, Project Structure (3-phase bootstrap)
-2. **Core Concepts** — Modules, Providers & DI Scopes, Controllers & Routes, Dependency Injection (`MustInject`/`MustInjectAll`, multi-binding)
+2. **Core Concepts** — Modules, Providers & DI Scopes, Controllers & Routes, Dependency Injection (`Inject`/`InjectAll`, multi-binding)
 3. **Request Pipeline** — Overview & Execution Order, Middleware, Guards, Interceptors, Filters, Exceptions & Panic Recovery
 4. **Validation & Schemas** — Schema Builder Basics, String Family, Numeric & Boolean, Date & Time, Array Builder, Object Builder, Runtime Validation (params/query/body), Custom Validators
 5. **Multipart & File Uploads** — Multipart Form Streaming
@@ -58,7 +58,7 @@ graph TD
 7. **Emitter** — Emitter, Listeners, `MustOn`
 8. **Scheduler** — Cron, Interval, Timeout
 9. **Health Checks** — Terminus-style readiness/liveness pattern
-10. **Testing** — `MustNewTestApp`, `MustOverride`, `MustRequest`, assertions
+10. **Testing** — `NewTestApp`, `Override`, `Request`, assertions
 11. **API Reference** — Generated/curated reference pages per exported symbol, grouped by the sections above
 
 ---

@@ -17,7 +17,7 @@ var UserProvider_ = gonest.NewProvider(func(provider *gonest.Provider) {
 
 Every exported package-level var produced by a gonest builder (`NewProvider`,
 `NewController`, `NewModule`, `NewListener`, `NewScheduler`, `NewResolver`,
-and [`ProviderAs`](#exporting-a-provider-as-an-interface) below) gets a
+and [`As`](#exporting-a-provider-as-an-interface) below) gets a
 trailing underscore — `UserProvider_`, `NotificationController_` —
 unconditionally, not only when a same-named struct/type happens to collide
 with it. One rule instead of a case-by-case judgment call.
@@ -32,7 +32,7 @@ function with dependency parameters:
 - `func(ctx) T`
 - `func(ctx) (T, error)`
 
-Dependencies are resolved with `MustInject`/`MustInjectAll` **inside** the
+Dependencies are resolved with `Inject`/`InjectAll` **inside** the
 builder, before `Constructor` is called — not as parameters to the
 constructor function itself.
 
@@ -46,24 +46,24 @@ constructor function itself.
 
 ## Resolving dependencies
 
-`MustInject[T](owner)` resolves by type and panics unless exactly one match is
+`owner.Inject[T]()` resolves by type and panics unless exactly one match is
 found. Both pointer types (`*UserService`) and interface types require an
 **exact** registration — there is no structural fallback. A provider only
 becomes resolvable by an interface `T` if it was explicitly wrapped for `T`
-via [`ProviderAs`](#exporting-a-provider-as-an-interface), below.
+via [`As`](#exporting-a-provider-as-an-interface), below.
 
-`MustInjectAll[T](owner)` returns every match for `T` — used for
+`owner.InjectAll[T]()` returns every match for `T` — used for
 plugin/strategy patterns — and never panics on 0 or N matches. It also works
 from a `Provider` owner (inside its own `Constructor` builder fn), with one
 restriction: only `gonest.ScopeSingleton` providers can be members of the
 returned slice, and the slice's element order is not guaranteed. See
-[Where `MustInject` can be called](/docs/core-concepts/dependency-injection#where-mustinject-can-be-called).
+[Where `Inject` can be called](/docs/core-concepts/dependency-injection#where-mustinject-can-be-called).
 
 ```go
 type Connectable interface{ Ping() bool }
 
 var SystemController_ = gonest.NewController(func(controller *gonest.Controller) {
-  connectables := gonest.MustInjectAll[Connectable](controller)
+  connectables := controller.InjectAll[Connectable]()
   _ = connectables
 })
 ```
@@ -73,7 +73,7 @@ var SystemController_ = gonest.NewController(func(controller *gonest.Controller)
 A `Provider`'s `Constructor` registers a **concrete** type (`*Service`, not
 whatever interface it happens to implement). `MustInject[T]`/`MustInjectAll[T]`
 only match an interface `T` when some provider was explicitly wrapped for `T`
-via `gonest.ProviderAs[T](ref)` — the old structural fallback
+via `ref.As[T]()` — the old structural fallback
 (`reflect.Type.Implements()`, matching whichever provider happened to satisfy
 `T`) has been removed entirely. A concrete provider that is never wrapped is
 not resolvable by any interface it happens to satisfy, even if it's the only
@@ -102,7 +102,7 @@ var Provider_ = gonest.NewProvider(func(provider *gonest.Provider) {
 ```go
 // notifier/impl/email/module.go
 // AsNotifier_ wraps Provider_, explicitly registering it as port.Notifier.
-var AsNotifier_ = gonest.ProviderAs[port.Notifier](Provider_)
+var AsNotifier_ = Provider_.As[port.Notifier]()
 
 var Module_ = gonest.NewModule(func(module *gonest.Module) {
   module.Providers(Provider_, AsNotifier_) // Provider_'s own concrete
@@ -113,16 +113,16 @@ var Module_ = gonest.NewModule(func(module *gonest.Module) {
 Consumer code injects the interface only, unaware which adapter answers it:
 
 ```go
-notify := gonest.MustInject[port.Notifier](controller)
+notify := controller.Inject[port.Notifier]()
 ```
 
 <Callout type="warn">
-  `ProviderAs[T](ref)` never drives construction itself — `ref`'s own
+  `ref.As[T]()` never drives construction itself — `ref`'s own
   concrete registration must ALSO be passed to `Providers(...)`, as shown
   above. Wrapping a provider without also registering its concrete ref fails
-  loud at `NewApp`/`MustNewApp` bootstrap time, not at the first
-  `MustInject[T]` call. `T` must be an interface type (`ProviderAs` panics
-  immediately otherwise), and wrapping the result of another `ProviderAs`
+  loud at `NewApp`/`NewApp` bootstrap time, not at the first
+  `MustInject[T]` call. `T` must be an interface type (`As` panics
+  immediately otherwise), and wrapping the result of another `As`
   call (chaining) also panics — wrap the original concrete `ProviderRef`
   again for each interface it needs to expose.
 </Callout>

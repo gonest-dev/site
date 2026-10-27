@@ -10,7 +10,7 @@ A `Controller` groups routes under a path prefix. Build one with
 var UserController = gonest.NewController(func(controller *gonest.Controller) {
   controller.Path("/users")
   controller.Tags("Users")
-  userService := gonest.MustInject[*UserService](controller)
+  userService := controller.Inject[*UserService]()
 
   controller.RouteGet("/", func(route *gonest.Route) {
     route.Handler(func(c *gonest.HttpContext) {
@@ -51,7 +51,7 @@ controller.RouteGet("/:user_id", func(route *gonest.Route) {
 
 ## Injecting dependencies per-route
 
-`gonest.MustInject`/`gonest.MustInjectAll` also work from inside a route's
+`route.Inject`/`route.InjectAll` also work from inside a route's
 own `fn` — pass the `*gonest.Route` itself as the owner instead of the
 controller. This resolves from the same module scope the controller would
 use, so a controller with many routes can keep each route's dependency
@@ -63,7 +63,7 @@ var UserController = gonest.NewController(func(controller *gonest.Controller) {
   controller.Path("/users")
 
   controller.RouteGet("/:user_id", func(route *gonest.Route) {
-    userService := gonest.MustInject[*UserService](route)
+    userService := route.Inject[*UserService]()
 
     route.Handler(func(c *gonest.HttpContext) {
       c.Response().Json(userService.FindByID(c.Request().Param("user_id")))
@@ -72,7 +72,7 @@ var UserController = gonest.NewController(func(controller *gonest.Controller) {
 })
 ```
 
-See [Where `MustInject` can be called](/docs/core-concepts/dependency-injection#where-mustinject-can-be-called).
+See [Where `Inject` can be called](/docs/core-concepts/dependency-injection#where-mustinject-can-be-called).
 
 ## Next steps
 

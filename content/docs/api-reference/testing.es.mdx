@@ -5,9 +5,9 @@ description: Referencia de MustNewTestApp y TestResponse
 
 | Símbolo | Descripción |
 |---|---|
-| `MustNewTestApp(module, func(b *gonest.TestBuilder) {...})` | Ejecuta el bootstrap de 3 fases sin iniciar un listener real. |
-| `MustOverride[T](builder, mockValue)` | Sustituye el constructor de un Provider por un mock. `T` debe ser una interfaz. |
-| `tester.MustRequest(method, path, body)` | Despacho (dispatch) de solicitud en memoria; `body` está codificado en JSON si no es nil. |
+| `NewTestApp(module, func(b *gonest.TestBuilder) {...})` | Ejecuta el bootstrap de 3 fases sin iniciar un listener real. |
+| `builder.Override[T](mockValue)` | Sustituye el constructor de un Provider por un mock. `T` debe ser una interfaz. |
+| `tester.Request(method, path, body)` | Despacho (dispatch) de solicitud en memoria; `body` está codificado en JSON si no es nil. |
 | `TestResponse.AssertStatus(t, want)` | Afirma (asserts) el estado de la respuesta. |
 | `TestResponse.AssertJsonPath(t, path, want)` | Afirma una ruta JSON de notación de puntos (ej: `"address.zip"`). |
 | `gonest.HttpMethod`, `HttpGet`, `HttpPost`, `HttpPut`, `HttpDelete`, `HttpQuery` | Atajos de verbos HTTP para despacho. |

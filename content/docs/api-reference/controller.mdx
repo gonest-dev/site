@@ -42,7 +42,7 @@ By convention in GoNest projects, declared reference variables end with a traili
 
 ## Injecting dependencies per-route
 
-`gonest.MustInject[T]`/`gonest.MustInjectAll[T]` work from inside a route's
+`route.Inject[T]()`/`route.InjectAll[T]()` work from inside a route's
 `fn` too, not just at the top of the controller's own builder — pass the
 `*gonest.Route` itself as the owner. This resolves from the exact same
 module scope as the controller would, so a controller with many routes can
@@ -51,7 +51,7 @@ instead of stacking every usecase at the top of the controller:
 
 ```go
 c.RouteGet("/:id", func(r *gonest.Route) {
-	userRepo := gonest.MustInject[UserRepository](r)
+	userRepo := r.Inject[UserRepository]()
 
 	r.Summary("Get user by id")
 	r.Handler(func(ctx *gonest.HttpContext) {
@@ -65,7 +65,7 @@ c.RouteGet("/:id", func(r *gonest.Route) {
 })
 ```
 
-See: [Where `MustInject` can be called](/docs/core-concepts/dependency-injection#where-mustinject-can-be-called).
+See: [Where `Inject` can be called](/docs/core-concepts/dependency-injection#where-mustinject-can-be-called).
 
 ## Redirects
 
@@ -117,7 +117,7 @@ var UserController_ = gonest.NewController(func(c *gonest.Controller) {
 
 	// GET /users/:id - Get user by ID, dependency injected per-route
 	c.RouteGet("/:id", func(r *gonest.Route) {
-		userRepo := gonest.MustInject[UserRepository](r)
+		userRepo := r.Inject[UserRepository]()
 
 		r.Summary("Get user by ID").
 			Description("Fetches a user profile given a unique identifier.").
@@ -141,7 +141,7 @@ var UserController_ = gonest.NewController(func(c *gonest.Controller) {
 
 	// POST /users - Create new user with request validation and Swagger responses
 	c.RoutePost("", func(r *gonest.Route) {
-		userRepo := gonest.MustInject[UserRepository](r)
+		userRepo := r.Inject[UserRepository]()
 
 		r.Summary("Create new user").
 			Description("Registers a new user account with validated JSON input.").
@@ -154,7 +154,7 @@ var UserController_ = gonest.NewController(func(c *gonest.Controller) {
 			})
 
 		r.Handler(func(ctx *gonest.HttpContext) {
-			body := gonest.MustParse[CreateUserDto](ctx.Request().Body().Json(), CreateUserSchema_)
+			body := ctx.Request().Body().Json().Parse[CreateUserDto](CreateUserSchema_)
 
 			user, err := userRepo.Create(body.Name, body.Email)
 			if err != nil {

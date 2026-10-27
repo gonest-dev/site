@@ -5,23 +5,23 @@ description: In-memory bootstrap, provider overrides, and assertions
 
 ```go
 func TestUserController_Get(t *testing.T) {
-  tester := gonest.MustNewTestApp(UserModule, func(b *gonest.TestBuilder) {
-    gonest.MustOverride[IUserService](b, &UserServiceMock{ /* ... */ })
+  tester := gonest.NewTestApp(UserModule, func(b *gonest.TestBuilder) {
+    b.Override[IUserService](&UserServiceMock{ /* ... */ })
   })
   defer tester.Close()
 
-  res := tester.MustRequest(gonest.HttpGet, "/users/42", nil)
+  res := tester.Request(gonest.HttpGet, "/users/42", nil)
   res.AssertStatus(t, gonest.HttpStatusOk)
   res.AssertJsonPath(t, "id", int64(42))
 }
 ```
 
-## `MustNewTestApp(module, fn)`
+## `NewTestApp(module, fn)`
 
-Runs the **same** three-phase bootstrap as `MustNewApp`, minus starting a
+Runs the **same** three-phase bootstrap as `NewApp`, minus starting a
 real HTTP listener — routes are registered for in-memory dispatch.
 
-## `MustOverride[T](builder, mockValue)`
+## `builder.Override[T](mockValue)`
 
 Substitutes a provider's real constructor with a mock, keyed by `T`'s
 `reflect.Type`.
@@ -34,7 +34,7 @@ Substitutes a provider's real constructor with a mock, keyed by `T`'s
 
 ## Dispatching requests
 
-`tester.MustRequest(method, path, body)` dispatches an in-memory request — no
+`tester.Request(method, path, body)` dispatches an in-memory request — no
 real network port — against the test app. `body` is JSON-encoded if non-nil.
 
 Root HTTP-verb aliases used in tests/dispatch:

@@ -46,7 +46,7 @@ module.Exports(providers...) // same slice, no conversion needed
 
 Passing the wrong kind of `TokenRef` to a given method (e.g. a
 `ControllerRef` to `Providers`) panics immediately, naming the method and the
-received type — the same fail-fast posture as `MustInject`.
+received type — the same fail-fast posture as `Inject`.
 
 <Callout type="warn">
   `Use` and `Filters` are root-only when applied at the module level — they
@@ -105,8 +105,8 @@ no-op.
 </Callout>
 
 A provider exported by its **concrete** type is only injectable by that
-concrete type. To let an importing module `MustInject` a provider by an
-**interface** it implements, wrap it with `gonest.ProviderAs[T](ref)` before
+concrete type. To let an importing module `Inject` a provider by an
+**interface** it implements, wrap it with `ref.As[T]()` before
 passing it to `Providers`/`Exports` — see [Exporting a provider as an
 interface](/docs/core-concepts/providers#exporting-a-provider-as-an-interface).
 
@@ -155,14 +155,14 @@ func DatabaseModuleForRoot(opts DatabaseOptions) *gonest.Module {
 `forRootAsync` covers — a module picking which sibling module(s) to import/export based on a config
 value resolved from an INJECTED service, not from an argument passed in from outside — has a real
 gonest equivalent: `Module.Lazy(func(l *gonest.LazyModule) {...})`. Inside that callback,
-`gonest.MustInject[T](l)` eagerly and synchronously constructs a provider already registered via this
+`l.Inject[T]()` eagerly and synchronously constructs a provider already registered via this
 SAME module's own `Providers(...)`, and `l.Imports(...)`/`l.Exports(...)` behave exactly like
 `Module.Imports`/`Module.Exports`:
 
 ```go
 var Config_ = gonest.NewProvider(func(p *gonest.Provider) {
   p.Constructor(func() *Config {
-    return gonest.MustParse[Config](gonest.Dotenv(), configSchema) // env:"NOTIFICATION_DRIVER"
+    return gonest.Dotenv().Parse[Config](configSchema) // env:"NOTIFICATION_DRIVER"
   })
 })
 
@@ -170,7 +170,7 @@ var Module_ = gonest.NewModule(func(m *gonest.Module) {
   m.Providers(Config_)
   m.Exports(Config_)
   m.Lazy(func(l *gonest.LazyModule) {
-    config := gonest.MustInject[*Config](l)
+    config := l.Inject[*Config]()
     switch config.Driver {
     case "sms":
       l.Imports(sms.Module_)
@@ -188,10 +188,10 @@ or `sms.Module_` at bootstrap, decided from inside the DI graph instead of a fre
 `main()`.
 
 <Callout type="warn">
-  `Module.Lazy`'s `MustInject[T](l)` is intentionally narrow — it only sees providers registered via
+  `Module.Lazy`'s `l.Inject[T]()` is intentionally narrow — it only sees providers registered via
   THIS module's own `Providers(...)`, earlier in the same builder function (not an imported module's
   providers, since `Imports` isn't finalized yet — that's what `Lazy` is deciding). The targeted
-  provider must also be **self-contained**: its `Constructor` cannot itself call `MustInject` (no
+  provider must also be **self-contained**: its `Constructor` cannot itself call `Inject` (no
   nested dependencies), and it must be `ScopeSingleton` (the default). Both panic at bootstrap
   otherwise — `Lazy` is for a `Config`-shaped provider reading `.env`/flags, not a general synchronous
   sub-graph resolver.

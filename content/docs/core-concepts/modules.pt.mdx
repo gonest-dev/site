@@ -46,7 +46,7 @@ module.Exports(providers...) // mesma slice, sem conversão
 
 Passar o tipo errado de `TokenRef` pra um método dado (ex: um
 `ControllerRef` pra `Providers`) panica imediatamente, nomeando o método e o
-tipo recebido — a mesma postura fail-fast que `MustInject`.
+tipo recebido — a mesma postura fail-fast que `Inject`.
 
 <Callout type="warn">
   `Use` e `Filters` são apenas para a raiz quando aplicados no nível do Module — eles
@@ -55,8 +55,8 @@ tipo recebido — a mesma postura fail-fast que `MustInject`.
 </Callout>
 
 Um Provider exportado pelo seu tipo **concreto** só é injetável por esse tipo concreto. Pra deixar um
-Module que importa este outro fazer `MustInject` de um Provider por uma **interface** que ele
-implementa, embrulhe-o com `gonest.ProviderAs[T](ref)` antes de passá-lo pra `Providers`/`Exports` —
+Module que importa este outro fazer `Inject` de um Provider por uma **interface** que ele
+implementa, embrulhe-o com `ref.As[T]()` antes de passá-lo pra `Providers`/`Exports` —
 veja [Exportando um Provider como uma interface](/docs/core-concepts/providers#exportando-um-provider-como-uma-interface).
 
 ## Aplicando Middleware e Filters globais
@@ -114,14 +114,14 @@ O `DatabaseModuleForRoot` acima cobre options que o CHAMADOR passa explicitament
 `forRootAsync` do Nest cobre — um Module escolhendo qual(is) Module(s) irmão(s) importar/exportar a
 partir de um valor de config resolvido de um serviço INJETADO, não de um argumento passado de fora —
 tem um equivalente real no gonest: `Module.Lazy(func(l *gonest.LazyModule) {...})`. Dentro desse
-callback, `gonest.MustInject[T](l)` constrói de forma eager e síncrona um Provider já registrado nos
+callback, `l.Inject[T]()` constrói de forma eager e síncrona um Provider já registrado nos
 próprios `Providers(...)` DESTE Module, e `l.Imports(...)`/`l.Exports(...)` se comportam exatamente
 como `Module.Imports`/`Module.Exports`:
 
 ```go
 var Config_ = gonest.NewProvider(func(p *gonest.Provider) {
   p.Constructor(func() *Config {
-    return gonest.MustParse[Config](gonest.Dotenv(), configSchema) // env:"NOTIFICATION_DRIVER"
+    return gonest.Dotenv().Parse[Config](configSchema) // env:"NOTIFICATION_DRIVER"
   })
 })
 
@@ -129,7 +129,7 @@ var Module_ = gonest.NewModule(func(m *gonest.Module) {
   m.Providers(Config_)
   m.Exports(Config_)
   m.Lazy(func(l *gonest.LazyModule) {
-    config := gonest.MustInject[*Config](l)
+    config := l.Inject[*Config]()
     switch config.Driver {
     case "sms":
       l.Imports(sms.Module_)
@@ -147,11 +147,11 @@ Esse é o `.examples/notification-driver` real, funcionando — `NOTIFICATION_DR
 livre chamada a partir de `main()`.
 
 <Callout type="warn">
-  O `MustInject[T](l)` do `Module.Lazy` é propositalmente restrito — ele só enxerga Providers
+  O `l.Inject[T]()` do `Module.Lazy` é propositalmente restrito — ele só enxerga Providers
   registrados nos próprios `Providers(...)` DESTE Module, mais cedo na mesma função builder (não os
   Providers de um Module importado, já que `Imports` ainda não está finalizado — é justamente isso que
   o `Lazy` está decidindo). O Provider alvo também precisa ser **auto-contido**: seu `Constructor` não
-  pode chamar `MustInject` (sem dependências aninhadas), e precisa ser `ScopeSingleton` (o padrão).
+  pode chamar `Inject` (sem dependências aninhadas), e precisa ser `ScopeSingleton` (o padrão).
   Ambos causam panic no bootstrap caso contrário — `Lazy` é pra um Provider no formato `Config` lendo
   `.env`/flags, não um resolvedor síncrono de subgrafo genérico.
 </Callout>

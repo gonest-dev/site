@@ -5,23 +5,23 @@ description: Bootstrap em memória, sobrescrita de provedores e assertions
 
 ```go
 func TestUserController_Get(t *testing.T) {
-  tester := gonest.MustNewTestApp(UserModule, func(b *gonest.TestBuilder) {
-    gonest.MustOverride[IUserService](b, &UserServiceMock{ /* ... */ })
+  tester := gonest.NewTestApp(UserModule, func(b *gonest.TestBuilder) {
+    b.Override[IUserService](&UserServiceMock{ /* ... */ })
   })
   defer tester.Close()
 
-  res := tester.MustRequest(gonest.HttpGet, "/users/42", nil)
+  res := tester.Request(gonest.HttpGet, "/users/42", nil)
   res.AssertStatus(t, gonest.HttpStatusOk)
   res.AssertJsonPath(t, "id", int64(42))
 }
 ```
 
-## `MustNewTestApp(module, fn)`
+## `NewTestApp(module, fn)`
 
-Executa o **mesmo** bootstrap de três fases que `MustNewApp`, com exceção de não iniciar um
+Executa o **mesmo** bootstrap de três fases que `NewApp`, com exceção de não iniciar um
 listener HTTP real — as rotas são registradas para despacho em memória.
 
-## `MustOverride[T](builder, mockValue)`
+## `builder.Override[T](mockValue)`
 
 Substitui o construtor real de um provider por um mock, usando o `reflect.Type` de `T` como chave.
 
@@ -33,7 +33,7 @@ Substitui o construtor real de um provider por um mock, usando o `reflect.Type` 
 
 ## Despachando requisições
 
-`tester.MustRequest(method, path, body)` despacha uma requisição em memória — sem
+`tester.Request(method, path, body)` despacha uma requisição em memória — sem
 porta de rede real — contra o app de teste. `body` é codificado em JSON se não for nil.
 
 Atalhos de verbos HTTP na raiz usados em testes/despacho:

@@ -17,7 +17,7 @@ var UserProvider_ = gonest.NewProvider(func(provider *gonest.Provider) {
 
 Todo var a nivel de paquete exportado producido por un builder de gonest
 (`NewProvider`, `NewController`, `NewModule`, `NewListener`, `NewScheduler`,
-`NewResolver`, y [`ProviderAs`](#exportando-un-provider-como-una-interfaz)
+`NewResolver`, y [`As`](#exportando-un-provider-como-una-interfaz)
 abajo) recibe un guion bajo al final — `UserProvider_`,
 `NotificationController_` — incondicionalmente, no solo cuando existe una
 colisión real con un struct/type del mismo nombre. Una sola regla, en vez de
@@ -33,7 +33,7 @@ función con parámetros de dependencia:
 - `func(ctx) T`
 - `func(ctx) (T, error)`
 
-Las dependencias se resuelven con `MustInject`/`MustInjectAll` **dentro** del
+Las dependencias se resuelven con `Inject`/`InjectAll` **dentro** del
 constructor (builder), antes de que se llame a `Constructor` — no como parámetros para la
 función del constructor misma.
 
@@ -47,25 +47,25 @@ función del constructor misma.
 
 ## Resolviendo dependencias
 
-`MustInject[T](owner)` resuelve por tipo y da panic a menos que se encuentre exactamente una coincidencia.
+`owner.Inject[T]()` resuelve por tipo y da panic a menos que se encuentre exactamente una coincidencia.
 Tanto los tipos de puntero (`*UserService`) como los tipos de interfaz requieren un registro **exacto**
 — ya no existe una alternativa estructural. Un Provider solo se vuelve resoluble por una interfaz `T`
 si fue envuelto explícitamente para `T` vía
-[`ProviderAs`](#exportando-un-provider-como-una-interfaz), abajo.
+[`As`](#exportando-un-provider-como-una-interfaz), abajo.
 
-`MustInjectAll[T](owner)` devuelve cada coincidencia para `T` — utilizado para
+`owner.InjectAll[T]()` devuelve cada coincidencia para `T` — utilizado para
 patrones de plugin/estrategia — y nunca da panic en 0 o N coincidencias. También
 funciona desde un owner `Provider` (dentro de su propio builder fn de
 `Constructor`), con una restricción: solo los Providers `gonest.ScopeSingleton`
 pueden ser miembros del slice devuelto, y el orden de los elementos del slice no
 está garantizado. Consulta
-[Dónde se puede llamar a `MustInject`](/docs/core-concepts/dependency-injection#dónde-se-puede-llamar-a-mustinject).
+[Dónde se puede llamar a `Inject`](/docs/core-concepts/dependency-injection#dónde-se-puede-llamar-a-mustinject).
 
 ```go
 type Connectable interface{ Ping() bool }
 
 var SystemController_ = gonest.NewController(func(controller *gonest.Controller) {
-  connectables := gonest.MustInjectAll[Connectable](controller)
+  connectables := controller.InjectAll[Connectable]()
   _ = connectables
 })
 ```
@@ -74,7 +74,7 @@ var SystemController_ = gonest.NewController(func(controller *gonest.Controller)
 
 El `Constructor` de un `Provider` registra un tipo **concreto** (`*Service`, no la interfaz que
 casualmente implementa). `MustInject[T]`/`MustInjectAll[T]` solo coinciden con una interfaz `T` cuando
-algún Provider fue envuelto explícitamente para `T` vía `gonest.ProviderAs[T](ref)` — la alternativa
+algún Provider fue envuelto explícitamente para `T` vía `ref.As[T]()` — la alternativa
 estructural anterior (`reflect.Type.Implements()`, que coincidía con cualquier Provider que satisficiera
 `T`) fue eliminada por completo. Un Provider concreto que nunca se envuelve no es resoluble por ninguna
 interfaz que casualmente satisfaga, aunque sea el único implementador en el alcance.
@@ -102,7 +102,7 @@ var Provider_ = gonest.NewProvider(func(provider *gonest.Provider) {
 ```go
 // notifier/impl/email/module.go
 // AsNotifier_ envuelve Provider_, registrándolo explícitamente como port.Notifier.
-var AsNotifier_ = gonest.ProviderAs[port.Notifier](Provider_)
+var AsNotifier_ = Provider_.As[port.Notifier]()
 
 var Module_ = gonest.NewModule(func(module *gonest.Module) {
   module.Providers(Provider_, AsNotifier_) // el registro concreto de Provider_
@@ -113,15 +113,15 @@ var Module_ = gonest.NewModule(func(module *gonest.Module) {
 El código consumidor inyecta solo la interfaz, sin saber qué adaptador responde por ella:
 
 ```go
-notify := gonest.MustInject[port.Notifier](controller)
+notify := controller.Inject[port.Notifier]()
 ```
 
 <Callout type="warn">
-  `ProviderAs[T](ref)` nunca dirige la construcción por sí mismo — el registro concreto de `ref`
+  `ref.As[T]()` nunca dirige la construcción por sí mismo — el registro concreto de `ref`
   TAMBIÉN debe pasarse a `Providers(...)`, como se muestra arriba. Envolver un Provider sin también
-  registrar su ref concreto falla en voz alta en el bootstrap de `NewApp`/`MustNewApp`, no en la primera
-  llamada a `MustInject[T]`. `T` debe ser un tipo de interfaz (`ProviderAs` da panic inmediatamente si
-  no), y envolver el resultado de otra llamada a `ProviderAs` (encadenamiento) también da panic —
+  registrar su ref concreto falla en voz alta en el bootstrap de `NewApp`/`NewApp`, no en la primera
+  llamada a `MustInject[T]`. `T` debe ser un tipo de interfaz (`As` da panic inmediatamente si
+  no), y envolver el resultado de otra llamada a `As` (encadenamiento) también da panic —
   envuelve el `ProviderRef` concreto original de nuevo para cada interfaz que necesite exponer.
 </Callout>
 

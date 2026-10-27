@@ -45,7 +45,7 @@ OnModuleInit    — apenas las dependencias de ESTE provider están listas
 OnApplicationBootstrap — después de que TODO provider de la app terminó OnModuleInit
 ```
 
-Un hook que retorna un `error` no nulo hace que `NewApp` retorne ese error (`MustNewApp` entra en
+Un hook que retorna un `error` no nulo hace que `NewApp` retorne ese error (`NewApp` entra en
 panic con él) — exactamente el mismo contrato que ya tiene hoy un `Constructor` que falla.
 
 ## Shutdown: OnModuleDestroy, BeforeApplicationShutdown, OnApplicationShutdown
@@ -54,9 +54,9 @@ Los hooks de shutdown son **opt-in**, igual que el `app.enableShutdownHooks()` d
 `App.EnableShutdownHooks()` antes de `Listen`:
 
 ```go
-app := gonest.MustNewApp[gonest.FiberApp](AppModule)
+app := gonest.NewApp[gonest.FiberApp](AppModule)
 app.EnableShutdownHooks()
-app.MustListen(":3000")
+app.Listen(":3000")
 ```
 
 Una vez habilitado, una señal OS de terminación (`SIGINT` en cualquier plataforma; `SIGTERM` fuera de

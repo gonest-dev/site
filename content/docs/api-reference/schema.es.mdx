@@ -28,7 +28,7 @@ description: Referencia de gonest.NewSchema y ramificaciones de PropertyBuilder
 
 ## Funciones de parsing
 
-`gonest.MustParse[T](src, schema) T` / `gonest.Parse[T](src, schema) (T, error)`, donde `src` es uno de `req.Params()`, `req.Query()`, `req.Headers()`, `req.Body().Json()`, o `req.Body().Form(onFile)`.
+`src.Parse[T](schema) T` / `gonest.Parse[T](src, schema) (T, error)`, donde `src` es uno de `req.Params()`, `req.Query()`, `req.Headers()`, `req.Body().Json()`, o `req.Body().Form(onFile)`.
 
 Por convención en proyectos GoNest, las referencias de esquema se declaran como variables de paquete con un guion bajo al final (`_`).
 
@@ -78,7 +78,7 @@ var CreateUserSchema_ = gonest.NewSchema(func(t *CreateUserDto, s *gonest.Schema
 })
 ```
 
-### Validación en Tiempo de Ejecución con `MustParse`
+### Validación en Tiempo de Ejecución con `Parse`
 
 ```go
 // Parseo de payload desde datos sin procesar
@@ -92,7 +92,7 @@ rawInput := map[string]any{
 }
 
 // Retorna una estructura CreateUserDto fuertemente tipada y validada
-userDto := gonest.MustParse[CreateUserDto](rawInput, CreateUserSchema_)
+userDto := rawInput.Parse[CreateUserDto](CreateUserSchema_)
 ```
 
 Vea: [Schema Builder Basics](/docs/validation), [Array Builder](/docs/validation/array-builder), [Object Builder](/docs/validation/object-builder), [Runtime Validation](/docs/validation/runtime-validation)

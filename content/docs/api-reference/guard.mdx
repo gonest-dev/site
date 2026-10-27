@@ -9,6 +9,6 @@ description: gonest.NewGuard reference
 |---|---|
 | `Handler(func(c *gonest.HttpContext) bool)` | `false` produces an automatic 403; panicking with an `Exception` produces that exception's response. |
 
-Applied via `Controller.Guards(...)`. Controller-scoped only — no `Module.Guards`, no `MustInject` inside the builder.
+Applied via `Controller.Guards(...)`. Controller-scoped only — no `Module.Guards`, no `Inject` inside the builder.
 
 See: [Guards](/docs/request-pipeline/guards)

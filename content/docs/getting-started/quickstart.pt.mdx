@@ -12,7 +12,7 @@ description: Crie seu primeiro módulo gonest em poucos passos
 Um `Provider` constrói uma única instância para o grafo de injeção de dependência. O `Constructor` aceita
 apenas `func()`, `func() (T, error)`, `func(ctx) T` ou `func(ctx) (T, error)` —
 nunca uma função com parâmetros de dependência. As dependências são injetadas com
-`MustInject` **dentro** do builder, antes do `Constructor` ser executado.
+`Inject` **dentro** do builder, antes do `Constructor` ser executado.
 
 ```go
 type UserService struct{}
@@ -31,12 +31,12 @@ var UserProvider = gonest.NewProvider(func(provider *gonest.Provider) {
 ### Definir um controlador (controller)
 
 Um `Controller` agrupa rotas sob um prefixo de caminho. Resolva uma dependência uma única vez
-com `MustInject` e, em seguida, faça referência a ela a partir de qualquer manipulador de rota no mesmo builder.
+com `Inject` e, em seguida, faça referência a ela a partir de qualquer manipulador de rota no mesmo builder.
 
 ```go
 var UserController = gonest.NewController(func(controller *gonest.Controller) {
   controller.Path("/users")
-  userService := gonest.MustInject[*UserService](controller)
+  userService := controller.Inject[*UserService]()
 
   controller.RouteGet("/", func(route *gonest.Route) {
     route.Handler(func(c *gonest.HttpContext) {
@@ -53,7 +53,7 @@ var UserController = gonest.NewController(func(controller *gonest.Controller) {
 ### Definir um módulo (module)
 
 Um `Module` conecta provedores e controladores. Essa é a unidade que você passa para o
-`MustNewApp`.
+`NewApp`.
 
 ```go
 var UserModule = gonest.NewModule(func(module *gonest.Module) {
@@ -68,14 +68,14 @@ var UserModule = gonest.NewModule(func(module *gonest.Module) {
 
 ### Inicializar a aplicação (bootstrap)
 
-`MustNewApp[gonest.FiberApp]` executa a inicialização em três fases (veja
+`NewApp[gonest.FiberApp]` executa a inicialização em três fases (veja
 [Bootstrap](/docs/getting-started/bootstrap)) e retorna uma aplicação pronta para
 escutar requisições.
 
 ```go
 func main() {
-  app := gonest.MustNewApp[gonest.FiberApp](UserModule, gonest.AppOptions{})
-  app.MustListen(":3000")
+  app := gonest.NewApp[gonest.FiberApp](UserModule, gonest.AppOptions{})
+  app.Listen(":3000")
 }
 ```
 
@@ -103,7 +103,7 @@ var UserProvider = gonest.NewProvider(func(provider *gonest.Provider) {
 
 var UserController = gonest.NewController(func(controller *gonest.Controller) {
   controller.Path("/users")
-  userService := gonest.MustInject[*UserService](controller)
+  userService := controller.Inject[*UserService]()
 
   controller.RouteGet("/", func(route *gonest.Route) {
     route.Handler(func(c *gonest.HttpContext) {
@@ -118,8 +118,8 @@ var UserModule = gonest.NewModule(func(module *gonest.Module) {
 })
 
 func main() {
-  app := gonest.MustNewApp[gonest.FiberApp](UserModule, gonest.AppOptions{})
-  app.MustListen(":3000")
+  app := gonest.NewApp[gonest.FiberApp](UserModule, gonest.AppOptions{})
+  app.Listen(":3000")
 }
 ```
 

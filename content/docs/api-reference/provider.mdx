@@ -14,9 +14,9 @@ description: gonest.NewProvider reference
 
 | Function | Behavior |
 |---|---|
-| `MustInject[T](owner)` | Resolves exactly one match; panics on 0 or N. |
-| `MustInjectAll[T](owner)` | Resolves every match. Never panics on 0 or N matches — except from a `Provider` owner, where a matched `ScopeTransient` provider makes `NewApp`/`MustNewApp` panic (only `ScopeSingleton` providers can be slice members there). |
-| `ProviderAs[T any](ref ProviderRef) ProviderRef` | Wraps `ref`, registering it as interface `T` — the only way `T` becomes resolvable by `MustInject`/`MustInjectAll`. `ref`'s own concrete registration must also be passed to `Providers(...)`. Panics immediately if `T` isn't an interface, or if `ref` is itself the result of another `ProviderAs` call (chaining). |
+| `owner.Inject[T]()` | Resolves exactly one match; panics on 0 or N. |
+| `owner.InjectAll[T]()` | Resolves every match. Never panics on 0 or N matches — except from a `Provider` owner, where a matched `ScopeTransient` provider makes `NewApp`/`NewApp` panic (only `ScopeSingleton` providers can be slice members there). |
+| `ProviderAs[T any](ref ProviderRef) ProviderRef` | Wraps `ref`, registering it as interface `T` — the only way `T` becomes resolvable by `Inject`/`InjectAll`. `ref`'s own concrete registration must also be passed to `Providers(...)`. Panics immediately if `T` isn't an interface, or if `ref` is itself the result of another `As` call (chaining). |
 
 ## Code Examples
 
@@ -39,7 +39,7 @@ var UserServiceProvider_ = gonest.NewProvider(func(p *gonest.Provider) {
 })
 ```
 
-### Registering Interface Bindings with `ProviderAs`
+### Registering Interface Bindings with `As`
 
 In GoNest, reference variables end with a trailing underscore (`_`) by convention. To inject an interface rather than a concrete struct (analogous to NestJS `{ provide: 'IUserRepository', useClass: PgUserRepository }`), use `gonest.ProviderAs[T]`:
 
@@ -68,7 +68,7 @@ var PgUserRepository_ = gonest.NewProvider(func(p *gonest.Provider) {
 })
 
 // 2. Map the concrete provider to the UserRepository interface (trailing _)
-var UserRepository_ = gonest.ProviderAs[UserRepository](PgUserRepository_)
+var UserRepository_ = PgUserRepository_.As[UserRepository]()
 
 // 3. Register both in your Module (both concrete and interface refs are required)
 var UserModule_ = gonest.NewModule(func(m *gonest.Module) {
@@ -76,16 +76,16 @@ var UserModule_ = gonest.NewModule(func(m *gonest.Module) {
 })
 ```
 
-### Resolving Dependencies with `MustInject` and `MustInjectAll`
+### Resolving Dependencies with `Inject` and `InjectAll`
 
-Once the interface is registered with `ProviderAs`, resolve instances using the interface type:
+Once the interface is registered with `As`, resolve instances using the interface type:
 
 ```go
 // Resolves the single registered implementation for UserRepository (panics if 0 or >1 matches)
-userRepo := gonest.MustInject[UserRepository](owner)
+userRepo := owner.Inject[UserRepository]()
 
 // Resolves all registered implementations matching UserRepository interface
-allRepos := gonest.MustInjectAll[UserRepository](owner)
+allRepos := owner.InjectAll[UserRepository]()
 ```
 
 See: [Providers & DI Scopes](/docs/core-concepts/providers), [Dependency Injection](/docs/core-concepts/dependency-injection)

@@ -442,7 +442,7 @@ T42, T46, T50 → T51 → T52 → T53
 
 ### T16: Core Concepts — Controllers, Routes & Dependency Injection page [P]
 
-**What**: Write `content/docs/core-concepts/controllers.mdx` (Controller/Route builders, per-verb shorthands), `dependency-injection.mdx` (`MustInject`/`MustInjectAll`, pointer vs. interface matching, multi-binding example with `Connectable`/`Pingable`-style pattern).
+**What**: Write `content/docs/core-concepts/controllers.mdx` (Controller/Route builders, per-verb shorthands), `dependency-injection.mdx` (`Inject`/`InjectAll`, pointer vs. interface matching, multi-binding example with `Connectable`/`Pingable`-style pattern).
 **Where**: `content/docs/core-concepts/controllers.mdx`, `content/docs/core-concepts/dependency-injection.mdx`
 **Depends on**: T10
 **Reuses**: Content map DI graph section, multi-binding code example
@@ -453,7 +453,7 @@ T42, T46, T50 → T51 → T52 → T53
 
 **Done when**:
 - [ ] All per-verb route shorthands listed (`RouteGet`/`RoutePost`/.../`RouteConnect`)
-- [ ] `MustInject`/`MustInjectAll` resolution rules (pointer exact match vs. interface `Implements()` fallback) explained accurately
+- [ ] `Inject`/`InjectAll` resolution rules (pointer exact match vs. interface `Implements()` fallback) explained accurately
 - [ ] Multi-binding example included and matches content map
 - [ ] Gate check passes: `npm run build`
 
@@ -533,7 +533,7 @@ T42, T46, T50 → T51 → T52 → T53
 
 ### T20: Request Pipeline — Guards page [P]
 
-**What**: Write `guards.mdx` documenting `NewGuard`/`Handler(func(ctx) bool)`, false→403 behavior, panic-with-Exception override, multiple-guards short-circuit, controller-scoped-only limitation (no `Module.Guards`, no `MustInject` inside builder).
+**What**: Write `guards.mdx` documenting `NewGuard`/`Handler(func(ctx) bool)`, false→403 behavior, panic-with-Exception override, multiple-guards short-circuit, controller-scoped-only limitation (no `Module.Guards`, no `Inject` inside builder).
 **Where**: `content/docs/request-pipeline/guards.mdx`
 **Depends on**: T17
 **Reuses**: Content map Guard code example (`AuthGuard`)
@@ -892,7 +892,7 @@ T42, T46, T50 → T51 → T52 → T53
 
 ### T36: Health Checks (Terminus-style) page [P]
 
-**What**: Write `content/docs/health-checks/index.mdx` documenting the "just a normal Controller" pattern, `Pingable`/`Connectable` interface + `MustInjectAll`, `/readyz` (200/503 aggregation) vs. `/livez` (static 200, `SendString`) convention, new primitives `Context.SendString`/`HttpStatusOk`/`HttpStatusServiceUnavailable`.
+**What**: Write `content/docs/health-checks/index.mdx` documenting the "just a normal Controller" pattern, `Pingable`/`Connectable` interface + `InjectAll`, `/readyz` (200/503 aggregation) vs. `/livez` (static 200, `SendString`) convention, new primitives `Context.SendString`/`HttpStatusOk`/`HttpStatusServiceUnavailable`.
 **Where**: `content/docs/health-checks/index.mdx`
 **Depends on**: T32
 **Reuses**: Content map Health Checks example (`HealthController`)
@@ -914,7 +914,7 @@ T42, T46, T50 → T51 → T52 → T53
 
 ### T37: Testing helpers page [P]
 
-**What**: Write `content/docs/testing/index.mdx` documenting `MustNewTestApp`, `MustOverride[T]` (interface-only requirement explained), `tester.MustRequest`, `TestResponse.AssertStatus`/`AssertJsonPath`, HTTP verb aliases (`HttpGet`/`HttpPost`/etc.).
+**What**: Write `content/docs/testing/index.mdx` documenting `NewTestApp`, `MustOverride[T]` (interface-only requirement explained), `tester.MustRequest`, `TestResponse.AssertStatus`/`AssertJsonPath`, HTTP verb aliases (`HttpGet`/`HttpPost`/etc.).
 **Where**: `content/docs/testing/index.mdx`
 **Depends on**: T32
 **Reuses**: Content map Testing example
@@ -924,7 +924,7 @@ T42, T46, T50 → T51 → T52 → T53
 - Skill: NONE
 
 **Done when**:
-- [ ] `MustOverride`'s interface-only constraint explicitly explained (why: no vtable swap on concrete pointer)
+- [ ] `Override`'s interface-only constraint explicitly explained (why: no vtable swap on concrete pointer)
 - [ ] Gate check passes: `npm run build`
 
 **Tests**: none
@@ -1253,7 +1253,7 @@ T42, T46, T50 → T51 → T52 → T53
 
 ### T52: Full search spot-check (20 queries)
 
-**What**: Manually (or via a small Playwright script) verify search returns the correct top-3 result for the 20 spot-check queries listed in spec.md's Success Criteria (`MustInject`, `NewSchema`, `Guard`, `Interceptor`, `Filter`, `Emitter`, `Scheduler`, `MustParseRestJsonBody`, `SetupSwagger`, `MustNewTestApp`, plus 10 more covering remaining sections).
+**What**: Manually (or via a small Playwright script) verify search returns the correct top-3 result for the 20 spot-check queries listed in spec.md's Success Criteria (`Inject`, `NewSchema`, `Guard`, `Interceptor`, `Filter`, `Emitter`, `Scheduler`, `MustParseRestJsonBody`, `SetupSwagger`, `NewTestApp`, plus 10 more covering remaining sections).
 **Where**: N/A (verification task; may add missing frontmatter/headings if a query fails to surface the right page)
 **Depends on**: T51
 **Reuses**: T9 search wiring

@@ -30,7 +30,7 @@ var UserProvider = gonest.NewProvider(func(provider *gonest.Provider) {
 
 var UserController = gonest.NewController(func(controller *gonest.Controller) {
   controller.Path("/users")
-  userService := gonest.MustInject[*UserService](controller)
+  userService := controller.Inject[*UserService]()
 
   controller.RouteGet("/", func(route *gonest.Route) {
     route.Handler(func(req *gonest.Request, res *gonest.Response) {
@@ -45,8 +45,8 @@ var UserModule = gonest.NewModule(func(module *gonest.Module) {
 })
 
 func main() {
-  app := gonest.MustNewApp[gonest.FiberApp](UserModule) // AppOptions is optional
-  app.MustListen(":3000")
+  app := gonest.NewApp[gonest.FiberApp](UserModule) // AppOptions is optional
+  app.Listen(":3000")
 }`;
 
 const capabilityIcons: { icon: ComponentType<{ className?: string }>; href: string }[] = [

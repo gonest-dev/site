@@ -3,7 +3,7 @@ title: GraphQL
 description: Resolvers, automatic SDL generation, and Subscriptions via real protocols (graphql-transport-ws / graphql-sse)
 ---
 
-`GraphqlResolver` is analogous to `Controller` — registered via `module.Resolvers(...)`, reusing the exact same `Schema`/`Parse[T]`/`MustInject` as REST. Zero duplication of validation logic or DI setup between REST and GraphQL.
+`GraphqlResolver` is analogous to `Controller` — registered via `module.Resolvers(...)`, reusing the exact same `Schema`/`Parse[T]`/`Inject` as REST. Zero duplication of validation logic or DI setup between REST and GraphQL.
 
 By convention in GoNest projects, resolver reference variables end with a trailing underscore (`_`), e.g., `UserResolver_`.
 
@@ -13,14 +13,14 @@ package user
 import "gonest.dev/gonest"
 
 var UserResolver_ = gonest.NewGraphqlResolver(func(resolver *gonest.GraphqlResolver) {
-	userService := gonest.MustInject[UserService](resolver)
+	userService := resolver.Inject[UserService]()
 
 	resolver.Query("user", func(query *gonest.GraphqlQuery) {
 		query.Args(userIdParamsSchema)   // exact same Schema used in REST validation
 		query.Returns(userEntitySchema)  // exact same Schema feeds generated SDL
 
 		query.Handler(func(ctx *gonest.GraphqlContext) any {
-			args := gonest.MustParse[UserIdParams](ctx.Args(), userIdParamsSchema)
+			args := ctx.Args().Parse[UserIdParams](userIdParamsSchema)
 			return userService.Get(args.UserId) // returned value IS the data
 		})
 	})
@@ -28,7 +28,7 @@ var UserResolver_ = gonest.NewGraphqlResolver(func(resolver *gonest.GraphqlResol
 ```
 
 <Callout type="info">
-  The `owner` for `MustInject` must be `resolver` itself (or another Resolver/Controller) — the `Query`/`Mutation`/`Subscription` builders passed into their callbacks do not have independent DI capabilities.
+  The `owner` for `Inject` must be `resolver` itself (or another Resolver/Controller) — the `Query`/`Mutation`/`Subscription` builders passed into their callbacks do not have independent DI capabilities.
 </Callout>
 
 ## Registering Resolvers in a Module
@@ -61,8 +61,8 @@ resolver.Mutation("createUser", func(mutation *gonest.GraphqlMutation) {
 	mutation.Returns(userEntitySchema)
 
 	mutation.Handler(func(ctx *gonest.GraphqlContext) any {
-		input := gonest.MustParse[UserEntity](ctx.Args(), userEntitySchema)
-		userService := gonest.MustInject[UserService](resolver)
+		input := ctx.Args().Parse[UserEntity](userEntitySchema)
+		userService := resolver.Inject[UserService]()
 		return userService.Create(input)
 	})
 })
@@ -82,10 +82,10 @@ resolver.Subscription("orderCreated", func(subscription *gonest.GraphqlSubscript
 	subscription.Returns(orderEntitySchema)
 
 	subscription.Handler(func(ctx *gonest.GraphqlContext, emit func(any)) {
-		args := gonest.MustParse[OrderFilter](ctx.Args(), orderFilterSchema)
-		emitter := gonest.MustInject[*gonest.Emitter](resolver)
+		args := ctx.Args().Parse[OrderFilter](orderFilterSchema)
+		emitter := resolver.Inject[*gonest.Emitter]()
 
-		for event := range gonest.Subscribe[OrderCreatedEvent](emitter, ctx.Done()) {
+		for event := range emitter.Subscribe[OrderCreatedEvent](ctx.Done()) {
 			if event.CustomerId == args.CustomerId {
 				emit(event)
 			}
@@ -94,7 +94,7 @@ resolver.Subscription("orderCreated", func(subscription *gonest.GraphqlSubscript
 })
 ```
 
-`gonest.Subscribe[T](emitter, done)` is the dynamic counterpart to `NewListener`/`Emit` — a channel scoped to `done` that closes automatically when the client disconnects. `orderService.Create(...)` emits events via `emitter.Emit(OrderCreatedEvent{...})` without needing to know which subscription receives them.
+`emitter.Subscribe[T](done)` is the dynamic counterpart to `NewListener`/`Emit` — a channel scoped to `done` that closes automatically when the client disconnects. `orderService.Create(...)` emits events via `emitter.Emit(OrderCreatedEvent{...})` without needing to know which subscription receives them.
 
 ### Transport Protocols
 

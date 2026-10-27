@@ -23,7 +23,7 @@ var UserController = gonest.NewController(func(controller *gonest.Controller) {
     })
     route.Handler(func(c *gonest.HttpContext) {
       req, res := c.Request(), c.Response()
-      params := gonest.MustParse[UserIdParams](req.Params(), userIdParamsSchema)
+      params := req.Params().Parse[UserIdParams](userIdParamsSchema)
       res.Json(params)
     })
   })
@@ -34,8 +34,8 @@ var UserController = gonest.NewController(func(controller *gonest.Controller) {
 
 Validation always goes through one unified pair:
 
-- `gonest.Parse[T](src, schema) (T, error)` — non-panicking.
-- `gonest.MustParse[T](src, schema) T` — panics on validation failure (the
+- `src.SafeParse[T](schema) (T, error)` — non-panicking.
+- `src.Parse[T](schema) T` — panics on validation failure (the
   panic is turned into a `BadRequestException` response by the framework).
 
 `T` is the plain struct type (e.g. `UserIdParams`), not a pointer.
@@ -76,7 +76,7 @@ type UpdateUserDTO struct {
   Email gonest.Accessor[string] `json:"email"`
 }
 
-body := gonest.MustParse[*UpdateUserDTO](req.Body().Json(), updateUserSchema)
+body := req.Body().Json().Parse[*UpdateUserDTO](updateUserSchema)
 body.Name.OnDirty(func(name string) { user.Name = name })
 body.Email.Apply(&user.Email)
 

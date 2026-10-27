@@ -3,7 +3,7 @@ title: Estructura del Proyecto & Bootstrap
 description: Cómo MustNewApp conecta todo
 ---
 
-`gonest.MustNewApp[gonest.FiberApp](RootModule, gonest.AppOptions{})` ejecuta una
+`gonest.NewApp[gonest.FiberApp](RootModule, gonest.AppOptions{})` ejecuta una
 inicialización estricta en tres fases:
 
 <Steps>
@@ -22,7 +22,7 @@ resuelven **en paralelo** a través de `golang.org/x/sync/errgroup`.
 ### Fase 2 — Declaración de controladores (Controllers)
 
 Cada builder de `Controller` se ejecuta exactamente una vez. Como la Fase 1 ya
-finalizó, las llamadas a `MustInject` dentro del builder del controlador siempre se resuelven
+finalizó, las llamadas a `Inject` dentro del builder del controlador siempre se resuelven
 con respecto a un grafo de inyección de dependencias completo y ya construido, nunca un placeholder.
 
 </Step>
@@ -39,14 +39,14 @@ una vez, con un alcance limitado a la unión de todos los proveedores propios + 
 </Steps>
 
 <Callout type="info">
-  Este orden es el motivo por el cual `MustInject` nunca requiere un mecanismo de resolución
+  Este orden es el motivo por el cual `Inject` nunca requiere un mecanismo de resolución
   perezosa/diferida (lazy/deferred-resolution): para cuando se ejecuta el cuerpo de cualquier builder, todo de lo que podría
   depender legalmente ya existe.
 </Callout>
 
 ## AppOptions
 
-`app.MustListen(":3000")` bloquea la goroutine que realiza la llamada. `AppOptions` acepta:
+`app.Listen(":3000")` bloquea la goroutine que realiza la llamada. `AppOptions` acepta:
 
 - `BufferLogs` — almacena en búfer la salida de log durante el bootstrap.
 - `LogLevels` — configura la verbosidad del log.

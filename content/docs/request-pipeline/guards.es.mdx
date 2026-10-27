@@ -31,7 +31,7 @@ var UserController = gonest.NewController(func(controller *gonest.Controller) {
 
 <Callout type="warn">
   Los Guards son **solo del ámbito del Controller** — no hay `Module.Guards`. También
-  **no tienen soporte para `MustInject`** dentro del constructor (builder): un solo guard puede
+  **no tienen soporte para `Inject`** dentro del constructor (builder): un solo guard puede
   adjuntarse a través de muchos controllers/modules, por lo que no hay un solo "propietario" (owner)
   frente al cual resolver dependencias.
 </Callout>

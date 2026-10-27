@@ -5,7 +5,7 @@ description: Load .env files with full dotenvx parity, then bind and validate ty
 
 `gonest.Dotenv()` is a singleton — no DI, callable from `main()` before any `Module`/`Provider`/`NewApp`
 exists. It plays two roles: loading a `.env` file into the process, and (once loaded) acting as a
-`Parseable` source for `gonest.MustParse[T]`, exactly like any REST source.
+`Parseable` source for `Dotenv().Parse[T]`, exactly like any REST source.
 
 ```go
 package main
@@ -13,7 +13,7 @@ package main
 import "gonest.dev/gonest"
 
 func main() {
-  gonest.Dotenv().MustLoad("./.env")
+  gonest.Dotenv().Load("./.env")
 
   app, err := gonest.NewApp[gonest.FiberApp](AppModule)
   if err != nil {
@@ -60,7 +60,7 @@ Escapes (`\n`/`\r`/`\t`/`\\`) apply inside double quotes only, matching `dotenvx
 
 ## Env → Schema Binding
 
-`*Dotenv` satisfies `execution.Parseable` via `ParseInto` — `gonest.MustParse[T](gonest.Dotenv(), schema)`
+`*Dotenv` satisfies `execution.Parseable` via `ParseInto` — `gonest.Dotenv().Parse[T](schema)`
 works identically to any REST `Parse[T]` call, reusing the same validation pipeline (`resolveSchema`,
 `coerceParamString`, `validateValue`, `populate`) unchanged:
 
@@ -79,7 +79,7 @@ var databaseConfigSchema = gonest.NewSchema(func(t *DatabaseConfig, s *gonest.Sc
 
 var DatabaseConfigProvider = gonest.NewProvider(func(provider *gonest.Provider) {
   provider.Constructor(func() *DatabaseConfig {
-    return gonest.MustParse[*DatabaseConfig](gonest.Dotenv(), databaseConfigSchema)
+    return gonest.Dotenv().Parse[*DatabaseConfig](databaseConfigSchema)
   })
 })
 ```
@@ -93,12 +93,12 @@ var DatabaseConfigProvider = gonest.NewProvider(func(provider *gonest.Provider) 
 <Callout type="info">
   `T` in `MustParse[T]`/`Parse[T]` can be the struct itself or a pointer to it. `MustParse[*DatabaseConfig]`
   allocates the struct and hands back the populated pointer directly — exactly what a `Provider.Constructor`
-  returning `*DatabaseConfig` needs, no manual `config := MustParse[DatabaseConfig](...); return &config`.
+  returning `*DatabaseConfig` needs, no manual `config := ...); return &config`.
 </Callout>
 
 <Callout type="warn">
   `Schema.Validate(instance)` (validating an already-built struct) does **not** exist and was
-  deliberately rejected — it would open a second, parallel validation path in `Schema`. `Parse[T]`
+  deliberately rejected — it would open a second.Parse[DatabaseConfig](parallel validation path in `Schema`. `Parse[T]`
   always validates against a raw source, never a populated instance.
 </Callout>
 

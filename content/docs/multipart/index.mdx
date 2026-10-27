@@ -23,8 +23,8 @@ var PostController = gonest.NewController(func(controller *gonest.Controller) {
     route.FormBody(createPostFormSchema, "file") // documents multipart/form-data in OpenAPI
     route.Handler(func(c *gonest.HttpContext) {
       req, res := c.Request(), c.Response()
-      form := gonest.MustParse[CreatePostForm](req.Body().Form(func(f *gonest.FormFile) error {
-        return uploadToS3(f.Filename(), f.ContentType(), f.Reader())
+      form := req.Body().Form(func(f *gonest.FormFile) error {
+        return uploadToS3(f.Filename().Parse[CreatePostForm](f.ContentType(), f.Reader())
       }), createPostFormSchema)
       res.Json(map[string]string{"title": form.Title})
     })
@@ -32,8 +32,8 @@ var PostController = gonest.NewController(func(controller *gonest.Controller) {
 })
 
 func main() {
-  app := gonest.MustNewApp[gonest.FiberApp](AppModule, gonest.AppOptions{EnableFormStreaming: true})
-  app.MustListen(":3000")
+  app := gonest.NewApp[gonest.FiberApp](AppModule, gonest.AppOptions{EnableFormStreaming: true})
+  app.Listen(":3000")
 }
 ```
 

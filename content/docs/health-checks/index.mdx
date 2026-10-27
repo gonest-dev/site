@@ -15,7 +15,7 @@ type Pingable interface {
 
 var HealthController = gonest.NewController(func(controller *gonest.Controller) {
   controller.Path("/health")
-  pingables := gonest.MustInjectAll[Pingable](controller)
+  pingables := controller.InjectAll[Pingable]()
 
   controller.RouteGet("/readyz", func(route *gonest.Route) {
     route.Handler(func(c *gonest.HttpContext) {
@@ -38,7 +38,7 @@ var HealthController = gonest.NewController(func(controller *gonest.Controller) 
 ```
 
 - **`/readyz`** (readiness): pings every registered `Pingable` via
-  [`MustInjectAll`](/docs/core-concepts/dependency-injection) — 200 if all are
+  [`InjectAll`](/docs/core-concepts/dependency-injection) — 200 if all are
   up, 503 if any is down.
 - **`/livez`** (liveness): a static 200 via `c.Response().Status(...).Text("OK")` —
   `Text` forces `Content-Type: text/plain`, a raw, non-JSON body proving the
@@ -49,11 +49,11 @@ var HealthController = gonest.NewController(func(controller *gonest.Controller) 
 primitives, not Terminus-specific.
 
 <Callout type="info">
-  The same `MustInjectAll[Pingable](owner)` pattern also works from a
+  The same `owner.InjectAll[Pingable]()` pattern also works from a
   `Provider` owner, not only a `Controller` — useful for aggregating every
   `Pingable` adapter into a health-check usecase/service instead of exposing
   it directly through the controller. See
-  [Where `MustInject` can be called](/docs/core-concepts/dependency-injection#where-mustinject-can-be-called).
+  [Where `Inject` can be called](/docs/core-concepts/dependency-injection#where-mustinject-can-be-called).
 </Callout>
 
 ## Next steps

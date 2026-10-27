@@ -5,7 +5,7 @@ description: MustInject, MustInjectAll y multi-binding
 
 gonest resuelve las dependencias por **tipo**, no por nombre o token de cadena.
 
-## `MustInject[T](owner)`
+## `owner.Inject[T]()`
 
 Resuelve exactamente una instancia de `T`. Da panic si se encuentran cero o más de una
 coincidencia.
@@ -13,14 +13,14 @@ coincidencia.
 - **Tipos de puntero** (`*UserService`) requieren una coincidencia exacta de tipo.
 - **Tipos de interfaz** también requieren una coincidencia exacta — ya no existe una alternativa
   estructural. Un Provider solo se vuelve resoluble por una interfaz `T` si fue envuelto
-  explícitamente para `T` vía `gonest.ProviderAs[T](ref)`; consulta
+  explícitamente para `T` vía `ref.As[T]()`; consulta
   [Exportando un Provider como una interfaz](/docs/core-concepts/providers#exportando-un-provider-como-una-interfaz).
 
 ```go
-userService := gonest.MustInject[*UserService](controller)
+userService := controller.Inject[*UserService]()
 ```
 
-## `MustInjectAll[T](owner)`
+## `owner.InjectAll[T]()`
 
 Resuelve **cada** Provider que coincide con `T`. Nunca da panic en 0 o N coincidencias — úsalo
 para patrones de plugin/estrategia (plugin/strategy patterns) donde múltiples Providers implementan legítimamente
@@ -34,7 +34,7 @@ type Pingable interface {
 
 var HealthController_ = gonest.NewController(func(controller *gonest.Controller) {
   controller.Path("/health")
-  pingables := gonest.MustInjectAll[Pingable](controller)
+  pingables := controller.InjectAll[Pingable]()
   _ = pingables
 })
 ```
@@ -45,42 +45,42 @@ var HealthController_ = gonest.NewController(func(controller *gonest.Controller)
   descubre todos automáticamente.
 </Callout>
 
-## Dónde se puede llamar a `MustInject`
+## Dónde se puede llamar a `Inject`
 
-`MustInject`/`MustInjectAll` son legales dentro de los constructores de `Provider`, `Controller`
+`Inject`/`InjectAll` son legales dentro de los constructores de `Provider`, `Controller`
 — en cualquier lugar donde el framework garantice que la Fase 1 (resolución de Providers) ya
 se ha completado. Consulta [Bootstrap](/docs/getting-started/bootstrap).
 
-Desde un owner `Provider`, `MustInjectAll[T](owner)` resuelve de forma distinta a como lo
+Desde un owner `Provider`, `owner.InjectAll[T]()` resuelve de forma distinta a como lo
 hace desde un owner `Controller`/`Middleware`/`Guard`/`Interceptor`/`Filter`. El constructor
 (builder fn) de un `Provider` corre antes de que exista cualquier instancia, así que, en vez
-de resolver de inmediato, `MustInjectAll` devuelve ya mismo un slice de longitud fija — ya
+de resolver de inmediato, `InjectAll` devuelve ya mismo un slice de longitud fija — ya
 dimensionado según cuántos Providers en el alcance coinciden con `T` — y cada elemento se
 completa in situ tan pronto como su Provider correspondiente realmente se resuelve. Solo los
 Providers `gonest.ScopeSingleton` pueden ser miembros de ese slice: un Provider
-`ScopeTransient` que de otro modo coincidiría hace que `NewApp`/`MustNewApp` lance panic. El
+`ScopeTransient` que de otro modo coincidiría hace que `NewApp`/`NewApp` lance panic. El
 orden de los elementos del slice no está garantizado, y cero coincidencias sigue devolviendo
 un slice vacío en vez de panic — el mismo contrato que el camino de resolución directa de
 arriba.
 
-Los constructores de `Guard` son la única excepción: **no** tienen soporte para `MustInject`,
+Los constructores de `Guard` son la única excepción: **no** tienen soporte para `Inject`,
 porque un solo Guard se puede adjuntar a través de múltiples Controllers/Modules —
 no hay un único "propietario" (owner) con el cual resolver.
 
 ## Builder fn, no `Constructor`
 
-`MustInject`/`MustInjectAll` deben llamarse en el **builder fn** — la función pasada a
+`Inject`/`InjectAll` deben llamarse en el **builder fn** — la función pasada a
 `gonest.NewProvider`/`NewController`/etc — **antes** de que `Constructor(...)` se registre,
 nunca desde dentro del propio closure de `Constructor`:
 
 ```go
 var UserService_ = gonest.NewProvider(func(p *gonest.Provider) {
   // ✅ correcto: resuelto aquí, en el builder fn
-  repo := gonest.MustInject[*UserRepository](p)
+  repo := p.Inject[*UserRepository]()
 
   p.Constructor(func() *UserService {
     // ❌ incorrecto: llamando a MustInject/MustInjectAll DENTRO de Constructor
-    // repo := gonest.MustInject[*UserRepository](p)
+    // repo := p.Inject[*UserRepository]()
     return &UserService{repo: repo}
   })
 })

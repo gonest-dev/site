@@ -20,7 +20,7 @@ var UserModule = gonest.NewModule(func(module *gonest.Module) {
 })
 
 var UserProvider = gonest.NewProvider(func(provider *gonest.Provider) {
-  emitter := gonest.MustInject[*gonest.Emitter](provider)
+  emitter := provider.Inject[*gonest.Emitter]()
   provider.Constructor(func() *UserService { return &UserService{emitter: emitter} })
 })
 ```
@@ -28,7 +28,7 @@ var UserProvider = gonest.NewProvider(func(provider *gonest.Provider) {
 <Callout type="info">
   `Listener[EventType]` é um tipo genérico de verdade — o argumento de tipo de `NewListener` é
   inferido a partir do próprio parâmetro da função builder. O builder recebe o `*Listener[EventType]`
-  (pra `MustInject`/`MustInjectAll`) e deve chamar `On` ou `MustOn` exatamente uma vez: qualquer
+  (pra `Inject`/`InjectAll`) e deve chamar `On` ou `MustOn` exatamente uma vez: qualquer
   dependência é resolvida UMA VEZ, em tempo de bootstrap, e capturada no closure pra todo evento
   futuro.
 </Callout>
@@ -53,14 +53,14 @@ struct do Go.
 
 ## Subscriptions dinâmicas (`Subscribe[T]`)
 
-`NewListener`+`On`/`MustOn` registra um handler estático, com a vida toda do app. `gonest.Subscribe[T](emitter, done)`
+`NewListener`+`On`/`MustOn` registra um handler estático, com a vida toda do app. `emitter.Subscribe[T](done)`
 é seu par dinâmico — um canal que vive só enquanto `done` continua aberto (tipicamente a vida de uma
 conexão), fechado automaticamente assim que dispara. É sobre isso que as Subscriptions de GraphQL
 são construídas (ver [GraphQL](/docs/graphql)):
 
 ```go
 func(ctx *gonest.GraphqlContext, emit func(any)) {
-  for event := range gonest.Subscribe[OrderCreatedEvent](emitter, ctx.Done()) {
+  for event := range emitter.Subscribe[OrderCreatedEvent](ctx.Done()) {
     emit(event)
   }
 }

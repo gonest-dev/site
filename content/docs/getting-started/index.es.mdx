@@ -33,7 +33,7 @@ gonest replica los patrones de Nest que los desarrolladores de JS/TS ya conocen,
 - **Cero magia en el camino crítico (hot path).** La reflexión (reflection) se utiliza únicamente donde Go realmente
   lo requiere (por ejemplo, leer el tipo de un campo a través de `Property(&t.X)`), nunca como sustituto de una llamada explícita al builder.
 - **Bootstrap en tres fases.** Resolución de Proveedores → Declaración de Controladores →
-  Declaración de las Etapas del Pipeline, de modo que `MustInject` dentro de cualquier builder siempre realiza una búsqueda directa y ya resuelta, nunca un placeholder. Consulta
+  Declaración de las Etapas del Pipeline, de modo que `Inject` dentro de cualquier builder siempre realiza una búsqueda directa y ya resuelta, nunca un placeholder. Consulta
   [Bootstrap](/docs/getting-started/bootstrap) para más detalles.
 
 ## Alcance de la v1

@@ -48,7 +48,7 @@ builder encadeável (chainable builder) que sempre tem estes quatro:
   `*Metadata` e `MustJsonBody[T]`, em seguida, uma revisão de pré-lançamento posterior usou
   uma família de funções de parsing prefixadas com `Must...` específicas para body/params/query.
   Todas estas foram substituídas antes do lançamento — `NewSchema[T]` / `*Schema`
-  e `gonest.MustParse[T](src, schema)` (com `src` sendo
+  e `src.Parse[T](schema)` (com `src` sendo
   `req.Body().Json()`, `req.Params()`, `req.Query()`, `req.Headers()`, ou
   `req.Body().Form(onFile)`) são os nomes corretos atuais. Este site usa
   apenas a API atual.

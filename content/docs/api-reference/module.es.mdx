@@ -11,7 +11,7 @@ description: Referencia de gonest.NewModule
 | `Controllers(...TokenRef)` | Registra Controllers de propiedad de este Módulo. |
 | `Imports(...TokenRef)` | Importa otros Módulos, obteniendo acceso a sus Providers exportados. |
 | `Exports(...TokenRef)` | Expone Providers, o re-exporta un `*Module` importado entero (sus propios exports quedan visibles transitivamente), para los módulos que importan este — acepta ambos en la misma llamada. |
-| `Lazy(func(l *gonest.LazyModule) {...})` | Decide, de forma síncrona y desde DENTRO del grafo de DI, cuál(es) Módulo(s) `Imports`/`Exports` — a partir de un valor de configuración leído vía `gonest.MustInject[T](l)` de los propios `Providers(...)` de este Módulo. Equivalente en gonest a `DynamicModule.forRootAsync` de NestJS. |
+| `Lazy(func(l *gonest.LazyModule) {...})` | Decide, de forma síncrona y desde DENTRO del grafo de DI, cuál(es) Módulo(s) `Imports`/`Exports` — a partir de un valor de configuración leído vía `l.Inject[T]()` de los propios `Providers(...)` de este Módulo. Equivalente en gonest a `DynamicModule.forRootAsync` de NestJS. |
 | `Use(...TokenRef)` | Registra Middleware global. Solo en el Módulo raíz. |
 | `Filters(...TokenRef)` | Registra Filters de excepción globales. Solo en el Módulo raíz. |
 | `Listeners(...TokenRef)` | Registra oyentes (Listeners) de eventos. |
