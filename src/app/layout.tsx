@@ -1,5 +1,10 @@
 import './global.css';
 import { Inter } from 'next/font/google';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://gonest.dev'),
+};
 
 const inter = Inter({
   subsets: ['latin'],
