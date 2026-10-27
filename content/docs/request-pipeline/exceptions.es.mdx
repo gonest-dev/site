@@ -5,13 +5,13 @@ description: HttpException, excepciones integradas y el contrato de recuperació
 
 gonest.HttpException es el tipo base que toda excepción gonest embebe.
 
-`go
+```go
 gonest.NewHttpException().
   SetStatus(http.StatusBadRequest).
   SetName("FooError").
   SetMessage("lorem ipsum").
   SetDetails(details)
-`
+```
 
 Cualquier tipo que embeba HttpException satisface estructuralmente la interfaz
 Exception — la capa de recovery usa type-assertion, nunca un type-switch cerrado.
@@ -23,18 +23,18 @@ message usa el default del tipo (ej: "Resource not found" para NotFoundException
 Los 40 tipos de error HTTP estándar están disponibles — ver la lista completa en
 [Referencia de API → Exceptions](/docs/api-reference/exceptions).
 
-`go
+```go
 panic(gonest.NewNotFoundException("", map[string]any{"id": id}))
 panic(gonest.NewUnauthorizedException("Token expirado", nil))
 panic(gonest.NewTooManyRequestsException("", nil))
 panic(gonest.NewInternalServerErrorException("", err.Error()))
-`
+```
 
 ## Excepciones personalizadas
 
 Embeba gonest.HttpException exactamente como una excepción integrada:
 
-`go
+```go
 type FooError struct{ gonest.HttpException }
 
 func NewFooError(details any) *FooError {
@@ -46,7 +46,7 @@ func NewFooError(details any) *FooError {
       SetDetails(details),
   }
 }
-`
+```
 
 ## Contrato panic → respuesta
 
@@ -59,11 +59,9 @@ func NewFooError(details any) *FooError {
 
 ## Constantes de estado HTTP
 
-gonest.HttpStatus* reexporta las 63 constantes estándar 
-et/http.StatusXxx
+gonest.HttpStatus* reexporta las 63 constantes estándar `net/http.StatusXxx`
 bajo el namespace gonest (ej: gonest.HttpStatusNotFound), para que el código
-de handler nunca necesite importar 
-et/http solo por status codes.
+de handler nunca necesite importar `net/http` solo por status codes.
 
 ## Próximos pasos
 
