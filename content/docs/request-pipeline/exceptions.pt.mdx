@@ -52,7 +52,7 @@ func NewFooError(details any) *FooError {
 
 <Callout type="info">
   Qualquer panic com um valor que satisfaça Exception vira JSON
-  {"name": ..., "message": ..., "details": ...} com o status da exceção.
+  `{"name": ..., "message": ..., "details": ...}` com o status da exceção.
   Qualquer **outro** panic (nil pointer, index out of range, etc.) vira um
   500 genérico com **zero detalhe interno vazado** — o processo nunca crasha.
 </Callout>
